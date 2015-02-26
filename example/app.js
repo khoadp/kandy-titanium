@@ -3,37 +3,33 @@
 // to test out the module and to provide instructions
 // to users on how to use it by example.
 
-
-// open a single window
-var win = Ti.UI.createWindow({
-	backgroundColor:'white'
-});
-var label = Ti.UI.createLabel();
-win.add(label);
-win.open();
-
-// TODO: write your module tests here
 var kandy = require('com.kandy');
-Ti.API.info("module is => " + kandy);
 
-label.text = kandy.example();
+kandy.setup({
+	api_key: "DAK87b4d788686e4456b06de8d655ab16a7",
+	api_secret: "DASb29ae2979e9140538b7bda90614be909"
+});
 
-Ti.API.info("module exampleProp is => " + kandy.exampleProp);
-kandy.exampleProp = "This is a test value";
+/**
+ * ACCESS
+ */
 
-if (Ti.Platform.name == "android") {
-	var proxy = kandy.createExample({
-		message: "Creating an example Proxy",
-		backgroundColor: "red",
-		width: 100,
-		height: 100,
-		top: 100,
-		left: 150
-	});
+kandy.createAccess().login({
+	username: "user@domain.com",
+	password: "password",
+	success: function(s){
+		alert("Login success!");
+	},
+	error: function(e){
+		alert(e.message);
+	}
+});
 
-	proxy.printMessage("Hello world!");
-	proxy.message = "Hi world!.  It's me again.";
-	proxy.printMessage("Hello world!");
-	win.add(proxy);
-}
-
+kandy.createAccess().logout({
+	success: function(s){
+		alert("Logout success!");	
+	},
+	error: function(e){
+		alert(e.message);
+	}
+});
