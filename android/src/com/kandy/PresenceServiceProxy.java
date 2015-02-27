@@ -10,12 +10,51 @@ import org.appcelerator.kroll.annotations.Kroll;
 
 import com.genband.kandy.api.Kandy;
 import com.genband.kandy.api.services.common.KandyResponseListener;
+import com.genband.kandy.api.services.presence.IKandyPresence;
+import com.genband.kandy.api.services.presence.KandyPresenceServiceNotificationListener;
 
 @Kroll.proxy(creatableInModule = KandyModule.class)
 public class PresenceServiceProxy extends KrollProxy {
 
+	private KandyPresenceServiceNotificationListener _KandyPresenceServiceNotificationListener = null;
+
 	public PresenceServiceProxy() {
 		super();
+	}
+
+	@Kroll.method
+	public void registerNotificationListener(
+			final HashMap<String, KrollFunction> callbacks) {
+		if (_KandyPresenceServiceNotificationListener != null) {
+			unregisterNotificationListener();
+		}
+
+		_KandyPresenceServiceNotificationListener = new KandyPresenceServiceNotificationListener() {
+
+			public void onPresenceStateChanged(IKandyPresence presence) {
+				HashMap data = new HashMap();
+				data.put("user", presence.getContactName());
+				data.put("state", presence.getState().name());
+				Utils.checkAndSendResult(getKrollObject(),
+						callbacks.get("onPresenceStateChanged"), data);
+			}
+		};
+
+		Kandy.getServices()
+				.getPresenceService()
+				.registerNotificationListener(
+						_KandyPresenceServiceNotificationListener);
+	}
+
+	@Kroll.method
+	public void unregisterNotificationListener() {
+		if (_KandyPresenceServiceNotificationListener != null) {
+			Kandy.getServices()
+					.getPresenceService()
+					.unregisterNotificationListener(
+							_KandyPresenceServiceNotificationListener);
+			_KandyPresenceServiceNotificationListener = null;
+		}
 	}
 
 	@Kroll.method

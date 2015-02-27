@@ -21,11 +21,12 @@ public class AccessProxy extends KrollProxy {
 
 	@Kroll.method
 	public void login(HashMap args) {
-		String username = (String) args.get("username");
-		String password = (String) args.get("password");
 		final KrollFunction success = (KrollFunction) args.get("success");
 		final KrollFunction error = (KrollFunction) args.get("error");
 
+		String username = (String) args.get("username");
+		String password = (String) args.get("password");
+		
 		KandyRecord kandyUser;
 
 		try {

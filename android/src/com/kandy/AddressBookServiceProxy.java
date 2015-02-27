@@ -12,6 +12,7 @@ import org.json.JSONObject;
 
 import com.genband.kandy.api.Kandy;
 import com.genband.kandy.api.services.addressbook.IKandyContact;
+import com.genband.kandy.api.services.addressbook.KandyAddressBookServiceNotificationListener;
 import com.genband.kandy.api.services.addressbook.KandyDeviceContactsFilter;
 import com.genband.kandy.api.services.addressbook.KandyDeviceContactsListener;
 import com.genband.kandy.api.services.addressbook.KandyEmailContactRecord;
@@ -20,8 +21,42 @@ import com.genband.kandy.api.services.addressbook.KandyPhoneContactRecord;
 @Kroll.proxy(creatableInModule = KandyModule.class)
 public class AddressBookServiceProxy extends KrollProxy {
 
+	private KandyAddressBookServiceNotificationListener _addressBookServiceNotificationListener = null;
+
 	public AddressBookServiceProxy() {
 		super();
+	}
+
+	@Kroll.method
+	public void registerNotificationListener(
+			final HashMap<String, KrollFunction> callbacks) {
+		if (_addressBookServiceNotificationListener != null) {
+			unregisterNotificationListener();
+		}
+
+		_addressBookServiceNotificationListener = new KandyAddressBookServiceNotificationListener() {
+
+			public void onDeviceAddressBookChanged() {
+				Utils.checkAndSendResult(getKrollObject(),
+						callbacks.get("onDeviceAddressBookChanged"), null);
+			}
+		};
+
+		Kandy.getServices()
+				.getAddressBookService()
+				.registerNotificationListener(
+						_addressBookServiceNotificationListener);
+	}
+
+	@Kroll.method
+	public void unregisterNotificationListener() {
+		if (_addressBookServiceNotificationListener != null) {
+			Kandy.getServices()
+					.getAddressBookService()
+					.unregisterNotificationListener(
+							_addressBookServiceNotificationListener);
+			_addressBookServiceNotificationListener = null;
+		}
 	}
 
 	@Kroll.method

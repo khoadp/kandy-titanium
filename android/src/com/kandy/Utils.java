@@ -1,9 +1,15 @@
 package com.kandy;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 
 import org.appcelerator.kroll.KrollFunction;
 import org.appcelerator.kroll.KrollObject;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.app.Activity;
 
@@ -64,5 +70,42 @@ public final class Utils {
 		int resId = getResource(activity, name, "string");
 		str = activity.getString(resId);
 		return str;
+	}
+
+	public static HashMap JSONObjectToHashMap(JSONObject object)
+			throws JSONException {
+		HashMap<String, Object> map = new HashMap<String, Object>();
+
+		Iterator<String> keysItr = object.keys();
+		while (keysItr.hasNext()) {
+			String key = keysItr.next();
+			Object value = object.get(key);
+
+			if (value instanceof JSONArray) {
+				value = JSONArrayToList((JSONArray) value);
+			}
+
+			else if (value instanceof JSONObject) {
+				value = JSONObjectToHashMap((JSONObject) value);
+			}
+			map.put(key, value);
+		}
+		return map;
+	}
+
+	public static List JSONArrayToList(JSONArray array) throws JSONException {
+		List<Object> list = new ArrayList<Object>();
+		for (int i = 0; i < array.length(); i++) {
+			Object value = array.get(i);
+			if (value instanceof JSONArray) {
+				value = JSONArrayToList((JSONArray) value);
+			}
+
+			else if (value instanceof JSONObject) {
+				value = JSONObjectToHashMap((JSONObject) value);
+			}
+			list.add(value);
+		}
+		return list;
 	}
 }

@@ -7,18 +7,124 @@ import java.util.UUID;
 import org.appcelerator.kroll.KrollFunction;
 import org.appcelerator.kroll.KrollProxy;
 import org.appcelerator.kroll.annotations.Kroll;
+import org.json.JSONException;
+
+import android.net.Uri;
 
 import com.genband.kandy.api.Kandy;
 import com.genband.kandy.api.services.calls.KandyRecord;
 import com.genband.kandy.api.services.chats.IKandyEvent;
+import com.genband.kandy.api.services.chats.IKandyMessage;
+import com.genband.kandy.api.services.chats.KandyChatServiceNotificationListener;
 import com.genband.kandy.api.services.chats.KandyMessage;
 import com.genband.kandy.api.services.common.KandyResponseListener;
 
 @Kroll.proxy(creatableInModule = KandyModule.class)
 public class ChatServiceProxy extends KrollProxy {
 
+	private KandyChatServiceNotificationListener _kandyChatServiceNotificationListener = null;
+
 	public ChatServiceProxy() {
 		super();
+	}
+
+	@Kroll.method
+	public void registerNotificationListener(
+			final HashMap<String, KrollFunction> callbacks) {
+
+		if (_kandyChatServiceNotificationListener != null) {
+			unregisterNotificationListener();
+		}
+
+		_kandyChatServiceNotificationListener = new KandyChatServiceNotificationListener() {
+
+			public void onChatReceived(IKandyMessage message) {
+				HashMap data = null;
+
+				try {
+					data = Utils.JSONObjectToHashMap(message.toJson());
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+
+				Utils.checkAndSendResult(getKrollObject(),
+						callbacks.get("onChatReceived"), data);
+			}
+
+			public void onChatMediaDownloadSucceded(IKandyMessage message,
+					Uri uri) {
+				HashMap data = new HashMap();
+				try {
+					data = Utils.JSONObjectToHashMap(message.toJson());
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+
+				data.put("uri", uri);
+
+				Utils.checkAndSendResult(getKrollObject(),
+						callbacks.get("onChatMediaDownloadSucceded"), data);
+			}
+
+			public void onChatMediaDownloadProgress(IKandyMessage message,
+					int process) {
+				HashMap data = new HashMap();
+				try {
+					data = Utils.JSONObjectToHashMap(message.toJson());
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+
+				data.put("process", process);
+
+				Utils.checkAndSendResult(getKrollObject(),
+						callbacks.get("onChatMediaDownloadProgress"), data);
+			}
+
+			public void onChatMediaDownloadFailed(IKandyMessage message,
+					String error) {
+				HashMap data = new HashMap();
+				try {
+					data = Utils.JSONObjectToHashMap(message.toJson());
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+
+				data.put("error", error);
+
+				Utils.checkAndSendResult(getKrollObject(),
+						callbacks.get("onChatMediaDownloadFailed"), data);
+			}
+
+			public void onChatDelivered(IKandyMessage message) {
+				HashMap data = null;
+				try {
+					data = Utils.JSONObjectToHashMap(message.toJson());
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+
+				Utils.checkAndSendResult(getKrollObject(),
+						callbacks.get("onChatDelivered"), data);
+
+			}
+		};
+
+		Kandy.getServices()
+				.getChatService()
+				.registerNotificationListener(
+						_kandyChatServiceNotificationListener);
+	}
+
+	@Kroll.method
+	public void unregisterNotificationListener() {
+		if (_kandyChatServiceNotificationListener != null) {
+			Kandy.getServices()
+					.getChatService()
+					.unregisterNotificationListener(
+							_kandyChatServiceNotificationListener);
+			_kandyChatServiceNotificationListener = null;
+		}
 	}
 
 	@Kroll.method
