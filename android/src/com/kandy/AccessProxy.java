@@ -2,18 +2,9 @@ package com.kandy;
 
 import java.util.HashMap;
 
-import org.appcelerator.kroll.KrollDict;
 import org.appcelerator.kroll.KrollFunction;
 import org.appcelerator.kroll.KrollProxy;
 import org.appcelerator.kroll.annotations.Kroll;
-import org.appcelerator.titanium.TiC;
-import org.appcelerator.titanium.proxy.TiViewProxy;
-import org.appcelerator.titanium.util.TiConvert;
-import org.appcelerator.titanium.view.TiCompositeLayout;
-import org.appcelerator.titanium.view.TiUIView;
-import org.appcelerator.titanium.view.TiCompositeLayout.LayoutArrangement;
-
-import android.app.Activity;
 
 import com.genband.kandy.api.Kandy;
 import com.genband.kandy.api.access.KandyLoginResponseListener;
@@ -40,33 +31,24 @@ public class AccessProxy extends KrollProxy {
             kandyUser = new KandyRecord(username);
 
         } catch (IllegalArgumentException ex) {
-        	if(error != null){
-        		HashMap result = new HashMap();
-            	result.put("status", KandyModule.STATUS_ERROR);
-                error.call(getKrollObject(), result);	
-        	}
+        	Utils.sendFailResult(getKrollObject(), error, Utils.getString(getActivity(), "kandy_login_empty_username_text"));
             return;
         }
+		
+		if(password == null || password.isEmpty()){
+			Utils.sendFailResult(getKrollObject(), error, Utils.getString(getActivity(), "kandy_login_empty_password_text"));
+			return;
+		}
 
 		Kandy.getAccess().login(kandyUser, password, new KandyLoginResponseListener() {
 
             @Override
-            public void onRequestFailed(int responseCode, String err) {
-            	if(error != null){
-            		HashMap result = new HashMap();
-                	result.put("status", KandyModule.STATUS_ERROR);
-                	result.put("code", responseCode);
-                	result.put("message", err);
-                    error.call(getKrollObject(), result);	
-            	}
+            public void onRequestFailed(int code, String err) {
+            	Utils.sendFailResult(getKrollObject(), error, code, err);
             }
             @Override
             public void onLoginSucceeded() {
-            	if(success != null){
-            		HashMap result = new HashMap();
-                	result.put("status", KandyModule.STATUS_SUCCESS);
-                    success.call(getKrollObject(), result);	
-            	}
+            	Utils.sendSuccessResult(getKrollObject(), success);
             }
         });
 	}
@@ -79,23 +61,13 @@ public class AccessProxy extends KrollProxy {
 		Kandy.getAccess().logout(new KandyLogoutResponseListener() {
 			
 			@Override
-			public void onRequestFailed(int responseCode, String err) {
-				if(error != null){
-					HashMap result = new HashMap();
-	            	result.put("status", KandyModule.STATUS_ERROR);
-	            	result.put("code", responseCode);
-	            	result.put("message", err);
-	                error.call(getKrollObject(), result);	
-				}				
+			public void onRequestFailed(int code, String err) {
+				Utils.sendFailResult(getKrollObject(), error, code, err);		
 			}
 			
 			@Override
 			public void onLogoutSucceeded() {
-				if(success != null){
-					HashMap result = new HashMap();
-	            	result.put("status", KandyModule.STATUS_SUCCESS);
-	                success.call(getKrollObject(), result);	
-				}				
+				Utils.sendSuccessResult(getKrollObject(), success);				
 			}
 		});
 	}

@@ -2,17 +2,14 @@ package com.kandy;
 
 import java.util.HashMap;
 
-import org.appcelerator.kroll.KrollFunction;
 import org.appcelerator.kroll.KrollModule;
 import org.appcelerator.kroll.annotations.Kroll;
 import org.appcelerator.titanium.TiApplication;
 import org.appcelerator.kroll.common.Log;
-import org.appcelerator.kroll.common.TiConfig;
+
+import android.app.Activity;
 
 import com.genband.kandy.api.Kandy;
-import com.genband.kandy.api.access.KandyLoginResponseListener;
-import com.genband.kandy.api.access.KandyLogoutResponseListener;
-import com.genband.kandy.api.services.calls.KandyRecord;
 
 
 @Kroll.module(name="Kandy", id="com.kandy")
@@ -24,7 +21,7 @@ public class KandyModule extends KrollModule
 	
 	@Kroll.constant public static final int STATUS_ERROR = 0;
 	@Kroll.constant public static final int STATUS_SUCCESS = 1;
-	
+		
 	public KandyModule()
 	{
 		super();
