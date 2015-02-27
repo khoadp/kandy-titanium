@@ -10,6 +10,7 @@ import com.genband.kandy.api.Kandy;
 import com.genband.kandy.api.access.KandyLoginResponseListener;
 import com.genband.kandy.api.access.KandyLogoutResponseListener;
 import com.genband.kandy.api.services.calls.KandyRecord;
+import com.genband.kandy.api.services.common.IKandySession;
 
 @Kroll.proxy(creatableInModule = KandyModule.class)
 public class AccessProxy extends KrollProxy {
@@ -74,5 +75,27 @@ public class AccessProxy extends KrollProxy {
 				Utils.sendSuccessResult(getKrollObject(), success);
 			}
 		});
+	}
+
+	@Kroll.method
+	public void loadSession(HashMap args) {
+		final KrollFunction success = (KrollFunction) args.get("success");
+		final KrollFunction error = (KrollFunction) args.get("error");
+
+		IKandySession session = Kandy.getSession();
+
+		if (session.getKandyUser().getUser() != null) {
+			HashMap data = new HashMap();
+
+			data.put("userId", session.getKandyUser().getUserId());
+			data.put("user", session.getKandyUser().getUser());
+			data.put("domain", session.getKandyDomain().getName());
+			data.put("deviceId", session.getKandyUser().getDeviceId());
+
+			Utils.sendSuccessResult(getKrollObject(), success, data);
+		} else {
+			Utils.sendFailResult(getKrollObject(), error, 404,
+					"Session not found.");
+		}
 	}
 }

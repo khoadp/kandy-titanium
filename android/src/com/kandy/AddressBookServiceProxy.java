@@ -6,11 +6,16 @@ import java.util.List;
 import org.appcelerator.kroll.KrollFunction;
 import org.appcelerator.kroll.KrollProxy;
 import org.appcelerator.kroll.annotations.Kroll;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import com.genband.kandy.api.Kandy;
 import com.genband.kandy.api.services.addressbook.IKandyContact;
 import com.genband.kandy.api.services.addressbook.KandyDeviceContactsFilter;
 import com.genband.kandy.api.services.addressbook.KandyDeviceContactsListener;
+import com.genband.kandy.api.services.addressbook.KandyEmailContactRecord;
+import com.genband.kandy.api.services.addressbook.KandyPhoneContactRecord;
 
 @Kroll.proxy(creatableInModule = KandyModule.class)
 public class AddressBookServiceProxy extends KrollProxy {
@@ -40,7 +45,50 @@ public class AddressBookServiceProxy extends KrollProxy {
 
 					@Override
 					public void onRequestSucceded(List<IKandyContact> contacts) {
-						HashMap data = new HashMap();
+						JSONObject data = new JSONObject();
+						// TODO: check this!
+						try {
+							data.put("size", contacts.size());
+
+							JSONArray contactsArray = new JSONArray();
+							for (IKandyContact contact : contacts) {
+								JSONObject c = new JSONObject();
+
+								// Get display name
+								c.put("displayName", contact.getDisplayName());
+
+								// Get emails
+								JSONArray emails = new JSONArray();
+								for (KandyEmailContactRecord email : contact
+										.getEmails()) {
+									JSONObject e = new JSONObject();
+									e.put("address", email.getAddress());
+									e.put("type", email.getType().name());
+									emails.put(e);
+								}
+								c.put("emails", emails);
+
+								// Get number phones
+								JSONArray phones = new JSONArray();
+								for (KandyPhoneContactRecord phone : contact
+										.getNumbers()) {
+									JSONObject p = new JSONObject();
+									p.put("number", phone.getNumber());
+									p.put("type", phone.getType().name());
+									phones.put(p);
+								}
+								c.put("phones", phones);
+
+								contactsArray.put(c);
+
+							}
+
+							data.put("contacts", contactsArray);
+
+						} catch (JSONException e) {
+							e.printStackTrace();
+						}
+
 						Utils.sendSuccessResult(getKrollObject(), success, data);
 					}
 				});
