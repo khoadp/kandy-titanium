@@ -10,34 +10,35 @@ import com.genband.kandy.api.Kandy;
 import com.genband.kandy.api.services.location.IKandyAreaCode;
 import com.genband.kandy.api.services.location.KandyCountryInfoResponseListener;
 
-@Kroll.proxy(creatableInModule=KandyModule.class)
+@Kroll.proxy(creatableInModule = KandyModule.class)
 public class LocationServiceProxy extends KrollProxy {
-	
-	public LocationServiceProxy(){
+
+	public LocationServiceProxy() {
 		super();
 	}
-	
+
 	@Kroll.method
-	public void getCountryInfo(HashMap args){
-		final KrollFunction success = (KrollFunction)args.get("success");
-		final KrollFunction error = (KrollFunction)args.get("error");
-		
-		Kandy.getServices().getLocationService().getCountryInfo(new KandyCountryInfoResponseListener() {
-			
-			@Override
-			public void onRequestFailed(int code, String err) {
-				Utils.sendFailResult(getKrollObject(), error, code, err);				
-			}
-			
-			@Override
-			public void onRequestSuccess(IKandyAreaCode response) {
-				HashMap data = new HashMap();
-				data.put("code", response.getCountryCode());
-				data.put("nameLong", response.getCountryNameLong());
-				data.put("nameShort", response.getCountryNameShort());
-				Utils.sendSuccessResult(getKrollObject(), success, data);
-			}
-		});
+	public void getCountryInfo(HashMap args) {
+		final KrollFunction success = (KrollFunction) args.get("success");
+		final KrollFunction error = (KrollFunction) args.get("error");
+
+		Kandy.getServices().getLocationService()
+				.getCountryInfo(new KandyCountryInfoResponseListener() {
+
+					@Override
+					public void onRequestFailed(int code, String err) {
+						Utils.sendFailResult(getKrollObject(), error, code, err);
+					}
+
+					@Override
+					public void onRequestSuccess(IKandyAreaCode response) {
+						HashMap data = new HashMap();
+						data.put("code", response.getCountryCode());
+						data.put("nameLong", response.getCountryNameLong());
+						data.put("nameShort", response.getCountryNameShort());
+						Utils.sendSuccessResult(getKrollObject(), success, data);
+					}
+				});
 	}
 
 }

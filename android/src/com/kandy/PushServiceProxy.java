@@ -9,50 +9,53 @@ import org.appcelerator.kroll.annotations.Kroll;
 import com.genband.kandy.api.Kandy;
 import com.genband.kandy.api.services.common.KandyResponseListener;
 
+@Kroll.proxy(creatableInModule = KandyModule.class)
 public class PushServiceProxy extends KrollProxy {
-	
-	public PushServiceProxy(){
+
+	public PushServiceProxy() {
 		super();
 	}
-	
+
 	@Kroll.method
-	public void enablePushNotification(HashMap args){
-		final KrollFunction success = (KrollFunction)args.get("success");
-		final KrollFunction error = (KrollFunction)args.get("error");
-		
-		Kandy.getServices().getPushService().enablePushNotification(new KandyResponseListener() {
-			
-			@Override
-			public void onRequestFailed(int code, String err) {
-				Utils.sendFailResult(getKrollObject(), error, code, err);
-				
-			}
-			
-			@Override
-			public void onRequestSucceded() {
-				Utils.sendSuccessResult(getKrollObject(), success);				
-			}
-		});
+	public void enablePushNotification(HashMap args) {
+		final KrollFunction success = (KrollFunction) args.get("success");
+		final KrollFunction error = (KrollFunction) args.get("error");
+
+		Kandy.getServices().getPushService()
+				.enablePushNotification(new KandyResponseListener() {
+
+					@Override
+					public void onRequestFailed(int code, String err) {
+						Utils.sendFailResult(getKrollObject(), error, code, err);
+
+					}
+
+					@Override
+					public void onRequestSucceded() {
+						Utils.sendSuccessResult(getKrollObject(), success);
+					}
+				});
 	}
-	
+
 	@Kroll.method
-	public void disablePushNotification(HashMap args){
-		final KrollFunction success = (KrollFunction)args.get("success");
-		final KrollFunction error = (KrollFunction)args.get("error");
-		
-		Kandy.getServices().getPushService().disablePushNotification(new KandyResponseListener() {
-			
-			@Override
-			public void onRequestFailed(int code, String err) {
-				Utils.sendFailResult(getKrollObject(), error, code, err);
-				
-			}
-			
-			@Override
-			public void onRequestSucceded() {
-				Utils.sendSuccessResult(getKrollObject(), success);				
-			}
-		});
+	public void disablePushNotification(HashMap args) {
+		final KrollFunction success = (KrollFunction) args.get("success");
+		final KrollFunction error = (KrollFunction) args.get("error");
+
+		Kandy.getServices().getPushService()
+				.disablePushNotification(new KandyResponseListener() {
+
+					@Override
+					public void onRequestFailed(int code, String err) {
+						Utils.sendFailResult(getKrollObject(), error, code, err);
+
+					}
+
+					@Override
+					public void onRequestSucceded() {
+						Utils.sendSuccessResult(getKrollObject(), success);
+					}
+				});
 	}
 
 }
