@@ -15,6 +15,12 @@ import com.genband.kandy.api.services.calls.KandyCallServiceNotificationListener
 import com.genband.kandy.api.services.calls.KandyCallState;
 import com.genband.kandy.api.services.calls.KandyRecord;
 
+/**
+ * Call service
+ * 
+ * @author kodeplusdev
+ *
+ */
 @Kroll.proxy(creatableInModule = KandyModule.class)
 public class CallServiceProxy extends KrollProxy {
 
@@ -27,6 +33,9 @@ public class CallServiceProxy extends KrollProxy {
 		super();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void handleCreationDict(KrollDict options) {
 		super.handleCreationDict(options);
@@ -36,6 +45,11 @@ public class CallServiceProxy extends KrollProxy {
 		}
 	}
 
+	/**
+	 * Register notification listeners
+	 * 
+	 * @param callbacks
+	 */
 	@Kroll.method
 	public void registerNotificationListener(
 			final HashMap<String, KrollFunction> callbacks) {
@@ -116,6 +130,9 @@ public class CallServiceProxy extends KrollProxy {
 						_kandyCallServiceNotificationListener);
 	}
 
+	/**
+	 * Unregister notification listeners
+	 */
 	@Kroll.method
 	public void unregisterNotificationListener() {
 		if (_kandyCallServiceNotificationListener != null) {
@@ -127,6 +144,11 @@ public class CallServiceProxy extends KrollProxy {
 		}
 	}
 
+	/**
+	 * Create a PSTN call
+	 * 
+	 * @param args
+	 */
 	@Kroll.method
 	public void createPSTNCall(HashMap args) {
 		final KrollFunction success = (KrollFunction) args.get("success");
@@ -137,6 +159,11 @@ public class CallServiceProxy extends KrollProxy {
 		_call = Kandy.getServices().getCallService().createPSTNCall(number);
 	}
 
+	/**
+	 * Create a voip call
+	 * 
+	 * @param args
+	 */
 	@Kroll.method
 	public void createVoipCall(HashMap args) {
 		final KrollFunction success = (KrollFunction) args.get("success");
@@ -159,6 +186,11 @@ public class CallServiceProxy extends KrollProxy {
 		// TODO: create a view
 	}
 
+	/**
+	 * Hangup current call
+	 * 
+	 * @param args
+	 */
 	@Kroll.method
 	public void hangup(HashMap args) {
 		final KrollFunction success = (KrollFunction) args.get("success");
@@ -184,6 +216,11 @@ public class CallServiceProxy extends KrollProxy {
 		});
 	}
 
+	/**
+	 * Mute current call
+	 * 
+	 * @param args
+	 */
 	@Kroll.method
 	public void mute(HashMap args) {
 		final KrollFunction success = (KrollFunction) args.get("success");
@@ -209,6 +246,11 @@ public class CallServiceProxy extends KrollProxy {
 		});
 	}
 
+	/**
+	 * Unmute current call
+	 * 
+	 * @param args
+	 */
 	@Kroll.method
 	public void unmute(HashMap args) {
 		final KrollFunction success = (KrollFunction) args.get("success");
@@ -234,6 +276,11 @@ public class CallServiceProxy extends KrollProxy {
 		});
 	}
 
+	/**
+	 * Hold current call
+	 * 
+	 * @param args
+	 */
 	@Kroll.method
 	public void hold(HashMap args) {
 		final KrollFunction success = (KrollFunction) args.get("success");
@@ -259,6 +306,11 @@ public class CallServiceProxy extends KrollProxy {
 		});
 	}
 
+	/**
+	 * Unhold current call
+	 * 
+	 * @param args
+	 */
 	@Kroll.method
 	public void unhold(HashMap args) {
 		final KrollFunction success = (KrollFunction) args.get("success");
@@ -284,6 +336,11 @@ public class CallServiceProxy extends KrollProxy {
 		});
 	}
 
+	/**
+	 * Enable video sharing 
+	 * 
+	 * @param args
+	 */
 	@Kroll.method
 	public void startVideoSharing(HashMap args) {
 		final KrollFunction success = (KrollFunction) args.get("success");
@@ -309,6 +366,11 @@ public class CallServiceProxy extends KrollProxy {
 		});
 	}
 
+	/**
+	 * Disable video sharing
+	 * 
+	 * @param args
+	 */
 	@Kroll.method
 	public void stopVideoSharing(HashMap args) {
 		final KrollFunction success = (KrollFunction) args.get("success");
@@ -334,6 +396,11 @@ public class CallServiceProxy extends KrollProxy {
 		});
 	}
 
+	/**
+	 * Accept a coming call
+	 * 
+	 * @param args
+	 */
 	@Kroll.method
 	public void accept(HashMap args) {
 		final KrollFunction success = (KrollFunction) args.get("success");
@@ -362,6 +429,11 @@ public class CallServiceProxy extends KrollProxy {
 				});
 	}
 
+	/**
+	 * Reject a coming call
+	 * 
+	 * @param args
+	 */
 	@Kroll.method
 	public void reject(HashMap args) {
 		final KrollFunction success = (KrollFunction) args.get("success");
@@ -387,6 +459,11 @@ public class CallServiceProxy extends KrollProxy {
 		});
 	}
 
+	/**
+	 * Ignore a coming call
+	 * 
+	 * @param args
+	 */
 	@Kroll.method
 	public void ignore(HashMap args) {
 		final KrollFunction success = (KrollFunction) args.get("success");

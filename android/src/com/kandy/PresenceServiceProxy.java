@@ -13,6 +13,12 @@ import com.genband.kandy.api.services.common.KandyResponseListener;
 import com.genband.kandy.api.services.presence.IKandyPresence;
 import com.genband.kandy.api.services.presence.KandyPresenceServiceNotificationListener;
 
+/**
+ * Presence service
+ * 
+ * @author kodeplusdev
+ *
+ */
 @Kroll.proxy(creatableInModule = KandyModule.class)
 public class PresenceServiceProxy extends KrollProxy {
 
@@ -22,6 +28,11 @@ public class PresenceServiceProxy extends KrollProxy {
 		super();
 	}
 
+	/**
+	 * register notification listener
+	 * 
+	 * @param callbacks
+	 */
 	@Kroll.method
 	public void registerNotificationListener(
 			final HashMap<String, KrollFunction> callbacks) {
@@ -46,6 +57,9 @@ public class PresenceServiceProxy extends KrollProxy {
 						_KandyPresenceServiceNotificationListener);
 	}
 
+	/**
+	 * unregister notification listener
+	 */
 	@Kroll.method
 	public void unregisterNotificationListener() {
 		if (_KandyPresenceServiceNotificationListener != null) {
@@ -57,6 +71,11 @@ public class PresenceServiceProxy extends KrollProxy {
 		}
 	}
 
+	/**
+	 * Start watch users
+	 * 
+	 * @param args
+	 */
 	@Kroll.method
 	public void startWatch(HashMap args) {
 		final KrollFunction success = (KrollFunction) args.get("success");

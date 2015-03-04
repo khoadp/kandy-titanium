@@ -11,6 +11,12 @@ import com.genband.kandy.api.provisioning.IKandyValidationResponse;
 import com.genband.kandy.api.provisioning.KandyValidationResponseListener;
 import com.genband.kandy.api.services.common.KandyResponseListener;
 
+/**
+ * Provisioning service
+ * 
+ * @author kodeplusdev
+ *
+ */
 @Kroll.proxy(creatableInModule = KandyModule.class)
 public class ProvisioningServiceProxy extends KrollProxy {
 
@@ -18,6 +24,11 @@ public class ProvisioningServiceProxy extends KrollProxy {
 		super();
 	}
 
+	/**
+	 * Request code
+	 * 
+	 * @param args
+	 */
 	@Kroll.method
 	public void requestCode(HashMap args) {
 		final KrollFunction success = (KrollFunction) args.get("success");
@@ -41,6 +52,11 @@ public class ProvisioningServiceProxy extends KrollProxy {
 				});
 	}
 
+	/**
+	 * Validate
+	 * 
+	 * @param args
+	 */
 	@Kroll.method
 	public void validate(HashMap args) {
 		final KrollFunction success = (KrollFunction) args.get("success");
@@ -65,6 +81,11 @@ public class ProvisioningServiceProxy extends KrollProxy {
 				});
 	}
 
+	/**
+	 * Deactive
+	 * 
+	 * @param args
+	 */
 	@Kroll.method
 	public void deactivate(HashMap args) {
 		final KrollFunction success = (KrollFunction) args.get("success");

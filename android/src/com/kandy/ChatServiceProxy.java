@@ -19,6 +19,12 @@ import com.genband.kandy.api.services.chats.KandyChatServiceNotificationListener
 import com.genband.kandy.api.services.chats.KandyMessage;
 import com.genband.kandy.api.services.common.KandyResponseListener;
 
+/**
+ * Chat service
+ * 
+ * @author kodpelusdev
+ *
+ */
 @Kroll.proxy(creatableInModule = KandyModule.class)
 public class ChatServiceProxy extends KrollProxy {
 
@@ -28,6 +34,11 @@ public class ChatServiceProxy extends KrollProxy {
 		super();
 	}
 
+	/**
+	 * Register notification listeners
+	 * 
+	 * @param callbacks
+	 */
 	@Kroll.method
 	public void registerNotificationListener(
 			final HashMap<String, KrollFunction> callbacks) {
@@ -116,6 +127,9 @@ public class ChatServiceProxy extends KrollProxy {
 						_kandyChatServiceNotificationListener);
 	}
 
+	/**
+	 * Unregister notification listeners
+	 */
 	@Kroll.method
 	public void unregisterNotificationListener() {
 		if (_kandyChatServiceNotificationListener != null) {
@@ -127,6 +141,11 @@ public class ChatServiceProxy extends KrollProxy {
 		}
 	}
 
+	/**
+	 * Send message
+	 * 
+	 * @param args
+	 */
 	@Kroll.method
 	public void send(HashMap args) {
 		final KrollFunction success = (KrollFunction) args.get("success");
@@ -162,6 +181,11 @@ public class ChatServiceProxy extends KrollProxy {
 
 	}
 
+	/**
+	 * Send message received signal
+	 * 
+	 * @param args
+	 */
 	@Kroll.method
 	public void markAsReceived(HashMap args) {
 		final KrollFunction success = (KrollFunction) args.get("success");
@@ -191,11 +215,19 @@ public class ChatServiceProxy extends KrollProxy {
 				});
 	}
 
+	/**
+	 * Pull pending envents
+	 */
 	@Kroll.method
 	public void pullEvents() {
 		Kandy.getServices().getChatService().pullEvents();
 	}
 
+	/**
+	 * Pull pending events with callback
+	 * 
+	 * @param args
+	 */
 	@Kroll.method
 	public void pullEvents(HashMap args) {
 		final KrollFunction success = (KrollFunction) args.get("success");

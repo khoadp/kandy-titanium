@@ -10,6 +10,12 @@ import com.genband.kandy.api.Kandy;
 import com.genband.kandy.api.services.location.IKandyAreaCode;
 import com.genband.kandy.api.services.location.KandyCountryInfoResponseListener;
 
+/**
+ * Location service
+ * 
+ * @author kodeplusdev
+ *
+ */
 @Kroll.proxy(creatableInModule = KandyModule.class)
 public class LocationServiceProxy extends KrollProxy {
 
@@ -17,6 +23,11 @@ public class LocationServiceProxy extends KrollProxy {
 		super();
 	}
 
+	/**
+	 * Get country info
+	 * 
+	 * @param args
+	 */
 	@Kroll.method
 	public void getCountryInfo(HashMap args) {
 		final KrollFunction success = (KrollFunction) args.get("success");

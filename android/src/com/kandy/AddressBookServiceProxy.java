@@ -18,6 +18,12 @@ import com.genband.kandy.api.services.addressbook.KandyDeviceContactsListener;
 import com.genband.kandy.api.services.addressbook.KandyEmailContactRecord;
 import com.genband.kandy.api.services.addressbook.KandyPhoneContactRecord;
 
+/**
+ * Address book service
+ * 
+ * @author kodeplusdev
+ *
+ */
 @Kroll.proxy(creatableInModule = KandyModule.class)
 public class AddressBookServiceProxy extends KrollProxy {
 
@@ -27,6 +33,11 @@ public class AddressBookServiceProxy extends KrollProxy {
 		super();
 	}
 
+	/**
+	 * Register notification listener
+	 * 
+	 * @param callbacks This is an object with the properties: onDeviceAddressBookChanged
+	 */
 	@Kroll.method
 	public void registerNotificationListener(
 			final HashMap<String, KrollFunction> callbacks) {
@@ -48,6 +59,9 @@ public class AddressBookServiceProxy extends KrollProxy {
 						_addressBookServiceNotificationListener);
 	}
 
+	/**
+	 * unregister notification listener
+	 */
 	@Kroll.method
 	public void unregisterNotificationListener() {
 		if (_addressBookServiceNotificationListener != null) {
@@ -59,6 +73,11 @@ public class AddressBookServiceProxy extends KrollProxy {
 		}
 	}
 
+	/**
+	 * Get contacts from user device
+	 * 
+	 * @param args
+	 */
 	@Kroll.method
 	public void getDeviceContacts(HashMap args) {
 		final KrollFunction success = (KrollFunction) args.get("success");

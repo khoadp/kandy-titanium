@@ -19,6 +19,13 @@ public class AccessProxy extends KrollProxy {
 		super();
 	}
 
+	/**
+	 * Register/login the user on the server with credentials received from
+	 * admin.
+	 * 
+	 * @param args This is object with the properties: success, error,
+	 * 			   username, password
+	 */
 	@Kroll.method
 	public void login(HashMap args) {
 		final KrollFunction success = (KrollFunction) args.get("success");
@@ -26,7 +33,7 @@ public class AccessProxy extends KrollProxy {
 
 		String username = (String) args.get("username");
 		String password = (String) args.get("password");
-		
+
 		KandyRecord kandyUser;
 
 		try {
@@ -59,6 +66,11 @@ public class AccessProxy extends KrollProxy {
 				});
 	}
 
+	/**
+	 * This method unregisters user from the Kandy server.
+	 * 
+	 * @param args
+	 */
 	@Kroll.method
 	public void logout(HashMap args) {
 		final KrollFunction success = (KrollFunction) args.get("success");
@@ -78,6 +90,11 @@ public class AccessProxy extends KrollProxy {
 		});
 	}
 
+	/**
+	 * Load previous session.
+	 * 
+	 * @param args
+	 */
 	@Kroll.method
 	public void loadSession(HashMap args) {
 		final KrollFunction success = (KrollFunction) args.get("success");

@@ -9,6 +9,12 @@ import org.appcelerator.kroll.annotations.Kroll;
 import com.genband.kandy.api.Kandy;
 import com.genband.kandy.api.services.common.KandyResponseListener;
 
+/**
+ * Push service
+ * 
+ * @author kodeplusdev
+ *
+ */
 @Kroll.proxy(creatableInModule = KandyModule.class)
 public class PushServiceProxy extends KrollProxy {
 
@@ -16,6 +22,11 @@ public class PushServiceProxy extends KrollProxy {
 		super();
 	}
 
+	/**
+	 * Enable push notification
+	 * 
+	 * @param args
+	 */
 	@Kroll.method
 	public void enablePushNotification(HashMap args) {
 		final KrollFunction success = (KrollFunction) args.get("success");
@@ -37,6 +48,11 @@ public class PushServiceProxy extends KrollProxy {
 				});
 	}
 
+	/**
+	 * Disable push notification
+	 * 
+	 * @param args
+	 */
 	@Kroll.method
 	public void disablePushNotification(HashMap args) {
 		final KrollFunction success = (KrollFunction) args.get("success");
