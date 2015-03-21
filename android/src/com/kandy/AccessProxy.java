@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.genband.kandy.api.Kandy;
 import com.genband.kandy.api.access.KandyLoginResponseListener;
@@ -36,7 +37,7 @@ public class AccessProxy extends TiViewProxy {
 	private class AccessWidget extends TiUIView {
 		
 		View loginView, logoutView;
-		EditText userInfo;
+		TextView userInfo;
 		
 		public AccessWidget(TiViewProxy proxy) {
 			super(proxy);
@@ -61,7 +62,7 @@ public class AccessProxy extends TiViewProxy {
 			Button loginBtn = (Button)layoutWraper.findViewById(
 					Utils.getId(getActivity(), "kandy_login_btn"));
 			
-			userInfo = (EditText)layoutWraper.findViewById(
+			userInfo = (TextView)layoutWraper.findViewById(
 					Utils.getId(getActivity(), "kand_user_info_txt"));
 			Button logoutBtn = (Button)layoutWraper.findViewById(
 					Utils.getId(getActivity(), "kandy_logout_btn"));
