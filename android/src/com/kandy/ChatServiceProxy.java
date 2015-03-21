@@ -1,9 +1,9 @@
 package com.kandy;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.UUID;
 
+import org.appcelerator.kroll.KrollDict;
 import org.appcelerator.kroll.KrollFunction;
 import org.appcelerator.kroll.KrollProxy;
 import org.appcelerator.kroll.annotations.Kroll;
@@ -40,8 +40,7 @@ public class ChatServiceProxy extends KrollProxy {
 	 * @param callbacks
 	 */
 	@Kroll.method
-	public void registerNotificationListener(
-			final HashMap<String, KrollFunction> callbacks) {
+	public void registerNotificationListener(final KrollDict callbacks) {
 
 		if (_kandyChatServiceNotificationListener != null) {
 			unregisterNotificationListener();
@@ -50,23 +49,23 @@ public class ChatServiceProxy extends KrollProxy {
 		_kandyChatServiceNotificationListener = new KandyChatServiceNotificationListener() {
 
 			public void onChatReceived(IKandyMessage message) {
-				HashMap data = null;
+				KrollDict data = null;
 
 				try {
-					data = Utils.JSONObjectToHashMap(message.toJson());
+					data = Utils.JSONObjectToKrollDict(message.toJson());
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
 
 				Utils.checkAndSendResult(getKrollObject(),
-						callbacks.get("onChatReceived"), data);
+						(KrollFunction)callbacks.get("onChatReceived"), data);
 			}
 
 			public void onChatMediaDownloadSucceded(IKandyMessage message,
 					Uri uri) {
-				HashMap data = new HashMap();
+				KrollDict data = new KrollDict();
 				try {
-					data = Utils.JSONObjectToHashMap(message.toJson());
+					data = Utils.JSONObjectToKrollDict(message.toJson());
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
@@ -74,14 +73,14 @@ public class ChatServiceProxy extends KrollProxy {
 				data.put("uri", uri);
 
 				Utils.checkAndSendResult(getKrollObject(),
-						callbacks.get("onChatMediaDownloadSucceded"), data);
+						(KrollFunction)callbacks.get("onChatMediaDownloadSucceded"), data);
 			}
 
 			public void onChatMediaDownloadProgress(IKandyMessage message,
 					int process) {
-				HashMap data = new HashMap();
+				KrollDict data = new KrollDict();
 				try {
-					data = Utils.JSONObjectToHashMap(message.toJson());
+					data = Utils.JSONObjectToKrollDict(message.toJson());
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
@@ -89,14 +88,14 @@ public class ChatServiceProxy extends KrollProxy {
 				data.put("process", process);
 
 				Utils.checkAndSendResult(getKrollObject(),
-						callbacks.get("onChatMediaDownloadProgress"), data);
+						(KrollFunction)callbacks.get("onChatMediaDownloadProgress"), data);
 			}
 
 			public void onChatMediaDownloadFailed(IKandyMessage message,
 					String error) {
-				HashMap data = new HashMap();
+				KrollDict data = new KrollDict();
 				try {
-					data = Utils.JSONObjectToHashMap(message.toJson());
+					data = Utils.JSONObjectToKrollDict(message.toJson());
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
@@ -104,19 +103,19 @@ public class ChatServiceProxy extends KrollProxy {
 				data.put("error", error);
 
 				Utils.checkAndSendResult(getKrollObject(),
-						callbacks.get("onChatMediaDownloadFailed"), data);
+						(KrollFunction)callbacks.get("onChatMediaDownloadFailed"), data);
 			}
 
 			public void onChatDelivered(IKandyMessage message) {
-				HashMap data = null;
+				KrollDict data = null;
 				try {
-					data = Utils.JSONObjectToHashMap(message.toJson());
+					data = Utils.JSONObjectToKrollDict(message.toJson());
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
 
 				Utils.checkAndSendResult(getKrollObject(),
-						callbacks.get("onChatDelivered"), data);
+						(KrollFunction)callbacks.get("onChatDelivered"), data);
 
 			}
 		};
@@ -147,7 +146,7 @@ public class ChatServiceProxy extends KrollProxy {
 	 * @param args
 	 */
 	@Kroll.method
-	public void send(HashMap args) {
+	public void send(KrollDict args) {
 		final KrollFunction success = (KrollFunction) args.get("success");
 		final KrollFunction error = (KrollFunction) args.get("error");
 
@@ -187,7 +186,7 @@ public class ChatServiceProxy extends KrollProxy {
 	 * @param args
 	 */
 	@Kroll.method
-	public void markAsReceived(HashMap args) {
+	public void markAsReceived(KrollDict args) {
 		final KrollFunction success = (KrollFunction) args.get("success");
 		final KrollFunction error = (KrollFunction) args.get("error");
 
@@ -229,7 +228,7 @@ public class ChatServiceProxy extends KrollProxy {
 	 * @param args
 	 */
 	@Kroll.method
-	public void pullEvents(HashMap args) {
+	public void pullEvents(KrollDict args) {
 		final KrollFunction success = (KrollFunction) args.get("success");
 		final KrollFunction error = (KrollFunction) args.get("error");
 

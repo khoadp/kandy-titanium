@@ -1,7 +1,6 @@
 package com.kandy;
 
-import java.util.HashMap;
-
+import org.appcelerator.kroll.KrollDict;
 import org.appcelerator.kroll.KrollModule;
 import org.appcelerator.kroll.annotations.Kroll;
 import org.appcelerator.kroll.common.Log;
@@ -20,7 +19,7 @@ import com.genband.kandy.api.services.addressbook.KandyDeviceContactsFilter;
 public class KandyModule extends KrollModule {
 
 	// Standard Debugging variables
-	private static final String LCAT = "KandyModule";
+	private static final String LCAT = KandyModule.class.getSimpleName();
 	// private static final boolean DBG = TiConfig.LOGD;
 
 	@Kroll.constant
@@ -45,7 +44,7 @@ public class KandyModule extends KrollModule {
 	@Kroll.onAppCreate
 	public static void onAppCreate(TiApplication app) {
 		Log.d(LCAT, "inside onAppCreate");
-		// put module init code that needs to run when the application is
+		// put module initialize code that needs to run when the application is
 		// created
 	}
 
@@ -55,9 +54,10 @@ public class KandyModule extends KrollModule {
 	 * @param args This is an object with the properties: api_key, api_secret
 	 */
 	@Kroll.method
-	public void setup(HashMap args) {
+	public void initialize(KrollDict args) {
 		String apiKey = (String) args.get("api_key");
 		String apiSecret = (String) args.get("api_secret");
+		Log.d(LCAT, "Initialize...");
 		Kandy.initialize(getActivity(), apiKey, apiSecret);
 	}
 }

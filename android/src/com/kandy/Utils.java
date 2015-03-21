@@ -1,17 +1,17 @@
 package com.kandy;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import org.appcelerator.kroll.KrollDict;
 import org.appcelerator.kroll.KrollFunction;
 import org.appcelerator.kroll.KrollObject;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.app.Activity;
+import android.content.Context;
 
 /**
  * Common utilities
@@ -32,7 +32,7 @@ public final class Utils {
 	 * @param result
 	 */
 	public static void checkAndSendResult(KrollObject krollObject,
-			KrollFunction krollFunction, HashMap result) {
+			KrollFunction krollFunction, KrollDict result) {
 		if (krollObject != null && krollFunction != null) {
 			krollFunction.call(krollObject, result);
 		}
@@ -48,7 +48,7 @@ public final class Utils {
 	 */
 	public static void sendFailResult(KrollObject krollObject,
 			KrollFunction krollFunction, int code, String error) {
-		HashMap result = new HashMap();
+		KrollDict result = new KrollDict();
 		result.put("status", KandyModule.STATUS_ERROR);
 		result.put("code", code);
 		result.put("message", error);
@@ -64,7 +64,7 @@ public final class Utils {
 	 */
 	public static void sendFailResult(KrollObject krollObject,
 			KrollFunction krollFunction, String error) {
-		HashMap result = new HashMap();
+		KrollDict result = new KrollDict();
 		result.put("status", KandyModule.STATUS_ERROR);
 		result.put("code", ""); // undefined
 		result.put("message", error);
@@ -79,7 +79,7 @@ public final class Utils {
 	 */
 	public static void sendSuccessResult(KrollObject krollObject,
 			KrollFunction krollFunction) {
-		HashMap result = new HashMap();
+		KrollDict result = new KrollDict();
 		result.put("status", KandyModule.STATUS_SUCCESS);
 		checkAndSendResult(krollObject, krollFunction, result);
 	}
@@ -93,7 +93,7 @@ public final class Utils {
 	 */
 	public static void sendSuccessResult(KrollObject krollObject,
 			KrollFunction krollFunction, Object data) {
-		HashMap result = new HashMap();
+		KrollDict result = new KrollDict();
 		result.put("status", KandyModule.STATUS_SUCCESS);
 		result.put("data", data);
 		checkAndSendResult(krollObject, krollFunction, result);
@@ -107,10 +107,10 @@ public final class Utils {
 	 * @param type
 	 * @return
 	 */
-	public static int getResource(Activity activity, String name, String type) {
+	public static int getResource(Context context, String name, String type) {
 		int res = -1;
-		String packageName = activity.getPackageName();
-		res = activity.getResources().getIdentifier(name, type, packageName);
+		String packageName = context.getPackageName();
+		res = context.getResources().getIdentifier(name, type, packageName);
 		return res;
 	}
 
@@ -121,13 +121,35 @@ public final class Utils {
 	 * @param name
 	 * @return
 	 */
-	public static String getString(Activity activity, String name) {
+	public static String getString(Context context, String name) {
 		String str = "";
-		int resId = getResource(activity, name, "string");
-		str = activity.getString(resId);
+		int resId = getResource(context, name, "string");
+		str = context.getString(resId);
 		return str;
 	}
 
+	 /**
+     * Get identifier of the layout
+     *
+     * @param context
+     * @param name
+     * @return
+     */
+    public static int getLayout(Context context, String name){
+        return getResource(context, name, "layout");
+    }
+
+    /**
+     * Get identifier of the id
+     *
+     * @param context
+     * @param name
+     * @return
+     */
+    public static int getId(Context context, String name){
+        return getResource(context, name, "id");
+    }
+	
 	/**
 	 * Convert from JSON object to HashMap
 	 * 
@@ -135,9 +157,9 @@ public final class Utils {
 	 * @return
 	 * @throws JSONException
 	 */
-	public static HashMap JSONObjectToHashMap(JSONObject object)
+	public static KrollDict JSONObjectToKrollDict(JSONObject object)
 			throws JSONException {
-		HashMap<String, Object> map = new HashMap<String, Object>();
+		KrollDict map = new KrollDict();
 
 		Iterator<String> keysItr = object.keys();
 		while (keysItr.hasNext()) {
@@ -149,7 +171,7 @@ public final class Utils {
 			}
 
 			else if (value instanceof JSONObject) {
-				value = JSONObjectToHashMap((JSONObject) value);
+				value = JSONObjectToKrollDict((JSONObject) value);
 			}
 			map.put(key, value);
 		}
@@ -173,7 +195,7 @@ public final class Utils {
 			}
 
 			else if (value instanceof JSONObject) {
-				value = JSONObjectToHashMap((JSONObject) value);
+				value = JSONObjectToKrollDict((JSONObject) value);
 			}
 			list.add(value);
 		}

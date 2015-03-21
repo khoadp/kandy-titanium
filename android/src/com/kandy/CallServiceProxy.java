@@ -1,19 +1,24 @@
 package com.kandy;
 
-import java.util.HashMap;
-
 import org.appcelerator.kroll.KrollDict;
 import org.appcelerator.kroll.KrollFunction;
 import org.appcelerator.kroll.KrollProxy;
 import org.appcelerator.kroll.annotations.Kroll;
+import org.appcelerator.titanium.proxy.TiViewProxy;
+import org.appcelerator.titanium.view.TiUIView;
+
+import android.app.Activity;
+import android.view.View;
 
 import com.genband.kandy.api.Kandy;
 import com.genband.kandy.api.services.calls.IKandyCall;
 import com.genband.kandy.api.services.calls.IKandyIncomingCall;
+import com.genband.kandy.api.services.calls.IKandyOutgoingCall;
 import com.genband.kandy.api.services.calls.KandyCallResponseListener;
 import com.genband.kandy.api.services.calls.KandyCallServiceNotificationListener;
 import com.genband.kandy.api.services.calls.KandyCallState;
 import com.genband.kandy.api.services.calls.KandyRecord;
+import com.genband.kandy.api.services.calls.KandyView;
 
 /**
  * Call service
@@ -25,10 +30,13 @@ import com.genband.kandy.api.services.calls.KandyRecord;
 public class CallServiceProxy extends KrollProxy {
 
 	private IKandyCall _call;
+	private KandyView _localVideoView;
+	private KandyView _remoteVideoView;
+	
 	private boolean _startWithVideo = true;
 
 	private KandyCallServiceNotificationListener _kandyCallServiceNotificationListener = null;
-
+	
 	public CallServiceProxy() {
 		super();
 	}
@@ -44,15 +52,14 @@ public class CallServiceProxy extends KrollProxy {
 			_startWithVideo = options.getBoolean("startWithVideo");
 		}
 	}
-
+	
 	/**
 	 * Register notification listeners
 	 * 
 	 * @param callbacks
 	 */
 	@Kroll.method
-	public void registerNotificationListener(
-			final HashMap<String, KrollFunction> callbacks) {
+	public void registerNotificationListener( final KrollDict callbacks) {
 
 		if (_kandyCallServiceNotificationListener != null) {
 			unregisterNotificationListener();
@@ -62,65 +69,68 @@ public class CallServiceProxy extends KrollProxy {
 
 			public void onVideoStateChanged(IKandyCall callee,
 					boolean receiving, boolean sending) {
-				HashMap data = new HashMap();
+				KrollDict data = new KrollDict();
 				// TODO: add callee
 				data.put("id", callee.getCallId());
 				data.put("receiving", receiving);
 				data.put("sending", sending);
 				Utils.checkAndSendResult(getKrollObject(),
-						callbacks.get("onVideoStateChanged"), data);
+						(KrollFunction)callbacks.get("onVideoStateChanged"), data);
 			}
 
 			public void onIncomingCall(IKandyIncomingCall callee) {
-				HashMap data = new HashMap();
+				if (_call == null){
+					_call = callee; // TODO: fix this
+				}
+				KrollDict data = new KrollDict();
 				data.put("id", callee.getCallId());
 				data.put("callee", callee.getCallee().getUri());
 				data.put("via", callee.getVia());
 				Utils.checkAndSendResult(getKrollObject(),
-						callbacks.get("onIncomingCall"), data);
+						(KrollFunction)callbacks.get("onIncomingCall"), data);
 			}
 
 			public void onGSMCallIncoming(IKandyCall callee) {
-				HashMap data = new HashMap();
+				KrollDict data = new KrollDict();
 				data.put("id", callee.getCallId());
 				data.put("callee", callee.getCallee().getUri());
 				data.put("via", callee.getVia());
 				Utils.checkAndSendResult(getKrollObject(),
-						callbacks.get("onGSMCallIncoming"), data);
+						(KrollFunction)callbacks.get("onGSMCallIncoming"), data);
 			}
 
 			public void onGSMCallDisconnected(IKandyCall callee) {
-				HashMap data = new HashMap();
+				KrollDict data = new KrollDict();
 				data.put("id", callee.getCallId());
 				data.put("callee", callee.getCallee().getUri());
 				data.put("via", callee.getVia());
 				Utils.checkAndSendResult(getKrollObject(),
-						callbacks.get("onGSMCallDisconnected"), data);
+						(KrollFunction)callbacks.get("onGSMCallDisconnected"), data);
 			}
 
 			public void onGSMCallConnected(IKandyCall callee) {
-				HashMap data = new HashMap();
+				KrollDict data = new KrollDict();
 				data.put("id", callee.getCallId());
 				data.put("callee", callee.getCallee().getUri());
 				data.put("via", callee.getVia());
 				Utils.checkAndSendResult(getKrollObject(),
-						callbacks.get("onGSMCallConnected"), data);
+						(KrollFunction)callbacks.get("onGSMCallConnected"), data);
 			}
 
 			public void onCallStateChanged(KandyCallState state,
 					IKandyCall callee) {
-				HashMap data = new HashMap();
+				KrollDict data = new KrollDict();
 				data.put("id", callee.getCallId());
 				data.put("state", state.name());
 				Utils.checkAndSendResult(getKrollObject(),
-						callbacks.get("onCallStateChanged"), data);
+						(KrollFunction)callbacks.get("onCallStateChanged"), data);
 			}
 
 			public void onAudioStateChanged(IKandyCall callee, boolean mute) {
-				HashMap data = new HashMap();
+				KrollDict data = new KrollDict();
 				data.put("mute", mute);
 				Utils.checkAndSendResult(getKrollObject(),
-						callbacks.get("onAudioStateChanged"), data);
+						(KrollFunction)callbacks.get("onAudioStateChanged"), data);
 			}
 		};
 
@@ -150,7 +160,7 @@ public class CallServiceProxy extends KrollProxy {
 	 * @param args
 	 */
 	@Kroll.method
-	public void createPSTNCall(HashMap args) {
+	public void createPSTNCall(KrollDict args) {
 		final KrollFunction success = (KrollFunction) args.get("success");
 		final KrollFunction error = (KrollFunction) args.get("error");
 
@@ -165,7 +175,7 @@ public class CallServiceProxy extends KrollProxy {
 	 * @param args
 	 */
 	@Kroll.method
-	public void createVoipCall(HashMap args) {
+	public void createVoipCall(KrollDict args) {
 		final KrollFunction success = (KrollFunction) args.get("success");
 		final KrollFunction error = (KrollFunction) args.get("error");
 
@@ -181,9 +191,28 @@ public class CallServiceProxy extends KrollProxy {
 		}
 
 		_call = Kandy.getServices().getCallService()
-				.createVoipCall(callee, _startWithVideo); // TODO: change to
-															// prefs
-		// TODO: create a view
+				.createVoipCall(callee, _startWithVideo);
+		
+		if (_localVideoView != null && _remoteVideoView != null){
+			_call.setLocalVideoView(_localVideoView);
+			_call.setRemoteVideoView(_remoteVideoView);
+		} else {
+			KandyView dummyVideoView = new KandyView(getActivity(), null);
+			
+			_call.setLocalVideoView(dummyVideoView);
+			_call.setRemoteVideoView(dummyVideoView);
+		}
+		
+		((IKandyOutgoingCall)_call).establish(new KandyCallResponseListener() {
+			
+			public void onRequestSucceeded(IKandyCall call) {
+				Utils.sendSuccessResult(getKrollObject(), success);
+			}
+			
+			public void onRequestFailed(IKandyCall call, int code, String err) {
+				Utils.sendFailResult(getKrollObject(), error, code, err);
+			}
+		});
 	}
 
 	/**
@@ -192,7 +221,7 @@ public class CallServiceProxy extends KrollProxy {
 	 * @param args
 	 */
 	@Kroll.method
-	public void hangup(HashMap args) {
+	public void hangup(KrollDict args) {
 		final KrollFunction success = (KrollFunction) args.get("success");
 		final KrollFunction error = (KrollFunction) args.get("error");
 
@@ -222,7 +251,7 @@ public class CallServiceProxy extends KrollProxy {
 	 * @param args
 	 */
 	@Kroll.method
-	public void mute(HashMap args) {
+	public void mute(KrollDict args) {
 		final KrollFunction success = (KrollFunction) args.get("success");
 		final KrollFunction error = (KrollFunction) args.get("error");
 
@@ -252,7 +281,7 @@ public class CallServiceProxy extends KrollProxy {
 	 * @param args
 	 */
 	@Kroll.method
-	public void unmute(HashMap args) {
+	public void unmute(KrollDict args) {
 		final KrollFunction success = (KrollFunction) args.get("success");
 		final KrollFunction error = (KrollFunction) args.get("error");
 
@@ -282,7 +311,7 @@ public class CallServiceProxy extends KrollProxy {
 	 * @param args
 	 */
 	@Kroll.method
-	public void hold(HashMap args) {
+	public void hold(KrollDict args) {
 		final KrollFunction success = (KrollFunction) args.get("success");
 		final KrollFunction error = (KrollFunction) args.get("error");
 
@@ -312,7 +341,7 @@ public class CallServiceProxy extends KrollProxy {
 	 * @param args
 	 */
 	@Kroll.method
-	public void unhold(HashMap args) {
+	public void unhold(KrollDict args) {
 		final KrollFunction success = (KrollFunction) args.get("success");
 		final KrollFunction error = (KrollFunction) args.get("error");
 
@@ -342,7 +371,7 @@ public class CallServiceProxy extends KrollProxy {
 	 * @param args
 	 */
 	@Kroll.method
-	public void startVideoSharing(HashMap args) {
+	public void startVideoSharing(KrollDict args) {
 		final KrollFunction success = (KrollFunction) args.get("success");
 		final KrollFunction error = (KrollFunction) args.get("error");
 
@@ -372,7 +401,7 @@ public class CallServiceProxy extends KrollProxy {
 	 * @param args
 	 */
 	@Kroll.method
-	public void stopVideoSharing(HashMap args) {
+	public void stopVideoSharing(KrollDict args) {
 		final KrollFunction success = (KrollFunction) args.get("success");
 		final KrollFunction error = (KrollFunction) args.get("error");
 
@@ -402,7 +431,7 @@ public class CallServiceProxy extends KrollProxy {
 	 * @param args
 	 */
 	@Kroll.method
-	public void accept(HashMap args) {
+	public void accept(KrollDict args) {
 		final KrollFunction success = (KrollFunction) args.get("success");
 		final KrollFunction error = (KrollFunction) args.get("error");
 
@@ -435,7 +464,7 @@ public class CallServiceProxy extends KrollProxy {
 	 * @param args
 	 */
 	@Kroll.method
-	public void reject(HashMap args) {
+	public void reject(KrollDict args) {
 		final KrollFunction success = (KrollFunction) args.get("success");
 		final KrollFunction error = (KrollFunction) args.get("error");
 
@@ -465,7 +494,7 @@ public class CallServiceProxy extends KrollProxy {
 	 * @param args
 	 */
 	@Kroll.method
-	public void ignore(HashMap args) {
+	public void ignore(KrollDict args) {
 		final KrollFunction success = (KrollFunction) args.get("success");
 		final KrollFunction error = (KrollFunction) args.get("error");
 

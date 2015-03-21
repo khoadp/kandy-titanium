@@ -2,8 +2,8 @@ package com.kandy;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 
+import org.appcelerator.kroll.KrollDict;
 import org.appcelerator.kroll.KrollFunction;
 import org.appcelerator.kroll.KrollProxy;
 import org.appcelerator.kroll.annotations.Kroll;
@@ -34,8 +34,7 @@ public class PresenceServiceProxy extends KrollProxy {
 	 * @param callbacks
 	 */
 	@Kroll.method
-	public void registerNotificationListener(
-			final HashMap<String, KrollFunction> callbacks) {
+	public void registerNotificationListener(final KrollDict callbacks) {
 		if (_KandyPresenceServiceNotificationListener != null) {
 			unregisterNotificationListener();
 		}
@@ -43,11 +42,11 @@ public class PresenceServiceProxy extends KrollProxy {
 		_KandyPresenceServiceNotificationListener = new KandyPresenceServiceNotificationListener() {
 
 			public void onPresenceStateChanged(IKandyPresence presence) {
-				HashMap data = new HashMap();
+				KrollDict data = new KrollDict();
 				data.put("user", presence.getContactName());
 				data.put("state", presence.getState().name());
 				Utils.checkAndSendResult(getKrollObject(),
-						callbacks.get("onPresenceStateChanged"), data);
+						(KrollFunction)callbacks.get("onPresenceStateChanged"), data);
 			}
 		};
 
@@ -77,7 +76,7 @@ public class PresenceServiceProxy extends KrollProxy {
 	 * @param args
 	 */
 	@Kroll.method
-	public void startWatch(HashMap args) {
+	public void startWatch(KrollDict args) {
 		final KrollFunction success = (KrollFunction) args.get("success");
 		final KrollFunction error = (KrollFunction) args.get("error");
 

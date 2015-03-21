@@ -1,7 +1,6 @@
 package com.kandy;
 
-import java.util.HashMap;
-
+import org.appcelerator.kroll.KrollDict;
 import org.appcelerator.kroll.KrollFunction;
 import org.appcelerator.kroll.KrollProxy;
 import org.appcelerator.kroll.annotations.Kroll;
@@ -30,7 +29,7 @@ public class ProvisioningServiceProxy extends KrollProxy {
 	 * @param args
 	 */
 	@Kroll.method
-	public void requestCode(HashMap args) {
+	public void requestCode(KrollDict args) {
 		final KrollFunction success = (KrollFunction) args.get("success");
 		final KrollFunction error = (KrollFunction) args.get("error");
 
@@ -58,7 +57,7 @@ public class ProvisioningServiceProxy extends KrollProxy {
 	 * @param args
 	 */
 	@Kroll.method
-	public void validate(HashMap args) {
+	public void validate(KrollDict args) {
 		final KrollFunction success = (KrollFunction) args.get("success");
 		final KrollFunction error = (KrollFunction) args.get("error");
 
@@ -87,7 +86,7 @@ public class ProvisioningServiceProxy extends KrollProxy {
 	 * @param args
 	 */
 	@Kroll.method
-	public void deactivate(HashMap args) {
+	public void deactivate(KrollDict args) {
 		final KrollFunction success = (KrollFunction) args.get("success");
 		final KrollFunction error = (KrollFunction) args.get("error");
 
