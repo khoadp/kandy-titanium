@@ -13,7 +13,7 @@
         <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/kandy_phone_number_txt"
+                android:id="@+id/kandy_phone_number_edit"
                 android:textColor="@android:color/black"
                 android:layout_gravity="center_horizontal"
                 android:inputType="phone"
@@ -23,7 +23,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Request code"
-                android:id="@+id/kandy_request_btn"
+                android:id="@+id/kandy_request_button"
                 android:layout_gravity="center_horizontal"/>
     </LinearLayout>
 
@@ -42,7 +42,7 @@
         <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/kandy_otp_code_txt"
+                android:id="@+id/kandy_otp_code_edit"
                 android:textColor="@android:color/black"
                 android:layout_gravity="center_horizontal"
                 android:hint="Your OTP code"/>
@@ -51,7 +51,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Validate"
-                android:id="@+id/kandy_validate_btn"
+                android:id="@+id/kandy_validate_button"
                 android:layout_gravity="center_horizontal"/>
     </LinearLayout>
 
@@ -81,7 +81,7 @@
             <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/kandy_signed_phone_number_txt"
+                    android:id="@+id/kandy_signed_phone_number_tview"
                     android:textColor="@android:color/black"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:paddingLeft="10px"
@@ -93,7 +93,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Deactivate"
-                android:id="@+id/kandy_deactivate_btn"
+                android:id="@+id/kandy_deactivate_button"
                 android:layout_gravity="center_horizontal"/>
     </LinearLayout>
 </LinearLayout>

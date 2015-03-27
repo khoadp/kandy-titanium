@@ -1,0 +1,61 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingBottom="@dimen/kandy_vertical_margin"
+                android:paddingLeft="@dimen/kandy_horizontal_margin"
+                android:paddingRight="@dimen/kandy_horizontal_margin"
+                android:paddingTop="@dimen/kandy_vertical_margin">
+
+    <ListView
+            android:id="@+id/kandy_chats_messages_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/kandy_chats_phone_number_edit"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true" />
+
+    <EditText
+            android:id="@+id/kandy_chats_phone_number_edit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/kandy_chats_message_edit"
+            android:hint="@string/kandy_chat_phone_number_hint_text" />
+
+    <LinearLayout
+            android:id="@+id/kandy_chats_message_edit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/kandy_chats_get_incoming_msgs_button"
+            android:orientation="horizontal"
+            android:weightSum="1" >
+
+        <EditText
+                android:id="@+id/activity_chats_message_edit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.25"
+                android:hint="@string/kandy_chat_message_hint_text" />
+
+        <Button
+                android:id="@+id/kandy_chats_send_msg_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.75"
+                android:text="@string/kandy_chat_send_button_label" />
+    </LinearLayout>
+
+    <Button
+            android:id="@+id/kandy_chats_get_incoming_msgs_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/kandy_chats_ack_button"
+            android:text="@string/kandy_chat_pull_label" />
+
+    <Button
+            android:id="@+id/kandy_chats_ack_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:text="@string/kandy_chat_ack_label" />
+
+</RelativeLayout>

@@ -56,16 +56,16 @@ public class AccessProxy extends TiViewProxy {
 			
 			// Get widgets
 			final EditText username = (EditText)layoutWraper.findViewById(
-					Utils.getId(getActivity(), "kandy_username_txt"));
+					Utils.getId(getActivity(), "kandy_username_edit"));
 			final EditText password = (EditText)layoutWraper.findViewById(
-					Utils.getId(getActivity(), "kandy_password_txt"));
+					Utils.getId(getActivity(), "kandy_password_edit"));
 			Button loginBtn = (Button)layoutWraper.findViewById(
-					Utils.getId(getActivity(), "kandy_login_btn"));
+					Utils.getId(getActivity(), "kandy_login_button"));
 			
 			userInfo = (TextView)layoutWraper.findViewById(
-					Utils.getId(getActivity(), "kand_user_info_txt"));
+					Utils.getId(getActivity(), "kand_user_info_edit"));
 			Button logoutBtn = (Button)layoutWraper.findViewById(
-					Utils.getId(getActivity(), "kandy_logout_btn"));
+					Utils.getId(getActivity(), "kandy_logout_button"));
 			
 			// Set click events
 			loginBtn.setOnClickListener(new View.OnClickListener() {
@@ -138,8 +138,7 @@ public class AccessProxy extends TiViewProxy {
 	}
 	
 	// Callbacks Be used by widget
-	private KrollDict loginCallbacks;
-	private KrollDict logoutCallbacks;
+	private KrollDict callbacks = null;
 	
 	private AccessWidget accessWidget;
 	
@@ -170,20 +169,9 @@ public class AccessProxy extends TiViewProxy {
 	 */
 	@Kroll.setProperty
 	@Kroll.method
-	public void setLoginCallbacks(KrollDict callbacks){
-		loginCallbacks = callbacks;
+	public void setCallbacks(KrollDict callbacks){
+		this.callbacks = callbacks;
 	}
-	
-	/**
-	 * Set callbacks for logout action
-	 * 
-	 * @param callbacks
-	 */
-	@Kroll.setProperty
-	@Kroll.method
-	public void setLogoutCallbacks(KrollDict callbacks){
-		logoutCallbacks = callbacks;
-	}	
 	
 	/**
 	 * Display login view
@@ -215,51 +203,14 @@ public class AccessProxy extends TiViewProxy {
 	 * Register/login the user on the server with credentials received from
 	 * admin.
 	 * 
-	 * @param username
-	 * @param password
-	 * @param success
-	 * @param error
+	 * @param args
 	 */
 	@Kroll.method
-	public void login(String username, String password, KrollFunction success, KrollFunction error){
-		this.loginCallbacks = new KrollDict();
-		this.loginCallbacks.put("success", success);
-		this.loginCallbacks.put("error", error);
-		this.login(username, password, loginCallbacks);
-	}
-	
-	/**
-	 * Register/login the user on the server with credentials received from
-	 * admin.
-	 * 
-	 * @param username
-	 * @param password
-	 * @param callbacks
-	 */
-	@Kroll.method
-	public void login(String username, String password, KrollDict callbacks) {		
-		this.loginCallbacks = callbacks;
-		this.login(username, password);
-	}
-
-	/**
-	 * Register/login the user on the server with credentials received from
-	 * admin.
-	 * 
-	 * @param username
-	 * @param password
-	 */
-	@Kroll.method
-	public void login(final String username, final String password) {
-		
-		final KrollFunction success, error;
-		
-		if (loginCallbacks != null){
-			 success = (KrollFunction) loginCallbacks.get("success");
-			 error = (KrollFunction) loginCallbacks.get("error");
-		} else {
-			success = error = null;
-		}
+	public void login(KrollDict args){
+		final KrollFunction success = (KrollFunction)args.get("success");
+		final KrollFunction error = (KrollFunction)args.get("success");
+		final String username = (String)args.get("username");
+		final String password = (String)args.get("password");
 		
 		KandyRecord kandyUser;
 
@@ -300,17 +251,20 @@ public class AccessProxy extends TiViewProxy {
 	}
 
 	/**
-	 * This method unregisters user from the Kandy server.
+	 * Register/login the user on the server with credentials received from
+	 * admin.
 	 * 
-	 * @param success
-	 * @param error
+	 * @param username
+	 * @param password
 	 */
-	@Kroll.method
-	public void logout(KrollFunction success, KrollFunction error){
-		this.logoutCallbacks = new KrollDict();
-		this.logoutCallbacks.put("success", success);
-		this.logoutCallbacks.put("error", error);
-		this.logout(logoutCallbacks);
+	public void login(final String username, final String password) {
+		
+		KrollDict loginArgs = Utils.getKrollDictFromCallbacks(callbacks, "login");
+		
+		loginArgs.put("username", username);
+		loginArgs.put("password", password);
+		
+		this.login(loginArgs);
 	}
 	
 	/**
@@ -320,24 +274,9 @@ public class AccessProxy extends TiViewProxy {
 	 */
 	@Kroll.method
 	public void logout(KrollDict callbacks) {
-		logoutCallbacks = callbacks;
-		this.logout();
-	}
-	
-	/**
-	 * This method unregisters user from the Kandy server.
-	 */
-	@Kroll.method
-	public void logout(){
-		final KrollFunction success, error;
-
-		if (logoutCallbacks != null){
-			 success = (KrollFunction) logoutCallbacks.get("success");
-			 error = (KrollFunction) logoutCallbacks.get("error");
-		} else {
-			success = error = null;
-		}
-
+		final KrollFunction success = (KrollFunction)callbacks.get("success");
+		final KrollFunction error = (KrollFunction)callbacks.get("error");
+		
 		Kandy.getAccess().logout(new KandyLogoutResponseListener() {
 
 			@Override
@@ -354,6 +293,15 @@ public class AccessProxy extends TiViewProxy {
 			}
 		});
 	}
+	
+	/**
+	 * This method unregisters user from the Kandy server.
+	 */
+	public void logout(){
+		KrollDict logoutArgs = Utils.getKrollDictFromCallbacks(callbacks, "logout");
+		
+		logout(logoutArgs);
+	}
 
 	/**
 	 * Load previous session.
@@ -362,8 +310,8 @@ public class AccessProxy extends TiViewProxy {
 	 */
 	@Kroll.method
 	public void loadSession(KrollDict args) {
-		final KrollFunction success = (KrollFunction) args.get("success");
-		final KrollFunction error = (KrollFunction) args.get("error");
+		KrollFunction success = (KrollFunction) args.get("success");
+		KrollFunction error = (KrollFunction) args.get("error");
 
 		IKandySession session = Kandy.getSession();
 

@@ -51,13 +51,13 @@ public class KandyModule extends KrollModule {
 	/**
 	 * Setup Kandy API
 	 * 
-	 * @param args This is an object with the properties: api_key, api_secret
+	 * @param args
 	 */
 	@Kroll.method
 	public void initialize(KrollDict args) {
+		Log.d(LCAT, "Initializing...");
 		String apiKey = (String) args.get("api_key");
 		String apiSecret = (String) args.get("api_secret");
-		Log.d(LCAT, "Initialize...");
 		Kandy.initialize(getActivity(), apiKey, apiSecret);
 	}
 }

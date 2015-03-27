@@ -12,6 +12,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
+import android.util.Log;
 
 /**
  * Common utilities
@@ -200,5 +201,26 @@ public final class Utils {
 			list.add(value);
 		}
 		return list;
+	}
+	
+	/**
+	 * Get krollDict from callbacks. If not exists, return null
+	 * 
+	 * @param callbacks
+	 * @param key
+	 * @return
+	 */
+	public static KrollDict getKrollDictFromCallbacks(KrollDict callbacks, String key){
+		KrollDict result = null;
+		if (callbacks != null){
+			result = callbacks.getKrollDict(key);
+		}
+		
+		if (result == null){
+			Log.i(Utils.class.getSimpleName(), key + " is not defined");
+			result = new KrollDict();
+		}
+		
+		return result;
 	}
 }

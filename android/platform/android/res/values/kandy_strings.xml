@@ -40,5 +40,17 @@
 
     <string name="kandy_chat_phone_number_verification_text">Invalid recipient\'s number (recipientID@domain.com)
     </string>
+    <string name="kandy_chat_pull_label">Pull pending events</string>
+    <string name="kandy_chat_ack_label">Mark message as received</string>
+    <string name="kandy_chat_send_button_label">Send</string>
+    <string name="kandy_chats_message_sent_label">Message sent</string>
+    <string name="kandy_chat_phone_number_verification_text">Invalid recipient\'s number (recipientID@domain.com)</string>
+    <string name="kandy_chat_phone_number_domain_verification_text">Invalid recipient, please enter username with domain(userID@domain.com)</string>
+    <string name="kandy_chat_phone_number_hint_text">recipientID@domain.com</string>
+    <string name="kandy_chat_message_hint_text">Message</string>
+    <string name="kandy_chats_get_incoming_msgs_button_label">Get Pending Messages</string>
+    <string name="ui_message_listview_item_sender">Received From:</string>
+    <string name="ui_message_listview_item_recipient">Sent To:</string>
+    <string name="ui_message_listview_item_message">Message:</string>
 
 </resources>

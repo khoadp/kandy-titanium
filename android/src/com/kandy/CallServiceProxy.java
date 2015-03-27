@@ -2,13 +2,22 @@ package com.kandy;
 
 import org.appcelerator.kroll.KrollDict;
 import org.appcelerator.kroll.KrollFunction;
-import org.appcelerator.kroll.KrollProxy;
 import org.appcelerator.kroll.annotations.Kroll;
 import org.appcelerator.titanium.proxy.TiViewProxy;
 import org.appcelerator.titanium.view.TiUIView;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.EditText;
+import android.widget.ToggleButton;
 
 import com.genband.kandy.api.Kandy;
 import com.genband.kandy.api.services.calls.IKandyCall;
@@ -27,13 +36,115 @@ import com.genband.kandy.api.services.calls.KandyView;
  *
  */
 @Kroll.proxy(creatableInModule = KandyModule.class)
-public class CallServiceProxy extends KrollProxy {
+public class CallServiceProxy extends TiViewProxy {
 
-	private IKandyCall _call;
-	private KandyView _localVideoView;
-	private KandyView _remoteVideoView;
+	public static final String LCAT = CallServiceProxy.class.getSimpleName();
 	
+	/**
+	 * Call widget
+	 */
+	private class CallWidget extends TiUIView {
+
+		KandyView localView, remoteView;
+		
+		public CallWidget(TiViewProxy proxy) {
+			super(proxy);
+			
+			View layoutWraper;
+			
+			LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
+			layoutWraper = layoutInflater.inflate(
+					Utils.getLayout(getActivity(), "kandy_call_widget"), null);
+			
+			localView = (KandyView)layoutWraper.findViewById(
+					Utils.getId(getActivity(), "kandy_local_video_view"));
+			remoteView = (KandyView)layoutWraper.findViewById(
+					Utils.getId(getActivity(), "kandy_remote_video_view"));
+			
+			final EditText phoneNumber = (EditText)layoutWraper.findViewById(
+					Utils.getId(getActivity(), "kandy_phone_number_edit"));
+			CheckBox startWithVideo = (CheckBox)layoutWraper.findViewById(
+					Utils.getId(getActivity(), "kandy_video_checkbox"));
+			
+			Button btnCall = (Button)layoutWraper.findViewById(
+					Utils.getId(getActivity(), "kandy_call_button"));
+			Button btnHangup = (Button)layoutWraper.findViewById(
+					Utils.getId(getActivity(), "kandy_hangup_button"));
+			ToggleButton tbtnHold = (ToggleButton)layoutWraper.findViewById(
+					Utils.getId(getActivity(), "kandy_hold_tbutton"));
+			ToggleButton tbtnMute = (ToggleButton)layoutWraper.findViewById(
+					Utils.getId(getActivity(), "kandy_mute_tbutton"));
+			ToggleButton tbtnVideo = (ToggleButton)layoutWraper.findViewById(
+					Utils.getId(getActivity(), "kandy_video_tbutton"));
+			
+			startWithVideo.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+				
+				public void onCheckedChanged(CompoundButton comp, boolean checked) {
+					_startWithVideo = checked;
+				}
+			});
+			
+			btnCall.setOnClickListener(new View.OnClickListener() {
+				
+				public void onClick(View v) {
+					// TODO: some UI tweaks
+					CallServiceProxy.this.createVoipCall(phoneNumber.getText().toString());
+				}
+			});
+			
+			btnHangup.setOnClickListener(new View.OnClickListener() {
+							
+				public void onClick(View v) {
+					// TODO: some UI tweak
+					CallServiceProxy.this.hangup();
+				}
+			});
+			
+			tbtnHold.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+				
+				public void onCheckedChanged(CompoundButton btn, boolean checked) {
+					CallServiceProxy.this.hold(checked);
+				}
+			});
+			
+			tbtnMute.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+				
+				public void onCheckedChanged(CompoundButton btn, boolean checked) {
+					CallServiceProxy.this.mute(checked);
+				}
+			});
+			
+			tbtnVideo.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+				
+				public void onCheckedChanged(CompoundButton btn, boolean checked) {
+					CallServiceProxy.this.videoSharing(checked);
+				}
+			});
+			
+			setNativeView(layoutWraper);
+		}
+		
+		public void setVideoViewForCall(final IKandyCall call){
+			if (call != null){
+				getActivity().runOnUiThread(new Runnable() {
+					
+					public void run() {
+						if (localView != null && remoteView != null){
+							call.setLocalVideoView(localView);
+							call.setRemoteVideoView(remoteView);
+						}
+					}
+				});
+			}
+		}
+	}
+	
+	private KrollDict callbacks;
+	
+	private CallWidget callWidget;
+	private IKandyCall _call;
 	private boolean _startWithVideo = true;
+	private AlertDialog mIncomingCallDialog;
 
 	private KandyCallServiceNotificationListener _kandyCallServiceNotificationListener = null;
 	
@@ -51,6 +162,26 @@ public class CallServiceProxy extends KrollProxy {
 		if (options.containsKey("startWithVideo")) {
 			_startWithVideo = options.getBoolean("startWithVideo");
 		}
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public TiUIView createView(Activity activity) {
+		callWidget = new CallWidget(this);
+		return callWidget;
+	}
+	
+	/**
+	 * Set call callbacks
+	 * 
+	 * @param args
+	 */
+	@Kroll.setProperty
+	@Kroll.method
+	public void setCallbacks(KrollDict args){
+		callbacks = args;
 	}
 	
 	/**
@@ -88,6 +219,9 @@ public class CallServiceProxy extends KrollProxy {
 				data.put("via", callee.getVia());
 				Utils.checkAndSendResult(getKrollObject(),
 						(KrollFunction)callbacks.get("onIncomingCall"), data);
+				
+				// TODO: Create a incoming call dialog
+				answerCall(callee);
 			}
 
 			public void onGSMCallIncoming(IKandyCall callee) {
@@ -154,6 +288,128 @@ public class CallServiceProxy extends KrollProxy {
 		}
 	}
 
+	private void answerCall(final IKandyIncomingCall pCall) {
+		getActivity().runOnUiThread(new Runnable() {
+			
+			public void run() {
+				createIncomingCallPopup(pCall);
+			}
+		});
+	}
+	
+
+	/**
+	 * Creates the popup for incoming call 
+	 * @param pInCall incoming call for which dialog will be created
+	 */
+	private void createIncomingCallPopup(IKandyIncomingCall pInCall) {
+		_call = pInCall;
+		
+		callWidget.setVideoViewForCall(_call);
+
+		/*if(isFinishing()) {
+			//FIXME remove this after fix twice callback call
+			Log.i(TAG, "createIncomingCallPopup is finishing()");
+			return;
+		}*/
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+		builder.setPositiveButton(Utils.getString(getActivity(), "kandy_calls_answer_button_label"),
+				new DialogInterface.OnClickListener() {
+
+					public void onClick(DialogInterface dialog, int which) {
+						accept();
+						dialog.dismiss();
+					}
+		});
+
+		builder.setNeutralButton(Utils.getString(getActivity(), "kandy_calls_ignore_incoming_call_button_label"),
+				new DialogInterface.OnClickListener() {
+
+			public void onClick(DialogInterface dialog, int which) {
+				ignoreIncomingCall((IKandyIncomingCall)_call);
+				dialog.dismiss();
+			}
+		});
+
+		builder.setNegativeButton(Utils.getString(getActivity(), "kandy_calls_reject_incoming_call_button_label"),
+				new DialogInterface.OnClickListener() {
+
+			public void onClick(DialogInterface dialog, int which) {
+				rejectIncomingCall((IKandyIncomingCall)_call);
+				dialog.dismiss();
+			}
+		});
+
+		builder.setMessage(Utils.getString(getActivity(), "kandy_calls_incoming_call_popup_message_label") + _call.getCallee().getUri());
+
+		mIncomingCallDialog = builder.create();
+		mIncomingCallDialog.show();
+	}
+
+	/**
+	 * Ignoring the incoming call -  the caller wont know about ignore, call will continue on his side 
+	 * @param pCall incoming call instance
+	 */
+	public void ignoreIncomingCall(IKandyIncomingCall pCall) {
+		if(pCall == null) {
+			Log.i(LCAT, Utils.getString(getActivity(), "kandy_calls_invalid_hangup_text_msg"));
+			return;
+		}
+
+		pCall.ignore(new KandyCallResponseListener() {
+
+			public void onRequestSucceeded(IKandyCall call) {
+				Log.i(LCAT, "mCurrentIncomingCall.ignore succeed" );
+				_call = null;
+			}
+
+			public void onRequestFailed(IKandyCall call, int responseCode, String err) {
+				Log.i(LCAT, "mCurrentIncomingCall.ignore failed");
+			}
+		});
+	}
+
+	/**
+	 * Reject the incoming call
+	 * @param pCall incoming call instance
+	 */
+	public void rejectIncomingCall(IKandyIncomingCall pCall) {
+		if(pCall == null) {
+			Log.i(LCAT, Utils.getString(getActivity(), "kandy_calls_invalid_hangup_text_msg"));
+			return;
+		}
+
+		pCall.reject(new KandyCallResponseListener() {
+
+			public void onRequestSucceeded(IKandyCall call) {
+				Log.i(LCAT, "mCurrentIncomingCall.reject succeeded" );
+				_call = null;
+			}
+
+			public void onRequestFailed(IKandyCall call, int responseCode, String err) {
+				Log.i(LCAT, "mCurrentIncomingCall.reject. Error: " + err + "\nResponse code: " + responseCode);
+			}
+		});
+	}
+
+	/**
+	 * Accept incoming call
+	 */
+	public void accept() {
+		((IKandyIncomingCall)_call).accept(_startWithVideo, new KandyCallResponseListener() {
+
+			public void onRequestSucceeded(IKandyCall call) {
+				Log.i(LCAT, "mCurrentIncomingCall.accept succeed");
+			}
+
+			public void onRequestFailed(IKandyCall call, int responseCode, String err) {
+				Log.i(LCAT, "mCurrentIncomingCall.accept. Error: " + err + "\nResponse code: " + responseCode);
+			}
+		});	
+	}
+
+	
 	/**
 	 * Create a PSTN call
 	 * 
@@ -164,11 +420,24 @@ public class CallServiceProxy extends KrollProxy {
 		final KrollFunction success = (KrollFunction) args.get("success");
 		final KrollFunction error = (KrollFunction) args.get("error");
 
-		String number = (String) args.get("number");
+		String number = (String) args.get("callee");
 
 		_call = Kandy.getServices().getCallService().createPSTNCall(number);
 	}
 
+	/**
+	 * Create a voip call
+	 * 
+	 * @param callee
+	 */
+	public void createVoipCall(String callee){
+		KrollDict args = Utils.getKrollDictFromCallbacks(callbacks, "create");
+		
+		args.put("callee", callee);
+		
+		createVoipCall(args);
+	}
+	
 	/**
 	 * Create a voip call
 	 * 
@@ -178,12 +447,11 @@ public class CallServiceProxy extends KrollProxy {
 	public void createVoipCall(KrollDict args) {
 		final KrollFunction success = (KrollFunction) args.get("success");
 		final KrollFunction error = (KrollFunction) args.get("error");
-
-		String number = (String) args.get("number");
-
-		KandyRecord callee;
+		String callee = (String) args.get("callee");
+		
+		KandyRecord calleeRecord;
 		try {
-			callee = new KandyRecord(number);
+			calleeRecord = new KandyRecord(callee);
 		} catch (IllegalArgumentException ex) {
 			Utils.sendFailResult(getKrollObject(), error,
 					"kandy_calls_invalid_phone_text_msg");
@@ -191,17 +459,9 @@ public class CallServiceProxy extends KrollProxy {
 		}
 
 		_call = Kandy.getServices().getCallService()
-				.createVoipCall(callee, _startWithVideo);
+				.createVoipCall(calleeRecord, _startWithVideo);
 		
-		if (_localVideoView != null && _remoteVideoView != null){
-			_call.setLocalVideoView(_localVideoView);
-			_call.setRemoteVideoView(_remoteVideoView);
-		} else {
-			KandyView dummyVideoView = new KandyView(getActivity(), null);
-			
-			_call.setLocalVideoView(dummyVideoView);
-			_call.setRemoteVideoView(dummyVideoView);
-		}
+		callWidget.setVideoViewForCall(_call);
 		
 		((IKandyOutgoingCall)_call).establish(new KandyCallResponseListener() {
 			
@@ -214,7 +474,15 @@ public class CallServiceProxy extends KrollProxy {
 			}
 		});
 	}
-
+	
+	/**
+	 * Hangup current call
+	 */
+	public void hangup(){
+		KrollDict onHangup = Utils.getKrollDictFromCallbacks(callbacks, "hangup");		
+		this.hangup(onHangup);
+	}
+	
 	/**
 	 * Hangup current call
 	 * 
@@ -245,6 +513,21 @@ public class CallServiceProxy extends KrollProxy {
 		});
 	}
 
+	/**
+	 * Mute/Unmute the current call
+	 * 
+	 * @param checked
+	 */
+	public void mute(Boolean checked){
+		KrollDict onMute = Utils.getKrollDictFromCallbacks(callbacks, "mute");
+		
+		if (checked){
+			this.mute(onMute);
+		} else {
+			this.unmute(onMute);
+		}
+	}
+	
 	/**
 	 * Mute current call
 	 * 
@@ -306,6 +589,20 @@ public class CallServiceProxy extends KrollProxy {
 	}
 
 	/**
+	 * Hold/Unhold the current call
+	 * 
+	 * @param checked
+	 */
+	public void hold(Boolean checked){
+		KrollDict onHold = Utils.getKrollDictFromCallbacks(callbacks, "mute");
+		
+		if (checked){
+			this.hold(onHold);
+		} else {
+			this.unhold(onHold);
+		}
+	}
+	/**
 	 * Hold current call
 	 * 
 	 * @param args
@@ -334,6 +631,8 @@ public class CallServiceProxy extends KrollProxy {
 			}
 		});
 	}
+	
+	
 
 	/**
 	 * Unhold current call
@@ -363,6 +662,16 @@ public class CallServiceProxy extends KrollProxy {
 
 			}
 		});
+	}
+	
+	public void videoSharing(Boolean checked){
+		KrollDict onVideoSharing = Utils.getKrollDictFromCallbacks(callbacks, "videoSharing");
+		
+		if (checked){
+			this.startVideoSharing(onVideoSharing);
+		} else {
+			this.stopVideoSharing(onVideoSharing);
+		}
 	}
 
 	/**
