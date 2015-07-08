@@ -1,10 +1,4 @@
-package com.kandy;
-
-import org.appcelerator.kroll.KrollDict;
-import org.appcelerator.kroll.KrollFunction;
-import org.appcelerator.kroll.annotations.Kroll;
-import org.appcelerator.titanium.proxy.TiViewProxy;
-import org.appcelerator.titanium.view.TiUIView;
+package io.kandy;
 
 import android.app.Activity;
 import android.util.Log;
@@ -13,12 +7,17 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-
 import com.genband.kandy.api.Kandy;
 import com.genband.kandy.api.access.KandyLoginResponseListener;
 import com.genband.kandy.api.access.KandyLogoutResponseListener;
 import com.genband.kandy.api.services.calls.KandyRecord;
 import com.genband.kandy.api.services.common.IKandySession;
+import com.genband.kandy.api.utils.KandyIllegalArgumentException;
+import org.appcelerator.kroll.KrollDict;
+import org.appcelerator.kroll.KrollFunction;
+import org.appcelerator.kroll.annotations.Kroll;
+import org.appcelerator.titanium.proxy.TiViewProxy;
+import org.appcelerator.titanium.view.TiUIView;
 
 /**
  * Access service
@@ -63,7 +62,7 @@ public class AccessProxy extends TiViewProxy {
 					Utils.getId(getActivity(), "kandy_login_button"));
 			
 			userInfo = (TextView)layoutWraper.findViewById(
-					Utils.getId(getActivity(), "kand_user_info_edit"));
+					Utils.getId(getActivity(), "kandy_user_info_edit"));
 			Button logoutBtn = (Button)layoutWraper.findViewById(
 					Utils.getId(getActivity(), "kandy_logout_button"));
 			
@@ -206,7 +205,7 @@ public class AccessProxy extends TiViewProxy {
 	 * @param args
 	 */
 	@Kroll.method
-	public void login(KrollDict args){
+	public void login(KrollDict args) {
 		final KrollFunction success = (KrollFunction)args.get("success");
 		final KrollFunction error = (KrollFunction)args.get("success");
 		final String username = (String)args.get("username");
@@ -217,7 +216,7 @@ public class AccessProxy extends TiViewProxy {
 		try {
 			kandyUser = new KandyRecord(username);
 
-		} catch (IllegalArgumentException ex) {
+		} catch (KandyIllegalArgumentException ex) {
 			String err = Utils.getString(getActivity(), "kandy_login_empty_username_text");
 			Utils.sendFailResult(getKrollObject(), error, err);
 			Log.d(LCAT, err);

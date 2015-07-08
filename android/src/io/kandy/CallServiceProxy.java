@@ -1,10 +1,4 @@
-package com.kandy;
-
-import org.appcelerator.kroll.KrollDict;
-import org.appcelerator.kroll.KrollFunction;
-import org.appcelerator.kroll.annotations.Kroll;
-import org.appcelerator.titanium.proxy.TiViewProxy;
-import org.appcelerator.titanium.view.TiUIView;
+package io.kandy;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -12,22 +6,16 @@ import android.content.DialogInterface;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
+import android.widget.*;
 import android.widget.CompoundButton.OnCheckedChangeListener;
-import android.widget.EditText;
-import android.widget.ToggleButton;
-
 import com.genband.kandy.api.Kandy;
-import com.genband.kandy.api.services.calls.IKandyCall;
-import com.genband.kandy.api.services.calls.IKandyIncomingCall;
-import com.genband.kandy.api.services.calls.IKandyOutgoingCall;
-import com.genband.kandy.api.services.calls.KandyCallResponseListener;
-import com.genband.kandy.api.services.calls.KandyCallServiceNotificationListener;
-import com.genband.kandy.api.services.calls.KandyCallState;
-import com.genband.kandy.api.services.calls.KandyRecord;
-import com.genband.kandy.api.services.calls.KandyView;
+import com.genband.kandy.api.services.calls.*;
+import com.genband.kandy.api.utils.KandyIllegalArgumentException;
+import org.appcelerator.kroll.KrollDict;
+import org.appcelerator.kroll.KrollFunction;
+import org.appcelerator.kroll.annotations.Kroll;
+import org.appcelerator.titanium.proxy.TiViewProxy;
+import org.appcelerator.titanium.view.TiUIView;
 
 /**
  * Call service
@@ -182,110 +170,6 @@ public class CallServiceProxy extends TiViewProxy {
 	@Kroll.method
 	public void setCallbacks(KrollDict args){
 		callbacks = args;
-	}
-	
-	/**
-	 * Register notification listeners
-	 * 
-	 * @param callbacks
-	 */
-	@Kroll.method
-	public void registerNotificationListener( final KrollDict callbacks) {
-
-		if (_kandyCallServiceNotificationListener != null) {
-			unregisterNotificationListener();
-		}
-
-		_kandyCallServiceNotificationListener = new KandyCallServiceNotificationListener() {
-
-			public void onVideoStateChanged(IKandyCall callee,
-					boolean receiving, boolean sending) {
-				KrollDict data = new KrollDict();
-				// TODO: add callee
-				data.put("id", callee.getCallId());
-				data.put("receiving", receiving);
-				data.put("sending", sending);
-				Utils.checkAndSendResult(getKrollObject(),
-						(KrollFunction)callbacks.get("onVideoStateChanged"), data);
-			}
-
-			public void onIncomingCall(IKandyIncomingCall callee) {
-				if (_call == null){
-					_call = callee; // TODO: fix this
-				}
-				KrollDict data = new KrollDict();
-				data.put("id", callee.getCallId());
-				data.put("callee", callee.getCallee().getUri());
-				data.put("via", callee.getVia());
-				Utils.checkAndSendResult(getKrollObject(),
-						(KrollFunction)callbacks.get("onIncomingCall"), data);
-				
-				// TODO: Create a incoming call dialog
-				answerCall(callee);
-			}
-
-			public void onGSMCallIncoming(IKandyCall callee) {
-				KrollDict data = new KrollDict();
-				data.put("id", callee.getCallId());
-				data.put("callee", callee.getCallee().getUri());
-				data.put("via", callee.getVia());
-				Utils.checkAndSendResult(getKrollObject(),
-						(KrollFunction)callbacks.get("onGSMCallIncoming"), data);
-			}
-
-			public void onGSMCallDisconnected(IKandyCall callee) {
-				KrollDict data = new KrollDict();
-				data.put("id", callee.getCallId());
-				data.put("callee", callee.getCallee().getUri());
-				data.put("via", callee.getVia());
-				Utils.checkAndSendResult(getKrollObject(),
-						(KrollFunction)callbacks.get("onGSMCallDisconnected"), data);
-			}
-
-			public void onGSMCallConnected(IKandyCall callee) {
-				KrollDict data = new KrollDict();
-				data.put("id", callee.getCallId());
-				data.put("callee", callee.getCallee().getUri());
-				data.put("via", callee.getVia());
-				Utils.checkAndSendResult(getKrollObject(),
-						(KrollFunction)callbacks.get("onGSMCallConnected"), data);
-			}
-
-			public void onCallStateChanged(KandyCallState state,
-					IKandyCall callee) {
-				KrollDict data = new KrollDict();
-				data.put("id", callee.getCallId());
-				data.put("state", state.name());
-				Utils.checkAndSendResult(getKrollObject(),
-						(KrollFunction)callbacks.get("onCallStateChanged"), data);
-			}
-
-			public void onAudioStateChanged(IKandyCall callee, boolean mute) {
-				KrollDict data = new KrollDict();
-				data.put("mute", mute);
-				Utils.checkAndSendResult(getKrollObject(),
-						(KrollFunction)callbacks.get("onAudioStateChanged"), data);
-			}
-		};
-
-		Kandy.getServices()
-				.getCallService()
-				.registerNotificationListener(
-						_kandyCallServiceNotificationListener);
-	}
-
-	/**
-	 * Unregister notification listeners
-	 */
-	@Kroll.method
-	public void unregisterNotificationListener() {
-		if (_kandyCallServiceNotificationListener != null) {
-			Kandy.getServices()
-					.getCallService()
-					.unregisterNotificationListener(
-							_kandyCallServiceNotificationListener);
-			_kandyCallServiceNotificationListener = null;
-		}
 	}
 
 	private void answerCall(final IKandyIncomingCall pCall) {
@@ -452,7 +336,7 @@ public class CallServiceProxy extends TiViewProxy {
 		KandyRecord calleeRecord;
 		try {
 			calleeRecord = new KandyRecord(callee);
-		} catch (IllegalArgumentException ex) {
+		} catch (KandyIllegalArgumentException ex) {
 			Utils.sendFailResult(getKrollObject(), error,
 					"kandy_calls_invalid_phone_text_msg");
 			return;

@@ -1,10 +1,4 @@
-package com.kandy;
-
-import org.appcelerator.kroll.KrollDict;
-import org.appcelerator.kroll.KrollFunction;
-import org.appcelerator.kroll.annotations.Kroll;
-import org.appcelerator.titanium.proxy.TiViewProxy;
-import org.appcelerator.titanium.view.TiUIView;
+package io.kandy;
 
 import android.app.Activity;
 import android.util.Log;
@@ -13,13 +7,17 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-
 import com.genband.kandy.api.Kandy;
 import com.genband.kandy.api.provisioning.IKandyValidationResponse;
 import com.genband.kandy.api.provisioning.KandyValidationResponseListener;
 import com.genband.kandy.api.services.common.KandyResponseListener;
 import com.genband.kandy.api.services.location.IKandyAreaCode;
 import com.genband.kandy.api.services.location.KandyCountryInfoResponseListener;
+import org.appcelerator.kroll.KrollDict;
+import org.appcelerator.kroll.KrollFunction;
+import org.appcelerator.kroll.annotations.Kroll;
+import org.appcelerator.titanium.proxy.TiViewProxy;
+import org.appcelerator.titanium.view.TiUIView;
 
 /**
  * Provisioning service

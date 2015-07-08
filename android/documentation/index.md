@@ -8,7 +8,7 @@ TODO: Enter your module description here
 
 To access this module from JavaScript, you would do the following:
 
-    var kandy = require("com.kandy");
+    var kandy = require("io.kandy");
 
 The kandy variable is a reference to the Module object.
 

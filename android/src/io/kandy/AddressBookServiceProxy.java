@@ -1,8 +1,7 @@
-package com.kandy;
+package io.kandy;
 
-import java.util.HashMap;
-import java.util.List;
-
+import com.genband.kandy.api.Kandy;
+import com.genband.kandy.api.services.addressbook.*;
 import org.appcelerator.kroll.KrollFunction;
 import org.appcelerator.kroll.KrollProxy;
 import org.appcelerator.kroll.annotations.Kroll;
@@ -10,13 +9,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.genband.kandy.api.Kandy;
-import com.genband.kandy.api.services.addressbook.IKandyContact;
-import com.genband.kandy.api.services.addressbook.KandyAddressBookServiceNotificationListener;
-import com.genband.kandy.api.services.addressbook.KandyDeviceContactsFilter;
-import com.genband.kandy.api.services.addressbook.KandyDeviceContactsListener;
-import com.genband.kandy.api.services.addressbook.KandyEmailContactRecord;
-import com.genband.kandy.api.services.addressbook.KandyPhoneContactRecord;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * Address book service

@@ -1,13 +1,12 @@
-package com.kandy;
+package io.kandy;
 
+import com.genband.kandy.api.Kandy;
+import com.genband.kandy.api.services.addressbook.KandyDeviceContactsFilter;
 import org.appcelerator.kroll.KrollDict;
 import org.appcelerator.kroll.KrollModule;
 import org.appcelerator.kroll.annotations.Kroll;
 import org.appcelerator.kroll.common.Log;
 import org.appcelerator.titanium.TiApplication;
-
-import com.genband.kandy.api.Kandy;
-import com.genband.kandy.api.services.addressbook.KandyDeviceContactsFilter;
 
 /**
  * Kandy module
@@ -15,7 +14,7 @@ import com.genband.kandy.api.services.addressbook.KandyDeviceContactsFilter;
  * @author kodeplusdev
  *
  */
-@Kroll.module(name = "Kandy", id = "com.kandy")
+@Kroll.module(name = "Kandy", id = "io.kandy")
 public class KandyModule extends KrollModule {
 
 	// Standard Debugging variables

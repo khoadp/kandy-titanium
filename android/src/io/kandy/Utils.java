@@ -1,9 +1,7 @@
-package com.kandy;
+package io.kandy;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
+import android.content.Context;
+import android.util.Log;
 import org.appcelerator.kroll.KrollDict;
 import org.appcelerator.kroll.KrollFunction;
 import org.appcelerator.kroll.KrollObject;
@@ -11,8 +9,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.content.Context;
-import android.util.Log;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Common utilities
@@ -158,6 +157,7 @@ public final class Utils {
 	 * @return
 	 * @throws JSONException
 	 */
+	@SuppressWarnings("unchecked")
 	public static KrollDict JSONObjectToKrollDict(JSONObject object)
 			throws JSONException {
 		KrollDict map = new KrollDict();
@@ -186,7 +186,7 @@ public final class Utils {
 	 * @return
 	 * @throws JSONException
 	 */
-	public static List JSONArrayToList(JSONArray array) throws JSONException {
+	public static List<Object> JSONArrayToList(JSONArray array) throws JSONException {
 		List<Object> list = new ArrayList<Object>();
 
 		for (int i = 0; i < array.length(); i++) {
