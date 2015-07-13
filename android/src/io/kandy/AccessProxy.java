@@ -45,26 +45,26 @@ public class AccessProxy extends TiViewProxy {
 			
 			LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
 			layoutWraper = layoutInflater.inflate(
-					Utils.getLayout(getActivity(), "kandy_access_widget"), null);
+					KandyUtils.getLayout("kandy_access_widget"), null);
 			
 			// Get view containers
 			loginView = layoutWraper.findViewById(
-					Utils.getId(getActivity(), "kandy_login_view_container"));
+					KandyUtils.getId("kandy_login_view_container"));
 			logoutView = layoutWraper.findViewById(
-					Utils.getId(getActivity(), "kandy_logout_view_container"));
+					KandyUtils.getId("kandy_logout_view_container"));
 			
 			// Get widgets
 			final EditText username = (EditText)layoutWraper.findViewById(
-					Utils.getId(getActivity(), "kandy_username_edit"));
+					KandyUtils.getId("kandy_username_edit"));
 			final EditText password = (EditText)layoutWraper.findViewById(
-					Utils.getId(getActivity(), "kandy_password_edit"));
+					KandyUtils.getId("kandy_password_edit"));
 			Button loginBtn = (Button)layoutWraper.findViewById(
-					Utils.getId(getActivity(), "kandy_login_button"));
+					KandyUtils.getId("kandy_login_button"));
 			
 			userInfo = (TextView)layoutWraper.findViewById(
-					Utils.getId(getActivity(), "kandy_user_info_edit"));
+					KandyUtils.getId("kandy_user_info_edit"));
 			Button logoutBtn = (Button)layoutWraper.findViewById(
-					Utils.getId(getActivity(), "kandy_logout_button"));
+					KandyUtils.getId("kandy_logout_button"));
 			
 			// Set click events
 			loginBtn.setOnClickListener(new View.OnClickListener() {
@@ -217,15 +217,15 @@ public class AccessProxy extends TiViewProxy {
 			kandyUser = new KandyRecord(username);
 
 		} catch (KandyIllegalArgumentException ex) {
-			String err = Utils.getString(getActivity(), "kandy_login_empty_username_text");
-			Utils.sendFailResult(getKrollObject(), error, err);
+			String err = KandyUtils.getString("kandy_login_empty_username_text");
+			KandyUtils.sendFailResult(getKrollObject(), error, err);
 			Log.d(LCAT, err);
 			return;
 		}
 
 		if (password == null || password.isEmpty()) {
-			String err = Utils.getString(getActivity(), "kandy_login_empty_password_text");
-			Utils.sendFailResult(getKrollObject(), error, err);
+			String err = KandyUtils.getString("kandy_login_empty_password_text");
+			KandyUtils.sendFailResult(getKrollObject(), error, err);
 			Log.d(LCAT, err);
 			return;
 		}
@@ -235,8 +235,8 @@ public class AccessProxy extends TiViewProxy {
 
 					@Override
 					public void onRequestFailed(int code, String err) {
-						Log.d(LCAT, String.format(Utils.getString(getActivity(), "kandy_error_message"), code, err));
-						Utils.sendFailResult(getKrollObject(), error, code, err);
+						Log.d(LCAT, String.format(KandyUtils.getString("kandy_error_message"), code, err));
+						KandyUtils.sendFailResult(getKrollObject(), error, code, err);
 					}
 
 					@Override
@@ -244,7 +244,7 @@ public class AccessProxy extends TiViewProxy {
 						accessWidget.setUserInformation(username);
 						accessWidget.displayLogoutView();
 						Log.d(LCAT, "Kandy > getAccess > login > onLoginSucceeded");
-						Utils.sendSuccessResult(getKrollObject(), success);
+						KandyUtils.sendSuccessResult(getKrollObject(), success);
 					}
 				});
 	}
@@ -258,7 +258,7 @@ public class AccessProxy extends TiViewProxy {
 	 */
 	public void login(final String username, final String password) {
 		
-		KrollDict loginArgs = Utils.getKrollDictFromCallbacks(callbacks, "login");
+		KrollDict loginArgs = KandyUtils.getKrollDictFromCallbacks(callbacks, "login");
 		
 		loginArgs.put("username", username);
 		loginArgs.put("password", password);
@@ -280,15 +280,15 @@ public class AccessProxy extends TiViewProxy {
 
 			@Override
 			public void onRequestFailed(int code, String err) {
-				Log.d(LCAT, String.format(Utils.getString(getActivity(), "kandy_error_message"), code, err));
-				Utils.sendFailResult(getKrollObject(), error, code, err);
+				Log.d(LCAT, String.format(KandyUtils.getString("kandy_error_message"), code, err));
+				KandyUtils.sendFailResult(getKrollObject(), error, code, err);
 			}
 
 			@Override
 			public void onLogoutSucceeded() {
 				accessWidget.displayLoginView();
 				Log.d(LCAT, "Kandy > getAccess > logout > onLogoutSucceeded");
-				Utils.sendSuccessResult(getKrollObject(), success);
+				KandyUtils.sendSuccessResult(getKrollObject(), success);
 			}
 		});
 	}
@@ -297,7 +297,7 @@ public class AccessProxy extends TiViewProxy {
 	 * This method unregisters user from the Kandy server.
 	 */
 	public void logout(){
-		KrollDict logoutArgs = Utils.getKrollDictFromCallbacks(callbacks, "logout");
+		KrollDict logoutArgs = KandyUtils.getKrollDictFromCallbacks(callbacks, "logout");
 		
 		logout(logoutArgs);
 	}
@@ -322,10 +322,10 @@ public class AccessProxy extends TiViewProxy {
 			data.put("domain", session.getKandyDomain().getName());
 			data.put("deviceId", session.getKandyUser().getDeviceId());
 
-			Utils.sendSuccessResult(getKrollObject(), success, data);
+			KandyUtils.sendSuccessResult(getKrollObject(), success, data);
 		} else {
 			Log.d(LCAT, "Session not found.");
-			Utils.sendFailResult(getKrollObject(), error, 404, "Session not found.");
+			KandyUtils.sendFailResult(getKrollObject(), error, 404, "Session not found.");
 		}
 	}
 }

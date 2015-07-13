@@ -42,8 +42,8 @@ public class AddressBookServiceProxy extends KrollProxy {
 		_addressBookServiceNotificationListener = new KandyAddressBookServiceNotificationListener() {
 
 			public void onDeviceAddressBookChanged() {
-				Utils.checkAndSendResult(getKrollObject(),
-						callbacks.get("onDeviceAddressBookChanged"), null);
+				KandyUtils.checkAndSendResult(getKrollObject(),
+						callbacks.get("onDeviceAddressBookChanged"));
 			}
 		};
 
@@ -88,7 +88,7 @@ public class AddressBookServiceProxy extends KrollProxy {
 
 					@Override
 					public void onRequestFailed(int code, String err) {
-						Utils.sendFailResult(getKrollObject(), error, code, err);
+						KandyUtils.sendFailResult(getKrollObject(), error, code, err);
 					}
 
 					@Override
@@ -137,7 +137,7 @@ public class AddressBookServiceProxy extends KrollProxy {
 							e.printStackTrace();
 						}
 
-						Utils.sendSuccessResult(getKrollObject(), success, data);
+						KandyUtils.sendSuccessResult(getKrollObject(), success, data);
 					}
 				});
 	}

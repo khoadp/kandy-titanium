@@ -45,6 +45,7 @@ public class KandyModule extends KrollModule {
 		Log.d(LCAT, "inside onAppCreate");
 		// put module initialize code that needs to run when the application is
 		// created
+		KandyUtils.initialize(app);
 	}
 
 	/**

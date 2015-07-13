@@ -45,23 +45,23 @@ public class ProvisioningServiceProxy extends TiViewProxy {
 			// Get view
 			LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
 			layoutWraper = layoutInflater.inflate(
-					Utils.getLayout(getActivity(), "kandy_provisioning_widget"), null);
+					KandyUtils.getLayout("kandy_provisioning_widget"), null);
 			
 			// Get widgets
 			
 			final EditText phoneNumber = (EditText)layoutWraper.findViewById(
-					Utils.getId(getActivity(), "kandy_phone_number_edit"));
+					KandyUtils.getId("kandy_phone_number_edit"));
 			final EditText otpCode = (EditText)layoutWraper.findViewById(
-					Utils.getId(getActivity(), "kandy_otp_code_edit"));
+					KandyUtils.getId("kandy_otp_code_edit"));
 			signedPhoneNumber = (TextView)layoutWraper.findViewById(
-					Utils.getId(getActivity(), "kandy_signed_phone_number_tview"));
+					KandyUtils.getId("kandy_signed_phone_number_tview"));
 			
 			Button requestBtn = (Button)layoutWraper.findViewById(
-					Utils.getId(getActivity(), "kandy_request_button"));
+					KandyUtils.getId("kandy_request_button"));
 			Button validateBtn = (Button)layoutWraper.findViewById(
-					Utils.getId(getActivity(), "kandy_validate_button"));
+					KandyUtils.getId("kandy_validate_button"));
 			Button deactivateBtn = (Button)layoutWraper.findViewById(
-					Utils.getId(getActivity(), "kandy_deactivate_button"));
+					KandyUtils.getId("kandy_deactivate_button"));
 			
 			// Set click events
 			
@@ -122,7 +122,7 @@ public class ProvisioningServiceProxy extends TiViewProxy {
 				
 				@Override
 				public void onRequestFailed(int code, String err) {
-					Log.d(LCAT, String.format(Utils.getString(ProvisioningServiceProxy.this.getActivity(), "kandy_error_message"), code, err));
+					Log.d(LCAT, String.format(KandyUtils.getString("kandy_error_message"), code, err));
 					twoLetterISOCountryCode = "US"; // FIXME: dummy code
 				}
 				
@@ -190,14 +190,14 @@ public class ProvisioningServiceProxy extends TiViewProxy {
 
 					@Override
 					public void onRequestFailed(int code, String err) {
-						Log.d(LCAT, String.format(Utils.getString(getActivity(), "kandy_error_message"), code, err));
-						Utils.sendFailResult(getKrollObject(), error, code, err);
+						Log.d(LCAT, String.format(KandyUtils.getString("kandy_error_message"), code, err));
+						KandyUtils.sendFailResult(getKrollObject(), error, code, err);
 					}
 
 					@Override
 					public void onRequestSucceded() {
 						Log.d(LCAT, "Kandy > getProvisioning > requestCode > onRequestSucceded");
-						Utils.sendSuccessResult(getKrollObject(), success);
+						KandyUtils.sendSuccessResult(getKrollObject(), success);
 						provisioningWidget.setSignedPhoneNumber(phoneNumber);
 					}
 				});
@@ -210,7 +210,7 @@ public class ProvisioningServiceProxy extends TiViewProxy {
 	 * @param twoLetterISOCountryCode
 	 */
 	public void requestCode(final String phoneNumber, String twoLetterISOCountryCode) {
-		KrollDict requestArgs = Utils.getKrollDictFromCallbacks(callbacks, "request");
+		KrollDict requestArgs = KandyUtils.getKrollDictFromCallbacks(callbacks, "request");
 		
 		requestArgs.put("phoneNumber", phoneNumber);
 		requestArgs.put("countryCode", twoLetterISOCountryCode);
@@ -241,14 +241,14 @@ public class ProvisioningServiceProxy extends TiViewProxy {
 
 					@Override
 					public void onRequestFailed(int code, String err) {
-						Log.d(LCAT, String.format(Utils.getString(getActivity(), "kandy_error_message"), code, err));
-						Utils.sendFailResult(getKrollObject(), error, code, err);
+						Log.d(LCAT, String.format(KandyUtils.getString( "kandy_error_message"), code, err));
+						KandyUtils.sendFailResult(getKrollObject(), error, code, err);
 					}
 
 					@Override
 					public void onRequestSuccess(IKandyValidationResponse reqpond) {
 						Log.d(LCAT, "Kandy > getProvisioning > validate > onRequestSuccess");
-						Utils.sendSuccessResult(getKrollObject(), success);
+						KandyUtils.sendSuccessResult(getKrollObject(), success);
 					}
 				});		
 	}
@@ -261,7 +261,7 @@ public class ProvisioningServiceProxy extends TiViewProxy {
 	 * @param otp
 	 */
 	public void validate(String phoneNumber, String otp, String twoLetterISOCountryCode) {
-		KrollDict validateArgs = Utils.getKrollDictFromCallbacks(callbacks, "validate");
+		KrollDict validateArgs = KandyUtils.getKrollDictFromCallbacks(callbacks, "validate");
 		
 		validateArgs.put("phoneNumber", phoneNumber);
 		validateArgs.put("otp", otp);
@@ -284,14 +284,14 @@ public class ProvisioningServiceProxy extends TiViewProxy {
 
 			@Override
 			public void onRequestFailed(int code, String err) {
-				Log.d(LCAT, String.format(Utils.getString(getActivity(), "kandy_error_message"), code, err));
-				Utils.sendFailResult(getKrollObject(), error, code, err);
+				Log.d(LCAT, String.format(KandyUtils.getString("kandy_error_message"), code, err));
+				KandyUtils.sendFailResult(getKrollObject(), error, code, err);
 			}
 
 			@Override
 			public void onRequestSucceded() {
 				Log.d(LCAT, "Kandy > getProvisioning > deactivate > onRequestSucceded");
-				Utils.sendSuccessResult(getKrollObject(), success);
+				KandyUtils.sendSuccessResult(getKrollObject(), success);
 				provisioningWidget.setSignedPhoneNumber("(none)");
 			}
 		});
@@ -301,7 +301,7 @@ public class ProvisioningServiceProxy extends TiViewProxy {
 	 * Deactivate phone number
 	 */
 	public void deactivate(){
-		KrollDict deactivateArgs = Utils.getKrollDictFromCallbacks(callbacks, "deactivate");
+		KrollDict deactivateArgs = KandyUtils.getKrollDictFromCallbacks(callbacks, "deactivate");
 		deactivate(deactivateArgs);
 	}
 }

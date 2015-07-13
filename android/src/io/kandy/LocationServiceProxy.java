@@ -36,7 +36,7 @@ public class LocationServiceProxy extends KrollProxy {
 
 					@Override
 					public void onRequestFailed(int code, String err) {
-						Utils.sendFailResult(getKrollObject(), error, code, err);
+						KandyUtils.sendFailResult(getKrollObject(), error, code, err);
 					}
 
 					@Override
@@ -45,7 +45,7 @@ public class LocationServiceProxy extends KrollProxy {
 						data.put("code", response.getCountryCode());
 						data.put("nameLong", response.getCountryNameLong());
 						data.put("nameShort", response.getCountryNameShort());
-						Utils.sendSuccessResult(getKrollObject(), success, data);
+						KandyUtils.sendSuccessResult(getKrollObject(), success, data);
 					}
 				});
 	}

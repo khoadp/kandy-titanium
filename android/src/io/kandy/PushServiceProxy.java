@@ -44,13 +44,13 @@ public class PushServiceProxy extends KrollProxy {
 
 					@Override
 					public void onRequestFailed(int code, String err) {
-						Utils.sendFailResult(getKrollObject(), error, code, err);
+						KandyUtils.sendFailResult(getKrollObject(), error, code, err);
 
 					}
 
 					@Override
 					public void onRequestSucceded() {
-						Utils.sendSuccessResult(getKrollObject(), success);
+						KandyUtils.sendSuccessResult(getKrollObject(), success);
 					}
 				});
 	}
@@ -70,13 +70,13 @@ public class PushServiceProxy extends KrollProxy {
 
 					@Override
 					public void onRequestFailed(int code, String err) {
-						Utils.sendFailResult(getKrollObject(), error, code, err);
+						KandyUtils.sendFailResult(getKrollObject(), error, code, err);
 
 					}
 
 					@Override
 					public void onRequestSucceded() {
-						Utils.sendSuccessResult(getKrollObject(), success);
+						KandyUtils.sendSuccessResult(getKrollObject(), success);
 					}
 				});
 	}

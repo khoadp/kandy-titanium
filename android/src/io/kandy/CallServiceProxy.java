@@ -42,28 +42,28 @@ public class CallServiceProxy extends TiViewProxy {
 			
 			LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
 			layoutWraper = layoutInflater.inflate(
-					Utils.getLayout(getActivity(), "kandy_call_widget"), null);
+					KandyUtils.getLayout("kandy_call_widget"), null);
 			
 			localView = (KandyView)layoutWraper.findViewById(
-					Utils.getId(getActivity(), "kandy_local_video_view"));
+					KandyUtils.getId("kandy_local_video_view"));
 			remoteView = (KandyView)layoutWraper.findViewById(
-					Utils.getId(getActivity(), "kandy_remote_video_view"));
+					KandyUtils.getId("kandy_remote_video_view"));
 			
 			final EditText phoneNumber = (EditText)layoutWraper.findViewById(
-					Utils.getId(getActivity(), "kandy_phone_number_edit"));
+					KandyUtils.getId("kandy_phone_number_edit"));
 			CheckBox startWithVideo = (CheckBox)layoutWraper.findViewById(
-					Utils.getId(getActivity(), "kandy_video_checkbox"));
+					KandyUtils.getId("kandy_video_checkbox"));
 			
 			Button btnCall = (Button)layoutWraper.findViewById(
-					Utils.getId(getActivity(), "kandy_call_button"));
+					KandyUtils.getId("kandy_call_button"));
 			Button btnHangup = (Button)layoutWraper.findViewById(
-					Utils.getId(getActivity(), "kandy_hangup_button"));
+					KandyUtils.getId("kandy_hangup_button"));
 			ToggleButton tbtnHold = (ToggleButton)layoutWraper.findViewById(
-					Utils.getId(getActivity(), "kandy_hold_tbutton"));
+					KandyUtils.getId("kandy_hold_tbutton"));
 			ToggleButton tbtnMute = (ToggleButton)layoutWraper.findViewById(
-					Utils.getId(getActivity(), "kandy_mute_tbutton"));
+					KandyUtils.getId("kandy_mute_tbutton"));
 			ToggleButton tbtnVideo = (ToggleButton)layoutWraper.findViewById(
-					Utils.getId(getActivity(), "kandy_video_tbutton"));
+					KandyUtils.getId("kandy_video_tbutton"));
 			
 			startWithVideo.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 				
@@ -198,7 +198,7 @@ public class CallServiceProxy extends TiViewProxy {
 		}*/
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-		builder.setPositiveButton(Utils.getString(getActivity(), "kandy_calls_answer_button_label"),
+		builder.setPositiveButton(KandyUtils.getString("kandy_calls_answer_button_label"),
 				new DialogInterface.OnClickListener() {
 
 					public void onClick(DialogInterface dialog, int which) {
@@ -207,7 +207,7 @@ public class CallServiceProxy extends TiViewProxy {
 					}
 		});
 
-		builder.setNeutralButton(Utils.getString(getActivity(), "kandy_calls_ignore_incoming_call_button_label"),
+		builder.setNeutralButton(KandyUtils.getString("kandy_calls_ignore_incoming_call_button_label"),
 				new DialogInterface.OnClickListener() {
 
 			public void onClick(DialogInterface dialog, int which) {
@@ -216,7 +216,7 @@ public class CallServiceProxy extends TiViewProxy {
 			}
 		});
 
-		builder.setNegativeButton(Utils.getString(getActivity(), "kandy_calls_reject_incoming_call_button_label"),
+		builder.setNegativeButton(KandyUtils.getString("kandy_calls_reject_incoming_call_button_label"),
 				new DialogInterface.OnClickListener() {
 
 			public void onClick(DialogInterface dialog, int which) {
@@ -225,7 +225,7 @@ public class CallServiceProxy extends TiViewProxy {
 			}
 		});
 
-		builder.setMessage(Utils.getString(getActivity(), "kandy_calls_incoming_call_popup_message_label") + _call.getCallee().getUri());
+		builder.setMessage(KandyUtils.getString("kandy_calls_incoming_call_popup_message_label") + _call.getCallee().getUri());
 
 		mIncomingCallDialog = builder.create();
 		mIncomingCallDialog.show();
@@ -237,7 +237,7 @@ public class CallServiceProxy extends TiViewProxy {
 	 */
 	public void ignoreIncomingCall(IKandyIncomingCall pCall) {
 		if(pCall == null) {
-			Log.i(LCAT, Utils.getString(getActivity(), "kandy_calls_invalid_hangup_text_msg"));
+			Log.i(LCAT, KandyUtils.getString("kandy_calls_invalid_hangup_text_msg"));
 			return;
 		}
 
@@ -260,7 +260,7 @@ public class CallServiceProxy extends TiViewProxy {
 	 */
 	public void rejectIncomingCall(IKandyIncomingCall pCall) {
 		if(pCall == null) {
-			Log.i(LCAT, Utils.getString(getActivity(), "kandy_calls_invalid_hangup_text_msg"));
+			Log.i(LCAT, KandyUtils.getString("kandy_calls_invalid_hangup_text_msg"));
 			return;
 		}
 
@@ -315,7 +315,7 @@ public class CallServiceProxy extends TiViewProxy {
 	 * @param callee
 	 */
 	public void createVoipCall(String callee){
-		KrollDict args = Utils.getKrollDictFromCallbacks(callbacks, "create");
+		KrollDict args = KandyUtils.getKrollDictFromCallbacks(callbacks, "create");
 		
 		args.put("callee", callee);
 		
@@ -337,7 +337,7 @@ public class CallServiceProxy extends TiViewProxy {
 		try {
 			calleeRecord = new KandyRecord(callee);
 		} catch (KandyIllegalArgumentException ex) {
-			Utils.sendFailResult(getKrollObject(), error,
+			KandyUtils.sendFailResult(getKrollObject(), error,
 					"kandy_calls_invalid_phone_text_msg");
 			return;
 		}
@@ -350,11 +350,11 @@ public class CallServiceProxy extends TiViewProxy {
 		((IKandyOutgoingCall)_call).establish(new KandyCallResponseListener() {
 			
 			public void onRequestSucceeded(IKandyCall call) {
-				Utils.sendSuccessResult(getKrollObject(), success);
+				KandyUtils.sendSuccessResult(getKrollObject(), success);
 			}
 			
 			public void onRequestFailed(IKandyCall call, int code, String err) {
-				Utils.sendFailResult(getKrollObject(), error, code, err);
+				KandyUtils.sendFailResult(getKrollObject(), error, code, err);
 			}
 		});
 	}
@@ -363,7 +363,7 @@ public class CallServiceProxy extends TiViewProxy {
 	 * Hangup current call
 	 */
 	public void hangup(){
-		KrollDict onHangup = Utils.getKrollDictFromCallbacks(callbacks, "hangup");		
+		KrollDict onHangup = KandyUtils.getKrollDictFromCallbacks(callbacks, "hangup");		
 		this.hangup(onHangup);
 	}
 	
@@ -378,7 +378,7 @@ public class CallServiceProxy extends TiViewProxy {
 		final KrollFunction error = (KrollFunction) args.get("error");
 
 		if (_call == null) {
-			Utils.sendFailResult(getKrollObject(), error,
+			KandyUtils.sendFailResult(getKrollObject(), error,
 					"kandy_calls_invalid_hangup_text_msg");
 			return;
 		}
@@ -386,12 +386,12 @@ public class CallServiceProxy extends TiViewProxy {
 		_call.hangup(new KandyCallResponseListener() {
 
 			public void onRequestSucceeded(IKandyCall call) {
-				Utils.sendSuccessResult(getKrollObject(), success);
+				KandyUtils.sendSuccessResult(getKrollObject(), success);
 				_call = null;
 			}
 
 			public void onRequestFailed(IKandyCall call, int code, String err) {
-				Utils.sendFailResult(getKrollObject(), error, code, err);
+				KandyUtils.sendFailResult(getKrollObject(), error, code, err);
 
 			}
 		});
@@ -403,7 +403,7 @@ public class CallServiceProxy extends TiViewProxy {
 	 * @param checked
 	 */
 	public void mute(Boolean checked){
-		KrollDict onMute = Utils.getKrollDictFromCallbacks(callbacks, "mute");
+		KrollDict onMute = KandyUtils.getKrollDictFromCallbacks(callbacks, "mute");
 		
 		if (checked){
 			this.mute(onMute);
@@ -423,7 +423,7 @@ public class CallServiceProxy extends TiViewProxy {
 		final KrollFunction error = (KrollFunction) args.get("error");
 
 		if (_call == null) {
-			Utils.sendFailResult(getKrollObject(), error,
+			KandyUtils.sendFailResult(getKrollObject(), error,
 					"kandy_calls_invalid_hangup_text_msg");
 			return;
 		}
@@ -431,12 +431,12 @@ public class CallServiceProxy extends TiViewProxy {
 		_call.mute(new KandyCallResponseListener() {
 
 			public void onRequestSucceeded(IKandyCall call) {
-				Utils.sendSuccessResult(getKrollObject(), success);
+				KandyUtils.sendSuccessResult(getKrollObject(), success);
 
 			}
 
 			public void onRequestFailed(IKandyCall call, int code, String err) {
-				Utils.sendFailResult(getKrollObject(), error, code, err);
+				KandyUtils.sendFailResult(getKrollObject(), error, code, err);
 
 			}
 		});
@@ -453,7 +453,7 @@ public class CallServiceProxy extends TiViewProxy {
 		final KrollFunction error = (KrollFunction) args.get("error");
 
 		if (_call == null) {
-			Utils.sendFailResult(getKrollObject(), error,
+			KandyUtils.sendFailResult(getKrollObject(), error,
 					"kandy_calls_invalid_hangup_text_msg");
 			return;
 		}
@@ -461,12 +461,12 @@ public class CallServiceProxy extends TiViewProxy {
 		_call.unmute(new KandyCallResponseListener() {
 
 			public void onRequestSucceeded(IKandyCall call) {
-				Utils.sendSuccessResult(getKrollObject(), success);
+				KandyUtils.sendSuccessResult(getKrollObject(), success);
 
 			}
 
 			public void onRequestFailed(IKandyCall call, int code, String err) {
-				Utils.sendFailResult(getKrollObject(), error, code, err);
+				KandyUtils.sendFailResult(getKrollObject(), error, code, err);
 
 			}
 		});
@@ -478,7 +478,7 @@ public class CallServiceProxy extends TiViewProxy {
 	 * @param checked
 	 */
 	public void hold(Boolean checked){
-		KrollDict onHold = Utils.getKrollDictFromCallbacks(callbacks, "mute");
+		KrollDict onHold = KandyUtils.getKrollDictFromCallbacks(callbacks, "mute");
 		
 		if (checked){
 			this.hold(onHold);
@@ -497,7 +497,7 @@ public class CallServiceProxy extends TiViewProxy {
 		final KrollFunction error = (KrollFunction) args.get("error");
 
 		if (_call == null) {
-			Utils.sendFailResult(getKrollObject(), error,
+			KandyUtils.sendFailResult(getKrollObject(), error,
 					"kandy_calls_invalid_hangup_text_msg");
 			return;
 		}
@@ -505,12 +505,12 @@ public class CallServiceProxy extends TiViewProxy {
 		_call.hold(new KandyCallResponseListener() {
 
 			public void onRequestSucceeded(IKandyCall call) {
-				Utils.sendSuccessResult(getKrollObject(), success);
+				KandyUtils.sendSuccessResult(getKrollObject(), success);
 
 			}
 
 			public void onRequestFailed(IKandyCall call, int code, String err) {
-				Utils.sendFailResult(getKrollObject(), error, code, err);
+				KandyUtils.sendFailResult(getKrollObject(), error, code, err);
 
 			}
 		});
@@ -529,7 +529,7 @@ public class CallServiceProxy extends TiViewProxy {
 		final KrollFunction error = (KrollFunction) args.get("error");
 
 		if (_call == null) {
-			Utils.sendFailResult(getKrollObject(), error,
+			KandyUtils.sendFailResult(getKrollObject(), error,
 					"kandy_calls_invalid_hangup_text_msg");
 			return;
 		}
@@ -537,19 +537,19 @@ public class CallServiceProxy extends TiViewProxy {
 		_call.unhold(new KandyCallResponseListener() {
 
 			public void onRequestSucceeded(IKandyCall call) {
-				Utils.sendSuccessResult(getKrollObject(), success);
+				KandyUtils.sendSuccessResult(getKrollObject(), success);
 
 			}
 
 			public void onRequestFailed(IKandyCall call, int code, String err) {
-				Utils.sendFailResult(getKrollObject(), error, code, err);
+				KandyUtils.sendFailResult(getKrollObject(), error, code, err);
 
 			}
 		});
 	}
 	
 	public void videoSharing(Boolean checked){
-		KrollDict onVideoSharing = Utils.getKrollDictFromCallbacks(callbacks, "videoSharing");
+		KrollDict onVideoSharing = KandyUtils.getKrollDictFromCallbacks(callbacks, "videoSharing");
 		
 		if (checked){
 			this.startVideoSharing(onVideoSharing);
@@ -569,7 +569,7 @@ public class CallServiceProxy extends TiViewProxy {
 		final KrollFunction error = (KrollFunction) args.get("error");
 
 		if (_call == null) {
-			Utils.sendFailResult(getKrollObject(), error,
+			KandyUtils.sendFailResult(getKrollObject(), error,
 					"kandy_calls_invalid_hangup_text_msg");
 			return;
 		}
@@ -577,12 +577,12 @@ public class CallServiceProxy extends TiViewProxy {
 		_call.startVideoSharing(new KandyCallResponseListener() {
 
 			public void onRequestSucceeded(IKandyCall call) {
-				Utils.sendSuccessResult(getKrollObject(), success);
+				KandyUtils.sendSuccessResult(getKrollObject(), success);
 
 			}
 
 			public void onRequestFailed(IKandyCall call, int code, String err) {
-				Utils.sendFailResult(getKrollObject(), error, code, err);
+				KandyUtils.sendFailResult(getKrollObject(), error, code, err);
 
 			}
 		});
@@ -599,7 +599,7 @@ public class CallServiceProxy extends TiViewProxy {
 		final KrollFunction error = (KrollFunction) args.get("error");
 
 		if (_call == null) {
-			Utils.sendFailResult(getKrollObject(), error,
+			KandyUtils.sendFailResult(getKrollObject(), error,
 					"kandy_calls_invalid_hangup_text_msg");
 			return;
 		}
@@ -607,12 +607,12 @@ public class CallServiceProxy extends TiViewProxy {
 		_call.stopVideoSharing(new KandyCallResponseListener() {
 
 			public void onRequestSucceeded(IKandyCall call) {
-				Utils.sendSuccessResult(getKrollObject(), success);
+				KandyUtils.sendSuccessResult(getKrollObject(), success);
 
 			}
 
 			public void onRequestFailed(IKandyCall call, int code, String err) {
-				Utils.sendFailResult(getKrollObject(), error, code, err);
+				KandyUtils.sendFailResult(getKrollObject(), error, code, err);
 
 			}
 		});
@@ -629,7 +629,7 @@ public class CallServiceProxy extends TiViewProxy {
 		final KrollFunction error = (KrollFunction) args.get("error");
 
 		if (_call == null) {
-			Utils.sendFailResult(getKrollObject(), error,
+			KandyUtils.sendFailResult(getKrollObject(), error,
 					"kandy_calls_invalid_hangup_text_msg");
 			return;
 		}
@@ -639,13 +639,13 @@ public class CallServiceProxy extends TiViewProxy {
 				new KandyCallResponseListener() {
 
 					public void onRequestSucceeded(IKandyCall call) {
-						Utils.sendSuccessResult(getKrollObject(), success);
+						KandyUtils.sendSuccessResult(getKrollObject(), success);
 
 					}
 
 					public void onRequestFailed(IKandyCall call, int code,
 							String err) {
-						Utils.sendFailResult(getKrollObject(), error, code, err);
+						KandyUtils.sendFailResult(getKrollObject(), error, code, err);
 
 					}
 				});
@@ -662,7 +662,7 @@ public class CallServiceProxy extends TiViewProxy {
 		final KrollFunction error = (KrollFunction) args.get("error");
 
 		if (_call == null) {
-			Utils.sendFailResult(getKrollObject(), error,
+			KandyUtils.sendFailResult(getKrollObject(), error,
 					"kandy_calls_invalid_hangup_text_msg");
 			return;
 		}
@@ -670,12 +670,12 @@ public class CallServiceProxy extends TiViewProxy {
 		((IKandyIncomingCall) _call).reject(new KandyCallResponseListener() {
 
 			public void onRequestSucceeded(IKandyCall call) {
-				Utils.sendSuccessResult(getKrollObject(), success);
+				KandyUtils.sendSuccessResult(getKrollObject(), success);
 
 			}
 
 			public void onRequestFailed(IKandyCall call, int code, String err) {
-				Utils.sendFailResult(getKrollObject(), error, code, err);
+				KandyUtils.sendFailResult(getKrollObject(), error, code, err);
 
 			}
 		});
@@ -692,7 +692,7 @@ public class CallServiceProxy extends TiViewProxy {
 		final KrollFunction error = (KrollFunction) args.get("error");
 
 		if (_call == null) {
-			Utils.sendFailResult(getKrollObject(), error,
+			KandyUtils.sendFailResult(getKrollObject(), error,
 					"kandy_calls_invalid_hangup_text_msg");
 			return;
 		}
@@ -700,12 +700,12 @@ public class CallServiceProxy extends TiViewProxy {
 		((IKandyIncomingCall) _call).ignore(new KandyCallResponseListener() {
 
 			public void onRequestSucceeded(IKandyCall call) {
-				Utils.sendSuccessResult(getKrollObject(), success);
+				KandyUtils.sendSuccessResult(getKrollObject(), success);
 
 			}
 
 			public void onRequestFailed(IKandyCall call, int code, String err) {
-				Utils.sendFailResult(getKrollObject(), error, code, err);
+				KandyUtils.sendFailResult(getKrollObject(), error, code, err);
 
 			}
 		});

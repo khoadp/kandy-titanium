@@ -50,7 +50,7 @@ public class PresenceServiceProxy extends KrollProxy {
         		list.add(new KandyRecord(u));
         } catch (KandyIllegalArgumentException e) {
             e.printStackTrace();
-            Utils.sendFailResult(getKrollObject(), error, e.getMessage());
+            KandyUtils.sendFailResult(getKrollObject(), error, e.getMessage());
         }
 
         if (list.size() == 0) return;
@@ -84,13 +84,13 @@ public class PresenceServiceProxy extends KrollProxy {
 			                e.printStackTrace();
 			            }
 
-			            Utils.sendSuccessResult(getKrollObject(), success, result);
+			            KandyUtils.sendSuccessResult(getKrollObject(), success, result);
 			        }
 
 			        @Override
 			        public void onRequestFailed(int code, String err) {
 			            Log.d(LCAT, "KandyPresenceResponseListener->onRequestFailed() was invoked: " + String.valueOf(code) + " - " + error);
-			            Utils.sendFailResult(getKrollObject(), error, code, err);
+			            KandyUtils.sendFailResult(getKrollObject(), error, code, err);
 			        }
 				});
 	}
