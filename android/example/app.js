@@ -6,4 +6,3 @@
 // TODO: write your module tests here
 var kandy = require('io.kandy');
 Ti.API.info("module is => " + kandy);
-
