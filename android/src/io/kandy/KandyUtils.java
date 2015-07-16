@@ -63,9 +63,7 @@ public final class KandyUtils {
 
 	public static void sendFailResult(KrollObject krollObject,
 			KrollFunction krollFunction) {
-		KrollDict result = new KrollDict();
-		result.put("status", KandyModule.STATUS_ERROR);
-		checkAndSendResult(krollObject, krollFunction, result);
+		checkAndSendResult(krollObject, krollFunction, KandyModule.STATUS_ERROR);
 	}
 
 	public static void sendFailResult(KrollObject krollObject,
@@ -82,9 +80,8 @@ public final class KandyUtils {
 
 	public static void sendSuccessResult(KrollObject krollObject,
 			KrollFunction krollFunction) {
-		KrollDict result = new KrollDict();
-		result.put("status", KandyModule.STATUS_SUCCESS);
-		checkAndSendResult(krollObject, krollFunction, result);
+		checkAndSendResult(krollObject, krollFunction,
+				KandyModule.STATUS_SUCCESS);
 	}
 
 	public static void sendSuccessResult(KrollObject krollObject,

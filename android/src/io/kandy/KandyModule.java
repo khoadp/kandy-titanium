@@ -2,18 +2,17 @@ package io.kandy;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
-import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import com.genband.kandy.api.IKandyGlobalSettings;
 import com.genband.kandy.api.Kandy;
 import com.genband.kandy.api.services.addressbook.KandyDeviceContactsFilter;
+import com.genband.kandy.api.services.addressbook.KandyDomainContactFilter;
+import org.appcelerator.kroll.KrollDict;
 import org.appcelerator.kroll.KrollModule;
 import org.appcelerator.kroll.annotations.Kroll;
 import org.appcelerator.kroll.common.Log;
 import org.appcelerator.titanium.TiApplication;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * Kandy module
@@ -46,9 +45,18 @@ public class KandyModule extends KrollModule {
 	public static int IS_FAVORITE = KandyDeviceContactsFilter.IS_FAVORITE
 			.ordinal();
 
+	// KandyDomainContactFilter Constants
+	@Kroll.constant
+	public static int FIRST_AND_LAST_NAME = KandyDomainContactFilter.FIRST_AND_LAST_NAME
+			.ordinal();
+
+	@Kroll.constant
+	public static int USER_ID = KandyDomainContactFilter.USER_ID.ordinal();
+
+	@Kroll.constant
+	public static int PHONE = KandyDomainContactFilter.PHONE.ordinal();
+
 	private SharedPreferences prefs;
-	private MediaPlayer ringin;
-	private MediaPlayer ringout;
 
 	public KandyModule() {
 		super();
@@ -59,14 +67,6 @@ public class KandyModule extends KrollModule {
 		super.onCreate(activity, savedInstanceState);
 
 		prefs = PreferenceManager.getDefaultSharedPreferences(activity);
-
-		ringin = MediaPlayer.create(activity,
-				KandyUtils.getResource("ringin", "raw"));
-		ringin.setLooping(true);
-
-		ringout = MediaPlayer.create(activity,
-				KandyUtils.getResource("ringout", "raw"));
-		ringout.setLooping(true);
 
 		// Initialize Kandy SDK
 		Kandy.initialize(
@@ -125,38 +125,25 @@ public class KandyModule extends KrollModule {
 	}
 
 	@Kroll.method
-	public JSONObject getSession() {
-		JSONObject obj = new JSONObject();
+	public KrollDict getSession() {
+		KrollDict obj = new KrollDict();
 
-		JSONObject domain = new JSONObject();
-		try {
-			domain.put("apiKey", Kandy.getSession().getKandyDomain()
-					.getApiKey());
-			domain.put("apiSecret", Kandy.getSession().getKandyDomain()
-					.getApiSecret());
-			domain.put("name", Kandy.getSession().getKandyDomain().getName());
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
+		KrollDict domain = new KrollDict();
+		domain.put("apiKey", Kandy.getSession().getKandyDomain().getApiKey());
+		domain.put("apiSecret", Kandy.getSession().getKandyDomain()
+				.getApiSecret());
+		domain.put("name", Kandy.getSession().getKandyDomain().getName());
 
-		JSONObject user = new JSONObject();
-		try {
-			user.put("id", Kandy.getSession().getKandyUser().getUserId());
-			user.put("name", Kandy.getSession().getKandyUser().getUser());
-			user.put("deviceId", Kandy.getSession().getKandyUser()
-					.getKandyDeviceId());
-			user.put("password", Kandy.getSession().getKandyUser()
-					.getPassword()); // FIXME: security?
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
+		KrollDict user = new KrollDict();
+		user.put("id", Kandy.getSession().getKandyUser().getUserId());
+		user.put("name", Kandy.getSession().getKandyUser().getUser());
+		user.put("deviceId", Kandy.getSession().getKandyUser()
+				.getKandyDeviceId());
+		user.put("password", Kandy.getSession().getKandyUser().getPassword()); // FIXME:
+																				// security?
 
-		try {
-			obj.put("domain", domain);
-			obj.put("user", user);
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
+		obj.put("domain", domain);
+		obj.put("user", user);
 
 		return obj;
 	}
