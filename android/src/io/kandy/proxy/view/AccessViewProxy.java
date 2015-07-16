@@ -57,6 +57,7 @@ public class AccessViewProxy extends TiUIView {
 		loginBtn.setOnClickListener(new View.OnClickListener() {
 
 			public void onClick(View v) {
+				loginEnabled(false);
 				((AccessProxy) getProxy()).login(loginSuccessCallback,
 						loginErrorCallback, username.getText().toString(),
 						password.getText().toString());
@@ -66,6 +67,7 @@ public class AccessViewProxy extends TiUIView {
 		logoutBtn.setOnClickListener(new View.OnClickListener() {
 
 			public void onClick(View v) {
+				logoutEnabled(false);
 				((AccessProxy) getProxy()).logout(logoutSuccessCallback,
 						logoutErrorCallback);
 			}

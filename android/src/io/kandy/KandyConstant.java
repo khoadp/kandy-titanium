@@ -27,4 +27,6 @@ public abstract class KandyConstant {
     public static final int VIDEO_PICKER_RESULT = 1003;
     public static final int AUDIO_PICKER_RESULT = 1004;
     public static final int FILE_PICKER_RESULT = 1005;
+    
+    public static final String DEFAULT_TWO_LETTER_ISO_COUNTRY_CODE = "US";
 }
