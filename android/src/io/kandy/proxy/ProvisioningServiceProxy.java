@@ -10,8 +10,8 @@ import com.genband.kandy.api.services.location.IKandyAreaCode;
 import com.genband.kandy.api.services.location.KandyCountryInfoResponseListener;
 import io.kandy.KandyConstant;
 import io.kandy.KandyModule;
-import io.kandy.KandyUtils;
-import io.kandy.proxy.view.ProvisioningViewProxy;
+import io.kandy.proxy.views.ProvisioningViewProxy;
+import io.kandy.utils.KandyUtils;
 import org.appcelerator.kroll.KrollDict;
 import org.appcelerator.kroll.KrollFunction;
 import org.appcelerator.kroll.annotations.Kroll;
@@ -27,8 +27,7 @@ import org.appcelerator.titanium.view.TiUIView;
 @Kroll.proxy(creatableInModule = KandyModule.class)
 public class ProvisioningServiceProxy extends TiViewProxy {
 
-	public static final String LCAT = ProvisioningServiceProxy.class
-			.getSimpleName();
+	public static final String LCAT = ProvisioningServiceProxy.class.getSimpleName();
 
 	private KrollDict callbacks = null;
 
@@ -44,26 +43,22 @@ public class ProvisioningServiceProxy extends TiViewProxy {
 	 */
 	private void getTwoLetterISOCountryCode() {
 		try {
-			Kandy.getServices().getLocationService()
-					.getCountryInfo(new KandyCountryInfoResponseListener() {
+			Kandy.getServices().getLocationService().getCountryInfo(new KandyCountryInfoResponseListener() {
 
-						@Override
-						public void onRequestFailed(int code, String err) {
-							Log.d(LCAT,
-									"KandyCountryInfoResponseListener->onRequestFailed() was invoked: "
-											+ String.valueOf(code) + " - "
-											+ err);
-							twoLetterISOCountryCode = KandyConstant.DEFAULT_TWO_LETTER_ISO_COUNTRY_CODE;
-						}
+				@Override
+				public void onRequestFailed(int code, String err) {
+					Log.d(LCAT,
+							"KandyCountryInfoResponseListener->onRequestFailed() was invoked: " + String.valueOf(code)
+									+ " - " + err);
+					twoLetterISOCountryCode = KandyConstant.DEFAULT_TWO_LETTER_ISO_COUNTRY_CODE;
+				}
 
-						@Override
-						public void onRequestSuccess(IKandyAreaCode respond) {
-							Log.d(LCAT,
-									"KandyCountryInfoResponseListener->onRequestSuccess() was invoked.");
-							twoLetterISOCountryCode = respond
-									.getCountryNameShort();
-						}
-					});
+				@Override
+				public void onRequestSuccess(IKandyAreaCode respond) {
+					Log.d(LCAT, "KandyCountryInfoResponseListener->onRequestSuccess() was invoked.");
+					twoLetterISOCountryCode = respond.getCountryNameShort();
+				}
+			});
 		} catch (Exception e) {
 			e.printStackTrace();
 			twoLetterISOCountryCode = KandyConstant.DEFAULT_TWO_LETTER_ISO_COUNTRY_CODE;
@@ -119,25 +114,21 @@ public class ProvisioningServiceProxy extends TiViewProxy {
 			twoLetterISOCountryCode = this.twoLetterISOCountryCode;
 		}
 
-		Kandy.getProvisioning().requestCode(phoneNumber,
-				twoLetterISOCountryCode, new KandyResponseListener() {
+		Kandy.getProvisioning().requestCode(phoneNumber, twoLetterISOCountryCode, new KandyResponseListener() {
 
-					@Override
-					public void onRequestFailed(int code, String err) {
-						Log.d(LCAT,
-								"KandyResponseListener->onRequestFailed() was invoked: "
-										+ String.valueOf(code) + " - " + err);
-						KandyUtils.sendFailResult(getKrollObject(), error,
-								code, err);
-					}
+			@Override
+			public void onRequestFailed(int code, String err) {
+				Log.d(LCAT, "KandyResponseListener->onRequestFailed() was invoked: " + String.valueOf(code) + " - "
+						+ err);
+				KandyUtils.sendFailResult(getKrollObject(), error, code, err);
+			}
 
-					@Override
-					public void onRequestSucceded() {
-						Log.d(LCAT,
-								"KandyResponseListener->onRequestSucceded() was invoked.");
-						KandyUtils.sendSuccessResult(getKrollObject(), success);
-					}
-				});
+			@Override
+			public void onRequestSucceded() {
+				Log.d(LCAT, "KandyResponseListener->onRequestSucceded() was invoked.");
+				KandyUtils.sendSuccessResult(getKrollObject(), success);
+			}
+		});
 	}
 
 	/**
@@ -146,15 +137,11 @@ public class ProvisioningServiceProxy extends TiViewProxy {
 	 * @param phoneNumber
 	 * @param twoLetterISOCountryCode
 	 */
-	public void requestCode(final KrollFunction success, KrollFunction error,
-			final String phoneNumber) {
-		KrollDict requestArgs = KandyUtils.getKrollDictFromCallbacks(callbacks,
-				"request");
+	public void requestCode(final KrollFunction success, KrollFunction error, final String phoneNumber) {
+		KrollDict requestArgs = KandyUtils.getKrollDictFromCallbacks(callbacks, "request");
 
-		requestArgs.put("success", KandyUtils.joinKrollFunctions(success,
-				(KrollFunction) requestArgs.get("success")));
-		requestArgs.put("error", KandyUtils.joinKrollFunctions(error,
-				(KrollFunction) requestArgs.get("error")));
+		requestArgs.put("success", KandyUtils.joinKrollFunctions(success, (KrollFunction) requestArgs.get("success")));
+		requestArgs.put("error", KandyUtils.joinKrollFunctions(error, (KrollFunction) requestArgs.get("error")));
 
 		requestArgs.put("phoneNumber", phoneNumber);
 
@@ -180,23 +167,20 @@ public class ProvisioningServiceProxy extends TiViewProxy {
 			twoLetterISOCountryCode = this.twoLetterISOCountryCode;
 		}
 
-		Kandy.getProvisioning().validateAndProvision(phoneNumber, otp,
-				twoLetterISOCountryCode, new KandyValidationResponseListener() {
+		Kandy.getProvisioning().validateAndProvision(phoneNumber, otp, twoLetterISOCountryCode,
+				new KandyValidationResponseListener() {
 
 					@Override
 					public void onRequestFailed(int code, String err) {
 						Log.d(LCAT,
 								"KandyValidationResponseListener->onRequestFailed() was invoked: "
 										+ String.valueOf(code) + " - " + err);
-						KandyUtils.sendFailResult(getKrollObject(), error,
-								code, err);
+						KandyUtils.sendFailResult(getKrollObject(), error, code, err);
 					}
 
 					@Override
-					public void onRequestSuccess(
-							IKandyValidationResponse reqpond) {
-						Log.d(LCAT,
-								"KandyValidationResponseListener->onRequestSuccess() was invoked.");
+					public void onRequestSuccess(IKandyValidationResponse reqpond) {
+						Log.d(LCAT, "KandyValidationResponseListener->onRequestSuccess() was invoked.");
 						KandyUtils.sendSuccessResult(getKrollObject(), success);
 					}
 				});
@@ -209,15 +193,12 @@ public class ProvisioningServiceProxy extends TiViewProxy {
 	 * @param twoLetterISOCountryCode
 	 * @param otp
 	 */
-	public void validate(KrollFunction success, KrollFunction error,
-			String phoneNumber, String otp) {
-		KrollDict validateArgs = KandyUtils.getKrollDictFromCallbacks(
-				callbacks, "validate");
+	public void validate(KrollFunction success, KrollFunction error, String phoneNumber, String otp) {
+		KrollDict validateArgs = KandyUtils.getKrollDictFromCallbacks(callbacks, "validate");
 
-		validateArgs.put("success", KandyUtils.joinKrollFunctions(success,
-				(KrollFunction) validateArgs.get("success")));
-		validateArgs.put("error", KandyUtils.joinKrollFunctions(error,
-				(KrollFunction) validateArgs.get("error")));
+		validateArgs
+				.put("success", KandyUtils.joinKrollFunctions(success, (KrollFunction) validateArgs.get("success")));
+		validateArgs.put("error", KandyUtils.joinKrollFunctions(error, (KrollFunction) validateArgs.get("error")));
 
 		validateArgs.put("phoneNumber", phoneNumber);
 		validateArgs.put("otp", otp);
@@ -239,16 +220,14 @@ public class ProvisioningServiceProxy extends TiViewProxy {
 
 			@Override
 			public void onRequestFailed(int code, String err) {
-				Log.d(LCAT,
-						"KandyResponseListener->onRequestFailed() was invoked: "
-								+ String.valueOf(code) + " - " + err);
+				Log.d(LCAT, "KandyResponseListener->onRequestFailed() was invoked: " + String.valueOf(code) + " - "
+						+ err);
 				KandyUtils.sendFailResult(getKrollObject(), error, code, err);
 			}
 
 			@Override
 			public void onRequestSucceded() {
-				Log.d(LCAT,
-						"KandyResponseListener->onRequestSucceded() was invoked.");
+				Log.d(LCAT, "KandyResponseListener->onRequestSucceded() was invoked.");
 				KandyUtils.sendSuccessResult(getKrollObject(), success);
 			}
 		});
@@ -258,13 +237,11 @@ public class ProvisioningServiceProxy extends TiViewProxy {
 	 * Deactivate phone number
 	 */
 	public void deactivate(KrollFunction success, KrollFunction error) {
-		KrollDict deactivateArgs = KandyUtils.getKrollDictFromCallbacks(
-				callbacks, "deactivate");
+		KrollDict deactivateArgs = KandyUtils.getKrollDictFromCallbacks(callbacks, "deactivate");
 
-		deactivateArgs.put("success", KandyUtils.joinKrollFunctions(success,
-				(KrollFunction) deactivateArgs.get("success")));
-		deactivateArgs.put("error", KandyUtils.joinKrollFunctions(error,
-				(KrollFunction) deactivateArgs.get("error")));
+		deactivateArgs.put("success",
+				KandyUtils.joinKrollFunctions(success, (KrollFunction) deactivateArgs.get("success")));
+		deactivateArgs.put("error", KandyUtils.joinKrollFunctions(error, (KrollFunction) deactivateArgs.get("error")));
 
 		deactivate(deactivateArgs);
 	}

@@ -33,7 +33,8 @@ public class KandyPushService extends GCMBaseIntentService {
 			@Override
 			public void onRequestFailed(int responseCode, String err) {
 
-				Log.d(TAG, "onMessage: handlePushNotification: not KANDY related push message, ignored, responseCode: " + responseCode + " error: " + err);
+				Log.d(TAG, "onMessage: handlePushNotification: not KANDY related push message, ignored, responseCode: "
+						+ responseCode + " error: " + err);
 			}
 
 			@Override

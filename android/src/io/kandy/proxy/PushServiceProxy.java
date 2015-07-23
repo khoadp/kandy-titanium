@@ -7,7 +7,7 @@ import com.genband.kandy.api.services.common.KandyResponseListener;
 import com.google.android.gcm.GCMRegistrar;
 import io.kandy.KandyConstant;
 import io.kandy.KandyModule;
-import io.kandy.KandyUtils;
+import io.kandy.utils.KandyUtils;
 import org.appcelerator.kroll.KrollDict;
 import org.appcelerator.kroll.KrollFunction;
 import org.appcelerator.kroll.KrollProxy;
@@ -46,30 +46,22 @@ public class PushServiceProxy extends KrollProxy {
 			GCMRegistrar.register(getActivity(), KandyConstant.GCM_PROJECT_ID);
 		}
 
-		Kandy.getServices()
-				.getPushService()
-				.enablePushNotification(registrationId,
-						new KandyResponseListener() {
+		Kandy.getServices().getPushService().enablePushNotification(registrationId, new KandyResponseListener() {
 
-							@Override
-							public void onRequestFailed(int code, String err) {
-								Log.d(LCAT,
-										"KandyResponseListener->onRequestFailed() was invoked: "
-												+ String.valueOf(code) + " - "
-												+ err);
-								KandyUtils.sendFailResult(getKrollObject(),
-										error, code, err);
+			@Override
+			public void onRequestFailed(int code, String err) {
+				Log.d(LCAT, "KandyResponseListener->onRequestFailed() was invoked: " + String.valueOf(code) + " - "
+						+ err);
+				KandyUtils.sendFailResult(getKrollObject(), error, code, err);
 
-							}
+			}
 
-							@Override
-							public void onRequestSucceded() {
-								Log.d(LCAT,
-										"KandyResponseListener->onRequestSucceded() was invoked.");
-								KandyUtils.sendSuccessResult(getKrollObject(),
-										success);
-							}
-						});
+			@Override
+			public void onRequestSucceded() {
+				Log.d(LCAT, "KandyResponseListener->onRequestSucceded() was invoked.");
+				KandyUtils.sendSuccessResult(getKrollObject(), success);
+			}
+		});
 	}
 
 	/**
@@ -82,26 +74,22 @@ public class PushServiceProxy extends KrollProxy {
 		final KrollFunction success = (KrollFunction) args.get("success");
 		final KrollFunction error = (KrollFunction) args.get("error");
 
-		Kandy.getServices().getPushService()
-				.disablePushNotification(new KandyResponseListener() {
+		Kandy.getServices().getPushService().disablePushNotification(new KandyResponseListener() {
 
-					@Override
-					public void onRequestFailed(int code, String err) {
-						Log.d(LCAT,
-								"KandyResponseListener->onRequestFailed() was invoked: "
-										+ String.valueOf(code) + " - " + err);
-						KandyUtils.sendFailResult(getKrollObject(), error,
-								code, err);
+			@Override
+			public void onRequestFailed(int code, String err) {
+				Log.d(LCAT, "KandyResponseListener->onRequestFailed() was invoked: " + String.valueOf(code) + " - "
+						+ err);
+				KandyUtils.sendFailResult(getKrollObject(), error, code, err);
 
-					}
+			}
 
-					@Override
-					public void onRequestSucceded() {
-						Log.d(LCAT,
-								"KandyResponseListener->onRequestSucceded() was invoked.");
-						KandyUtils.sendSuccessResult(getKrollObject(), success);
-					}
-				});
+			@Override
+			public void onRequestSucceded() {
+				Log.d(LCAT, "KandyResponseListener->onRequestSucceded() was invoked.");
+				KandyUtils.sendSuccessResult(getKrollObject(), success);
+			}
+		});
 	}
 
 }

@@ -6,8 +6,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import com.genband.kandy.api.IKandyGlobalSettings;
 import com.genband.kandy.api.Kandy;
-import com.genband.kandy.api.services.addressbook.KandyDeviceContactsFilter;
-import com.genband.kandy.api.services.addressbook.KandyDomainContactFilter;
+import io.kandy.utils.KandyUtils;
 import org.appcelerator.kroll.KrollDict;
 import org.appcelerator.kroll.KrollModule;
 import org.appcelerator.kroll.annotations.Kroll;
@@ -34,27 +33,37 @@ public class KandyModule extends KrollModule {
 
 	// KandyDeviceContactsFilter Constants
 	@Kroll.constant
-	public static int ALL = KandyDeviceContactsFilter.ALL.ordinal();
+	public static final String DEVICE_CONTACT_FILTER_ALL = "ALL";
 	@Kroll.constant
-	public static int HAS_EMAIL_ADDRESS = KandyDeviceContactsFilter.HAS_EMAIL_ADDRESS
-			.ordinal();
+	public static final String DEVICE_CONTACT_FILTER_HAS_EMAIL_ADDRESS = "HAS_EMAIL_ADDRESS";
 	@Kroll.constant
-	public static int HAS_PHONE_NUMBER = KandyDeviceContactsFilter.HAS_PHONE_NUMBER
-			.ordinal();
+	public static final String DEVICE_CONTACT_FILTER_HAS_PHONE_NUMBER = "HAS_PHONE_NUMBER";
 	@Kroll.constant
-	public static int IS_FAVORITE = KandyDeviceContactsFilter.IS_FAVORITE
-			.ordinal();
+	public static final String DEVICE_CONTACT_FILTER_IS_FAVORITE = "IS_FAVORITE";
 
 	// KandyDomainContactFilter Constants
 	@Kroll.constant
-	public static int FIRST_AND_LAST_NAME = KandyDomainContactFilter.FIRST_AND_LAST_NAME
-			.ordinal();
-
+	public static final String DOMAIN_CONTACT_FILTER_ALL = "ALL";
 	@Kroll.constant
-	public static int USER_ID = KandyDomainContactFilter.USER_ID.ordinal();
-
+	public static final String DOMAIN_CONTACT_FILTER_FIRST_AND_LAST_NAME = "FIRST_AND_LAST_NAME";
 	@Kroll.constant
-	public static int PHONE = KandyDomainContactFilter.PHONE.ordinal();
+	public static final String DOMAIN_CONTACT_FILTER_USER_ID = "USER_ID";
+	@Kroll.constant
+	public static final String DOMAIN_CONTACT_FILTER_PHONE = "PHONE";
+
+	// KandyRecordType Constants
+	@Kroll.constant
+	public static final String RECORD_TYPE_CONTACT = "CONTACT";
+	@Kroll.constant
+	public static final String RECORD_TYPE_GROUP = "GROUP";
+
+	// KandyThumbnailSize Constants
+	@Kroll.constant
+	public static final String THUMBNAIL_SIZE_SMALL = "SMALL";
+	@Kroll.constant
+	public static final String THUMBNAIL_SIZE_MEDIUM = "MEDIUM";
+	@Kroll.constant
+	public static final String THUMBNAIL_SIZE_LARGE = "LARGE";
 
 	private SharedPreferences prefs;
 
@@ -69,16 +78,12 @@ public class KandyModule extends KrollModule {
 		prefs = PreferenceManager.getDefaultSharedPreferences(activity);
 
 		// Initialize Kandy SDK
-		Kandy.initialize(
-				activity,
-				prefs.getString(KandyConstant.API_KEY_PREFS_KEY,
-						KandyUtils.getString("kandy_api_key")),
-				prefs.getString(KandyConstant.API_SECRET_PREFS_KEY,
-						KandyUtils.getString("kandy_api_secret")));
+		Kandy.initialize(activity,
+				prefs.getString(KandyConstant.API_KEY_PREFS_KEY, KandyUtils.getString("kandy_api_key")),
+				prefs.getString(KandyConstant.API_SECRET_PREFS_KEY, KandyUtils.getString("kandy_api_secret")));
 
 		IKandyGlobalSettings settings = Kandy.getGlobalSettings();
-		settings.setKandyHostURL(prefs.getString(
-				KandyConstant.KANDY_HOST_PREFS_KEY, settings.getKandyHostURL()));
+		settings.setKandyHostURL(prefs.getString(KandyConstant.KANDY_HOST_PREFS_KEY, settings.getKandyHostURL()));
 	}
 
 	@Kroll.onAppCreate
@@ -109,8 +114,7 @@ public class KandyModule extends KrollModule {
 		edit.putString(KandyConstant.KANDY_HOST_PREFS_KEY, url).apply();
 
 		IKandyGlobalSettings settings = Kandy.getGlobalSettings();
-		settings.setKandyHostURL(prefs.getString(
-				KandyConstant.KANDY_HOST_PREFS_KEY, settings.getKandyHostURL()));
+		settings.setKandyHostURL(prefs.getString(KandyConstant.KANDY_HOST_PREFS_KEY, settings.getKandyHostURL()));
 	}
 
 	@Kroll.getProperty
@@ -130,17 +134,14 @@ public class KandyModule extends KrollModule {
 
 		KrollDict domain = new KrollDict();
 		domain.put("apiKey", Kandy.getSession().getKandyDomain().getApiKey());
-		domain.put("apiSecret", Kandy.getSession().getKandyDomain()
-				.getApiSecret());
+		domain.put("apiSecret", Kandy.getSession().getKandyDomain().getApiSecret());
 		domain.put("name", Kandy.getSession().getKandyDomain().getName());
 
 		KrollDict user = new KrollDict();
 		user.put("id", Kandy.getSession().getKandyUser().getUserId());
 		user.put("name", Kandy.getSession().getKandyUser().getUser());
-		user.put("deviceId", Kandy.getSession().getKandyUser()
-				.getKandyDeviceId());
-		user.put("password", Kandy.getSession().getKandyUser().getPassword()); // FIXME:
-																				// security?
+		user.put("deviceId", Kandy.getSession().getKandyUser().getKandyDeviceId());
+		user.put("password", Kandy.getSession().getKandyUser().getPassword());
 
 		obj.put("domain", domain);
 		obj.put("user", user);

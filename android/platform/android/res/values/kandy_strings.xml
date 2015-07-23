@@ -41,16 +41,37 @@
     <string name="kandy_chat_phone_number_verification_text">Invalid recipient\'s number (recipientID@domain.com)
     </string>
     <string name="kandy_chat_pull_label">Pull pending events</string>
+    <string name="kandy_chat_pull_desc">Will refresh pending messages from Kandy services</string>
     <string name="kandy_chat_ack_label">Mark message as received</string>
     <string name="kandy_chat_send_button_label">Send</string>
-    <string name="kandy_chats_message_sent_label">Message sent</string>
+    <string name="kandy_chat_send_sms_label">Send SMS</string>
+    <string name="kandy_chat_sms_label">Will send SMS via Kandy services</string>
+    <string name="kandy_chat_message_invalid_title">Invalid SMS</string>
+    <string name="kandy_chat_message_empty_message">Please enter message text to be sent</string>
+    <string name="kandy_chat_message_invalid_phone">Invalid phone number, The phone number must be an E164 formatted number</string>
+    <string name="kandy_chat_message_click_menu_title">Message Action:</string>
+    <string name="kandy_chat_message_click_menu_view">View message</string>
+    <string name="kandy_chat_message_click_menu_ack">Mark as received</string>
+    <string name="kandy_chat_message_click_menu_cancel">Dismiss</string>
+    <string name="kandy_chat_message_click_menu_cancel_download">Cancel Download</string>
+    <string name="kandy_chat_message_sent_label">Message sent</string>
     <string name="kandy_chat_phone_number_verification_text">Invalid recipient\'s number (recipientID@domain.com)</string>
     <string name="kandy_chat_phone_number_domain_verification_text">Invalid recipient, please enter username with domain(userID@domain.com)</string>
     <string name="kandy_chat_phone_number_hint_text">recipientID@domain.com</string>
     <string name="kandy_chat_message_hint_text">Message</string>
-    <string name="kandy_chats_get_incoming_msgs_button_label">Get Pending Messages</string>
+    <string name="kandy_chat_get_incoming_msgs_button_label">Get Pending Messages</string>
     <string name="ui_message_listview_item_sender">Received From:</string>
     <string name="ui_message_listview_item_recipient">Sent To:</string>
     <string name="ui_message_listview_item_message">Message:</string>
+    
+    <string name="ui_dialog_cancel_button_label">Cancel</string>
+    <string name="loading">loading ...</string>
+    <string name="msg_uploading_video">Uploading video file</string>
+    <string name="msg_uploading_audio">Uploading audio file</string>
+    <string name="msg_uploading_contact">Uploading contact vCard</string>
+    <string name="msg_uploading_image">Uploading image file</string>
+    <string name="msg_upload_succeed">Upload succeed</string>
+    <string name="msg_pull_events">Pulling pending events...</string>
+    <string name="msg_pull_events_succeed">Pulling pending events succeed</string>
 
 </resources>

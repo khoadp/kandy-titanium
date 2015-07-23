@@ -1,370 +1,520 @@
 package io.kandy.proxy;
-//package io.kandy;
-//
-//import java.util.ArrayList;
-//import java.util.List;
-//import java.util.Queue;
-//import java.util.UUID;
-//import java.util.concurrent.LinkedBlockingQueue;
-//
-//import org.appcelerator.kroll.KrollDict;
-//import org.appcelerator.kroll.KrollFunction;
-//import org.appcelerator.kroll.annotations.Kroll;
-//import org.appcelerator.titanium.proxy.TiViewProxy;
-//import org.appcelerator.titanium.view.TiUIView;
-//import org.json.JSONException;
-//
-//import android.app.Activity;
-//import android.net.Uri;
-//import android.view.LayoutInflater;
-//import android.view.View;
-//import android.widget.Button;
-//import android.widget.EditText;
-//import android.widget.ListView;
-//
-//import com.genband.kandy.api.Kandy;
-//import com.genband.kandy.api.services.calls.KandyRecord;
-//import com.genband.kandy.api.services.chats.IKandyEvent;
-//import com.genband.kandy.api.services.chats.IKandyMessage;
-//import com.genband.kandy.api.services.chats.KandyChatServiceNotificationListener;
-//import com.genband.kandy.api.services.common.KandyResponseListener;
-//
-///**
-// * Chat service
-// * 
-// * @author kodpelusdev
-// *
-// */
-//@Kroll.proxy(creatableInModule = KandyModule.class)
-//public class ChatServiceProxy extends TiViewProxy {
-//
-//	public static String LCAT = ChatServiceProxy.class.getSimpleName();
-//	
-//	/**
-//	 * Chat widget
-//	 */
-//	private class ChatWidget extends TiUIView {
-//
-//		private List<Message> mMessagesList;
-//		private Queue<IKandyEvent> mMessagesUUIDQueue;
-//		private MessagesAdapter mAdapter;
-//		
-//		public ChatWidget(TiViewProxy proxy) {
-//			super(proxy);
-//			
-//			View layoutWraper;
-//			
-//			LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
-//			layoutWraper = layoutInflater.inflate(
-//					Utils.getLayout(getActivity(), "kandy_chat_widget"), null);
-//			
-//			ListView uiMessagesListView = (ListView)layoutWraper.findViewById(
-//					Utils.getId(getActivity(), "kandy_chats_messages_list"));
-//			// Set message adapter
-//			mMessagesList = new ArrayList<Message>();
-//			mMessagesUUIDQueue = new LinkedBlockingQueue<IKandyEvent>();
-//			mAdapter = new MessagesAdapter(getActivity(), Utils.getLayout(getActivity(), "message_listview_item"), mMessagesList);
-//			uiMessagesListView.setAdapter(mAdapter);
-//			
-//			final EditText phoneNumber = (EditText)layoutWraper.findViewById(
-//					Utils.getId(getActivity(), "kandy_chats_phone_number_edit"));
-//			final EditText messageEdit = (EditText)layoutWraper.findViewById(
-//					Utils.getId(getActivity(), "activity_chats_message_edit"));
-//			
-//			Button btnSend = (Button)layoutWraper.findViewById(
-//					Utils.getId(getActivity(), "kandy_chats_send_msg_button"));
-//			Button btnPull = (Button)layoutWraper.findViewById(
-//					Utils.getId(getActivity(), "kandy_chats_get_incoming_msgs_button"));
-//			Button btnAck = (Button)layoutWraper.findViewById(
-//					Utils.getId(getActivity(), "kandy_chats_ack_button"));
-//			
-//			btnSend.setOnClickListener(new View.OnClickListener() {
-//				
-//				public void onClick(View v) {
-//					ChatServiceProxy.this.send(phoneNumber.getText().toString(), messageEdit.getText().toString());
-//				}
-//			});
-//			
-//			btnPull.setOnClickListener(new View.OnClickListener() {
-//				
-//				public void onClick(View v) {
-//					KrollDict args = Utils.getKrollDictFromCallbacks(callbacks, "pull");
-//					ChatServiceProxy.this.pullEvents(args);
-//				}
-//			});
-//			
-//			btnAck.setOnClickListener(new View.OnClickListener() {
-//				
-//				public void onClick(View v) {
-//					IKandyEvent event = (mMessagesUUIDQueue.poll());
-//					if(event == null) return;
-//					if(getAckFormMessageByUUID(event.getUUID())) {
-//						mAdapter.notifyDataSetChanged();
-//						markMsgAsReceived(event);
-//					}
-//				}
-//			});
-//			
-//			setNativeView(layoutWraper);
-//		}
-//		
-//		private boolean getAckFormMessageByUUID(UUID pUUID) {
-//			for(int i = 0; i<mMessagesList.size(); i++) {
-//				Message msg = mMessagesList.get(i);
-//
-//				if(pUUID.equals(msg.getMessage().getUUID()) && 
-//						msg.getMessage().isIncoming() &&
-//						!msg.isAcked()) {
-//					mMessagesList.get(i).setAck(true);
-//					return true;
-//				}
-//			}
-//			
-//			return false;
-//		}
-//		
-//		public void setMessageDeliveredByUUID(UUID pUUID) {
-//			for(int i = 0; i<mMessagesList.size(); i++) {
-//				Message msg = mMessagesList.get(i);
-//
-//				if(!msg.getMessage().isIncoming() && 
-//						pUUID.equals(msg.getMessage().getUUID()) &&
-//						!msg.isMsgDelivered) {
-//					mMessagesList.get(i).setDelivered(true);
-//					return;
-//				}
-//			}
-//		}
-//
-//		public void markMsgAsReceived(final IKandyEvent pSelection) {
-//			
-//			Kandy.getServices().getChatService().markAsReceived(pSelection, new KandyResponseListener() {
-//				@Override
-//				public void onRequestFailed(int responseCode, String err) {
-//				}
-//
-//				@Override
-//				public void onRequestSucceded() {
-//				}
-//			});
-//		}
-//
-//		public void handleIncomingMessageOnUIThread(final IKandyMessage message) {
-//			getActivity().runOnUiThread(new Runnable() {
-//
-//				public void run() {
-//					handleIncomingMessage(message);
-//				}
-//			});
-//		}
-//		
-//		private void handleIncomingMessage(IKandyMessage message) {
-//			for(Message msg : mMessagesList) {
-//				if(msg.getMessage().isIncoming() && msg.getMessage().getUUID().equals(message.getUUID()))
-//					return;
-//			}
-//
-//			mMessagesList.add(new Message(message));
-//			mAdapter.notifyDataSetChanged();
-//		}
-//		
-//		private void handleDeliveredgMessage(IKandyEvent pEvent) {
-//			if(pEvent == null || pEvent.getUUID() == null) return;
-//			setMessageDeliveredByUUID(pEvent.getUUID());
-//			mAdapter.notifyDataSetChanged();
-//		}
-//
-//		public void handleDeliveredgMessageOnUIThread(final IKandyEvent pEvent) {
-//			getActivity().runOnUiThread(new Runnable() {
-//
-//				public void run() {
-//					handleDeliveredgMessage(pEvent);
-//				}
-//			});
-//		}
-//	}
-//	
-//	private KrollDict callbacks = null;
-//	
-//	private ChatWidget chatWidget;
-//	private KandyChatServiceNotificationListener _kandyChatServiceNotificationListener = null;
-//
-//	public ChatServiceProxy() {
-//		super();
-//	}
-//
-//	/**
-//	 * {@inheritDoc}
-//	 */
-//	@Override
-//	public TiUIView createView(Activity activity) {
-//		chatWidget = new ChatWidget(this);
-//		return chatWidget;
-//	}
-//	
-//	/**
-//	 * Set callbacks for chat widget
-//	 * 
-//	 * @param callbacks
-//	 */
-//	@Kroll.setProperty
-//	@Kroll.method
-//	public void setCallbacks(KrollDict callbacks){
-//		this.callbacks = callbacks;
-//	}
-//	
-//	/**
-//	 * Send message
-//	 * 
-//	 * @param recipient
-//	 * @param message
-//	 */
-//	public void send(String recipient, String message){
-//		KrollDict args = Utils.getKrollDictFromCallbacks(callbacks, "send");
-//		
-//		args.put("recipient", recipient);
-//		args.put("message", message);
-//		
-//		send(args);
-//	}
-//	
-//	/**
-//	 * Send message
-//	 * 
-//	 * @param args
-//	 */
-//	@Kroll.method
-//	public void send(KrollDict args) {
-//		final KrollFunction success = (KrollFunction) args.get("success");
-//		final KrollFunction error = (KrollFunction) args.get("error");
-//
-//		String user = (String) args.get("recipient");
-//		String text = (String) args.get("message");
-//
-//		KandyRecord recipient;
-//		try {
-//			recipient = new KandyRecord(user);
-//		} catch (IllegalArgumentException ex) {
-//			Utils.sendFailResult(getKrollObject(), error,
-//					"kandy_chat_phone_number_verification_text");
-//			return;
-//		}
-//
-//		final KandyMessage message = new KandyMessage(recipient, text);
-//
-//		Kandy.getServices().getChatService()
-//				.send(message, new KandyResponseListener() {
-//
-//					@Override
-//					public void onRequestFailed(int code, String err) {
-//						Utils.sendFailResult(getKrollObject(), error, code, err);
-//					}
-//
-//					@Override
-//					public void onRequestSucceded() {
-//						chatWidget.handleIncomingMessageOnUIThread(message);
-//						Utils.sendSuccessResult(getKrollObject(), success);
-//					}
-//				});
-//
-//	}
-//
-//	/**
-//	 * Send message received signal
-//	 * 
-//	 * @param args
-//	 */
-//	@Kroll.method
-//	public void markAsReceived(KrollDict args) {
-//		final KrollFunction success = (KrollFunction) args.get("success");
-//		final KrollFunction error = (KrollFunction) args.get("error");
-//
-//		String[] list = (String[]) args.get("list");
-//		ArrayList<IKandyEvent> events = new ArrayList<IKandyEvent>();
-//		for (String i : list) {
-//			KandyMessage event = new KandyMessage(new KandyRecord(
-//					"dummy@domain.com"), "dummy");
-//			event.setUUID(UUID.fromString(i));
-//			events.add(event);
-//		}
-//
-//		Kandy.getServices().getChatService()
-//				.markAsReceived(events, new KandyResponseListener() {
-//
-//					@Override
-//					public void onRequestFailed(int code, String err) {
-//						Utils.sendFailResult(getKrollObject(), error, code, err);
-//					}
-//
-//					@Override
-//					public void onRequestSucceded() {
-//						Utils.sendSuccessResult(getKrollObject(), success);
-//					}
-//				});
-//	}
-//
-//	/**
-//	 * Pull pending envents
-//	 */
-//	@Kroll.method
-//	public void pullEvents() {
-//		Kandy.getServices().getChatService().pullEvents();
-//	}
-//
-//	/**
-//	 * Pull pending events with callback
-//	 * 
-//	 * @param args
-//	 */
-//	@Kroll.method
-//	public void pullEvents(KrollDict args) {
-//		final KrollFunction success = (KrollFunction) args.get("success");
-//		final KrollFunction error = (KrollFunction) args.get("error");
-//
-//		Kandy.getServices().getChatService()
-//				.pullEvents(new KandyResponseListener() {
-//
-//					@Override
-//					public void onRequestFailed(int code, String err) {
-//						Utils.sendFailResult(getKrollObject(), error, code, err);
-//					}
-//
-//					@Override
-//					public void onRequestSucceded() {
-//						Utils.sendSuccessResult(getKrollObject(), success);
-//					}
-//				});
-//	}
-//	
-//	public class Message {
-//		private IKandyMessage mmMesage;
-//		private boolean isMsgDelivered;
-//		private boolean isMsgAcked;
-//
-//		public Message(IKandyMessage pMsg) {
-//			mmMesage = pMsg;
-//			isMsgAcked = false;
-//			isMsgDelivered = false;
-//		}
-//
-//		public synchronized void setDelivered(boolean isDelivered) {
-//			isMsgDelivered = isDelivered;
-//		}
-//
-//		public synchronized void setAck(boolean isAcked) {
-//			isMsgAcked = isAcked;
-//		}
-//
-//		public synchronized boolean isMessageDelviered() {
-//			return isMsgDelivered;
-//		}
-//
-//		public synchronized boolean isAcked() {
-//			return isMsgAcked;
-//		}
-//
-//		public IKandyMessage getMessage() {
-//			return mmMesage;
-//		}
-//	}
-//}
+
+import android.app.Activity;
+import android.content.Intent;
+import android.location.Location;
+import android.net.Uri;
+import android.os.Bundle;
+import android.provider.ContactsContract;
+import android.util.Log;
+import android.view.Window;
+import android.widget.Toast;
+import com.genband.kandy.api.Kandy;
+import com.genband.kandy.api.services.calls.KandyRecord;
+import com.genband.kandy.api.services.calls.KandyRecordType;
+import com.genband.kandy.api.services.chats.*;
+import com.genband.kandy.api.services.common.KandyResponseCancelListener;
+import com.genband.kandy.api.services.common.KandyResponseListener;
+import com.genband.kandy.api.services.common.KandyResponseProgressListener;
+import com.genband.kandy.api.services.location.KandyCurrentLocationListener;
+import com.genband.kandy.api.utils.KandyIllegalArgumentException;
+import io.kandy.KandyConstant;
+import io.kandy.KandyModule;
+import io.kandy.proxy.views.ChatViewProxy;
+import io.kandy.utils.KandyUtils;
+import org.appcelerator.kroll.KrollDict;
+import org.appcelerator.kroll.KrollFunction;
+import org.appcelerator.kroll.annotations.Kroll;
+import org.appcelerator.titanium.proxy.TiViewProxy;
+import org.appcelerator.titanium.view.TiUIView;
+import org.json.JSONObject;
+
+import java.util.UUID;
+
+/**
+ * Chat service
+ * 
+ * @author kodpelusdev
+ * 
+ */
+@Kroll.proxy(creatableInModule = KandyModule.class)
+public class ChatServiceProxy extends TiViewProxy {
+
+	private static final String LCAT = ChatServiceProxy.class.getSimpleName();
+
+	ChatViewProxy viewProxy;
+
+	@Override
+	public TiUIView createView(Activity activity) {
+		viewProxy = new ChatViewProxy(this);
+		return viewProxy;
+	}
+
+	@Override
+	public void onCreate(Activity activity, Bundle savedInstanceState) {
+		super.onCreate(activity, savedInstanceState);
+		activity.requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+	}
+
+	@Override
+	public void onPause(Activity activity) {
+		super.onPause(activity);
+		if (viewProxy != null)
+			viewProxy.unRegisterChatsNotifications();
+	}
+
+	@Override
+	public void onResume(Activity activity) {
+		super.onResume(activity);
+		if (viewProxy != null)
+			viewProxy.registerChatsNotifications();
+	}
+
+	@Kroll.method
+	@Kroll.setProperty
+	public void setCallbacks(KrollDict callbacks) {
+		if (viewProxy != null) {
+			viewProxy.setCallbacks(callbacks);
+		}
+	}
+
+	@Kroll.method
+	@Kroll.getProperty
+	public KrollDict getCallbacks() {
+		if (viewProxy != null) {
+			return viewProxy.getCallbacks();
+		}
+		return new KrollDict();
+	}
+
+	@Kroll.method
+	public void sendSMS(KrollDict args) {
+		KrollFunction success = (KrollFunction) args.get("success");
+		KrollFunction error = (KrollFunction) args.get("error");
+
+		String destination = args.getString("destination");
+		String title = args.getString("title");
+		String text = args.getString("message");
+
+		if (text == null || text.equals("")) {
+			KandyUtils
+					.sendFailResult(getKrollObject(), error, KandyUtils.getString("kandy_chat_message_empty_message"));
+			return;
+		}
+
+		final KandySMSMessage message;
+
+		try {
+			message = new KandySMSMessage(destination, title, text);
+		} catch (KandyIllegalArgumentException e) {
+			KandyUtils
+					.sendFailResult(getKrollObject(), error, KandyUtils.getString("kandy_chat_message_invalid_phone"));
+			Log.e(LCAT, "sendSMS: " + " " + e.getLocalizedMessage(), e);
+			return;
+		}
+
+		Kandy.getServices().getChatService().sendSMS(message, new KandyResponseListenerCallback(success, error));
+	}
+
+	private void sendChatMessage(KrollFunction success, KrollFunction error, String destination, IKandyMediaItem data,
+			String type) {
+		KandyRecord recipient;
+		try {
+			KandyRecordType recordType;
+			try {
+				recordType = KandyRecordType.valueOf(type);
+			} catch (Exception ex) {
+				recordType = KandyRecordType.CONTACT;
+			}
+
+			recipient = new KandyRecord(destination, recordType);
+		} catch (KandyIllegalArgumentException e) {
+			KandyUtils
+					.sendFailResult(getKrollObject(), error, KandyUtils.getString("kandy_chat_message_invalid_phone"));
+			Log.e(LCAT, "sendChatMessage: " + " " + e.getLocalizedMessage(), e);
+			return;
+		}
+
+		KandyChatMessage message = new KandyChatMessage(recipient, data);
+		Kandy.getServices().getChatService().sendChat(message, new KandyResponseListenerCallback(success, error));
+	}
+
+	@Kroll.method
+	public void sendChat(KrollDict args) {
+		KrollFunction success = (KrollFunction) args.get("success");
+		KrollFunction error = (KrollFunction) args.get("error");
+
+		String destination = args.getString("destination");
+		String text = args.getString("message");
+		String type = args.getString("type");
+
+		IKandyTextItem kandyText = KandyMessageBuilder.createText(text);
+		sendChatMessage(success, error, destination, kandyText, type);
+	}
+
+	@Kroll.method
+	public void pickAudio() {
+		Intent intent = new Intent(Intent.ACTION_PICK);
+		intent.setType("audio/*");
+		intent.setAction(Intent.ACTION_GET_CONTENT);
+		getActivity().startActivityForResult(intent, KandyConstant.AUDIO_PICKER_RESULT);
+	}
+
+	@Kroll.method
+	public void sendAudio(KrollDict args) {
+		KrollFunction success = (KrollFunction) args.get("success");
+		KrollFunction error = (KrollFunction) args.get("error");
+
+		String destination = args.getString("destination");
+		String caption = args.getString("caption");
+		String uri = args.getString("uri");
+		String type = args.getString("type");
+
+		IKandyAudioItem kandyAudio = null;
+		try {
+			kandyAudio = KandyMessageBuilder.createAudio(caption, Uri.parse(uri));
+		} catch (KandyIllegalArgumentException e) {
+			Log.d(LCAT, "sendAudio: " + e.getLocalizedMessage(), e);
+		}
+
+		sendChatMessage(success, error, destination, kandyAudio, type);
+	}
+
+	@Kroll.method
+	public void pickVideo() {
+		Intent intent = new Intent();
+		intent.setType("video/*");
+		intent.setAction(Intent.ACTION_GET_CONTENT);
+		getActivity().startActivityForResult(intent, KandyConstant.VIDEO_PICKER_RESULT);
+	}
+
+	@Kroll.method
+	public void sendVideo(KrollDict args) {
+		KrollFunction success = (KrollFunction) args.get("success");
+		KrollFunction error = (KrollFunction) args.get("error");
+
+		String destination = args.getString("destination");
+		String caption = args.getString("caption");
+		String uri = args.getString("uri");
+		String type = args.getString("type");
+
+		IKandyVideoItem kandyVideo = null;
+		try {
+			kandyVideo = KandyMessageBuilder.createVideo(caption, Uri.parse(uri));
+		} catch (KandyIllegalArgumentException e) {
+			Log.d(LCAT, "sendVideo: " + e.getLocalizedMessage(), e);
+		}
+
+		sendChatMessage(success, error, destination, kandyVideo, type);
+	}
+
+	@Kroll.method
+	public void pickImage() {
+		Intent intent = new Intent(Intent.ACTION_PICK);
+		intent.setType("image/*");
+		getActivity().startActivityForResult(intent, KandyConstant.IMAGE_PICKER_RESULT);
+	}
+
+	@Kroll.method
+	public void sendImage(KrollDict args) {
+		KrollFunction success = (KrollFunction) args.get("success");
+		KrollFunction error = (KrollFunction) args.get("error");
+
+		String destination = args.getString("destination");
+		String caption = args.getString("caption");
+		String uri = args.getString("uri");
+		String type = args.getString("type");
+
+		IKandyImageItem kandyImage = null;
+		try {
+			kandyImage = KandyMessageBuilder.createImage(caption, Uri.parse(uri));
+		} catch (KandyIllegalArgumentException e) {
+			e.printStackTrace();
+		}
+
+		sendChatMessage(success, error, destination, kandyImage, type);
+	}
+
+	@Kroll.method
+	public void pickContact() {
+		Intent contactPickerIntent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
+		getActivity().startActivityForResult(contactPickerIntent, KandyConstant.CONTACT_PICKER_RESULT);
+	}
+
+	@Kroll.method
+	public void sendContact(KrollDict args) {
+		KrollFunction success = (KrollFunction) args.get("success");
+		KrollFunction error = (KrollFunction) args.get("error");
+
+		String destination = args.getString("destination");
+		String caption = args.getString("caption");
+		String uri = args.getString("uri");
+		String type = args.getString("type");
+
+		IKandyContactItem kandyContact = null;
+		try {
+			kandyContact = KandyMessageBuilder.createContact(caption, Uri.parse(uri));
+		} catch (KandyIllegalArgumentException e) {
+			Log.d(LCAT, "sendContact: " + e.getLocalizedMessage(), e);
+		}
+
+		sendChatMessage(success, error, destination, kandyContact, type);
+	}
+
+	@Kroll.method
+	public void pickFile() {
+		Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+		intent.setType("*/*");
+		intent.addCategory(Intent.CATEGORY_OPENABLE);
+		try {
+			getActivity().startActivityForResult(Intent.createChooser(intent, "Select a File to Upload"),
+					KandyConstant.FILE_PICKER_RESULT);
+		} catch (android.content.ActivityNotFoundException ex) {
+			// Potentially direct the user to the Market with a Dialog
+			// Toast.makeText(this, "Please install a File Manager.",
+			// Toast.LENGTH_SHORT).show(); }
+			Toast.makeText(getActivity(), "Please install a File Manager", Toast.LENGTH_SHORT);
+		}
+	}
+
+	@Kroll.method
+	public void sendFile(KrollDict args) {
+		KrollFunction success = (KrollFunction) args.get("success");
+		KrollFunction error = (KrollFunction) args.get("error");
+
+		String destination = args.getString("destination");
+		String caption = args.getString("caption");
+		String uri = args.getString("uri");
+		String type = args.getString("type");
+
+		IKandyFileItem kandyFile = null;
+		try {
+			kandyFile = KandyMessageBuilder.createFile(caption, Uri.parse(uri));
+		} catch (KandyIllegalArgumentException e) {
+			e.printStackTrace();
+		}
+
+		sendChatMessage(success, error, destination, kandyFile, type);
+	}
+
+	@Kroll.method
+	public void sendCurrentLocation(KrollDict args) {
+		final KrollFunction success = (KrollFunction) args.get("success");
+		final KrollFunction error = (KrollFunction) args.get("error");
+
+		final String caption = args.getString("caption");
+		final String destination = args.getString("destination");
+		final String type = args.getString("type");
+
+		try {
+			Kandy.getServices().getLocationService().getCurrentLocation(new KandyCurrentLocationListener() {
+
+				@Override
+				public void onCurrentLocationReceived(Location location) {
+					Log.d(LCAT,
+							"KandyCurrentLocationListener->onCurrentLocationReceived() was invoked: "
+									+ location.toString());
+					IKandyLocationItem kandyLocation = KandyMessageBuilder.createLocation(caption, location);
+					sendChatMessage(success, error, destination, kandyLocation, type);
+				}
+
+				@Override
+				public void onCurrentLocationFailed(int code, String err) {
+					Log.d(LCAT, "KandyCurrentLocationListener->onRequestFailed() was invoked: " + String.valueOf(code)
+							+ " - " + error);
+					KandyUtils.sendFailResult(getKrollObject(), error, code, err);
+				}
+			});
+		} catch (KandyIllegalArgumentException e) {
+			Log.e(LCAT, "sendCurrentLocation(); " + e.getLocalizedMessage(), e);
+		}
+	}
+
+	@Kroll.method
+	public void sendLocation(KrollDict args) {
+		KrollFunction success = (KrollFunction) args.get("success");
+		KrollFunction error = (KrollFunction) args.get("error");
+
+		String caption = args.getString("caption");
+		String destination = args.getString("destination");
+		KrollDict location = args.getKrollDict("location");
+		String type = args.getString("type");
+
+		IKandyLocationItem kandyLocation = KandyMessageBuilder.createLocation(caption,
+				KandyUtils.getLocationFromJson(new JSONObject(location)));
+		sendChatMessage(success, error, destination, kandyLocation, type);
+	}
+
+	@Kroll.method
+	public void cancelMediaTransfer(KrollDict args) {
+		KrollFunction success = (KrollFunction) args.get("success");
+		KrollFunction error = (KrollFunction) args.get("error");
+
+		String uuid = args.getString("uuid");
+
+		try {
+			KandyChatMessage message = getMessageFromUUID(uuid);
+			Kandy.getServices().getChatService()
+					.cancelMediaTransfer(message, new KandyResponseCancelListenerCallback(success, error));
+		} catch (KandyIllegalArgumentException e) {
+			e.printStackTrace();
+			KandyUtils.sendFailResult(getKrollObject(), error, e.getMessage());
+		}
+	}
+
+	@Kroll.method
+	public void downloadMedia(KrollDict args) {
+		KrollFunction success = (KrollFunction) args.get("success");
+		KrollFunction error = (KrollFunction) args.get("error");
+
+		String uuid = args.getString("uuid");
+
+		try {
+			KandyChatMessage message = getMessageFromUUID(uuid);
+			Kandy.getServices().getChatService()
+					.downloadMedia(message, new KandyResponseProgressListenerCallback(success, error));
+		} catch (KandyIllegalArgumentException e) {
+			e.printStackTrace();
+			KandyUtils.sendFailResult(getKrollObject(), error, e.getMessage());
+		}
+	}
+
+	@Kroll.method
+	public void downloadMediaThumbnail(KrollDict args) {
+		KrollFunction success = (KrollFunction) args.get("success");
+		KrollFunction error = (KrollFunction) args.get("error");
+
+		String uuid = args.getString("uuid");
+		KandyThumbnailSize thumbnailSize;
+		try {
+			thumbnailSize = KandyThumbnailSize.valueOf(args.getString("thumbnailSize"));
+		} catch (Exception e) {
+			thumbnailSize = KandyThumbnailSize.MEDIUM;
+		}
+
+		try {
+			KandyChatMessage message = getMessageFromUUID(uuid);
+			Kandy.getServices()
+					.getChatService()
+					.downloadMediaThumbnail(message, thumbnailSize,
+							new KandyResponseProgressListenerCallback(success, error));
+		} catch (KandyIllegalArgumentException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Kroll.method
+	public void markAsReceived(KrollDict args) {
+		KrollFunction success = (KrollFunction) args.get("success");
+		KrollFunction error = (KrollFunction) args.get("error");
+
+		String uuid = args.getString("uuid");
+
+		try {
+			getMessageFromUUID(uuid).markAsReceived(new KandyResponseListenerCallback(success, error));
+		} catch (KandyIllegalArgumentException e) {
+			KandyUtils.sendFailResult(getKrollObject(), error, e.getMessage());
+			e.printStackTrace();
+		}
+	}
+
+	private KandyChatMessage getMessageFromUUID(String uuid) throws KandyIllegalArgumentException {
+		KandyChatMessage message = new KandyChatMessage(new KandyRecord("dummy@dummy.com"), "dummy");
+		message.setUUID(UUID.fromString(uuid));
+		return message;
+	}
+
+	@Kroll.method
+	public void pullEvents(KrollDict args) {
+		KrollFunction success = (KrollFunction) args.get("success");
+		KrollFunction error = (KrollFunction) args.get("error");
+
+		Kandy.getServices().getChatService().pullEvents(new KandyResponseListenerCallback(success, error));
+	}
+
+	private class KandyResponseCancelListenerCallback extends KandyResponseCancelListener {
+
+		private KrollFunction success, error;
+
+		public KandyResponseCancelListenerCallback(KrollFunction success, KrollFunction error) {
+			this.success = success;
+			this.error = error;
+		}
+
+		@Override
+		public void onCancelSucceded() {
+			Log.d(LCAT, "KandyResponseCancelListenerCallback->onRequestSucceded() was invoked.");
+			KandyUtils.sendSuccessResult(getKrollObject(), success);
+		}
+
+		@Override
+		public void onRequestFailed(int code, String err) {
+			Log.d(LCAT, "KandyResponseCancelListenerCallback->onRequestFailed() was invoked: " + String.valueOf(code)
+					+ " - " + err);
+			KandyUtils.sendFailResult(getKrollObject(), error, code, err);
+		}
+
+	}
+
+	private class KandyResponseProgressListenerCallback extends KandyResponseProgressListener {
+
+		private KrollFunction success, error;
+
+		public KandyResponseProgressListenerCallback(KrollFunction success, KrollFunction error) {
+			this.success = success;
+			this.error = error;
+		}
+
+		@Override
+		public void onProgressUpdate(IKandyTransferProgress progress) {
+			Log.d(LCAT, "KandyResponseProgressListener->onRequestSucceded() was invoked: "
+					+ progress.getState().toString() + " " + progress.getProgress());
+
+			KrollDict result = new KrollDict();
+
+			result.put("process", progress.getProgress());
+			result.put("state", progress.getState().toString());
+			result.put("byteTransfer", progress.getByteTransfer());
+			result.put("byteExpected", progress.getByteExpected());
+
+			KandyUtils.sendSuccessResult(getKrollObject(), success, result);
+		}
+
+		@Override
+		public void onRequestSucceded(Uri uri) {
+			Log.d(LCAT, "KandyResponseProgressListener->onRequestSucceded() was invoked: " + uri);
+			KandyUtils.sendSuccessResult(getKrollObject(), success, uri.toString());
+		}
+
+		@Override
+		public void onRequestFailed(int code, String err) {
+			Log.d(LCAT, "KandyResponseProgressListenerCallback->onRequestFailed() was invoked: " + String.valueOf(code)
+					+ " - " + err);
+			KandyUtils.sendFailResult(getKrollObject(), error, code, err);
+		}
+	}
+
+	private class KandyResponseListenerCallback extends KandyResponseListener {
+
+		private KrollFunction success, error;
+
+		public KandyResponseListenerCallback(KrollFunction success, KrollFunction error) {
+			this.success = success;
+			this.error = error;
+		}
+
+		@Override
+		public void onRequestSucceded() {
+			Log.d(LCAT, "KandyResponseListenerCallback->onRequestSucceded() was invoked.");
+			KandyUtils.sendSuccessResult(getKrollObject(), success);
+		}
+
+		@Override
+		public void onRequestFailed(int code, String err) {
+			Log.d(LCAT, "KandyResponseListenerCallback->onRequestFailed() was invoked: " + String.valueOf(code) + " - "
+					+ err);
+			KandyUtils.sendFailResult(getKrollObject(), error, code, err);
+		}
+
+	}
+}

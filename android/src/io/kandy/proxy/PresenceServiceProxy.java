@@ -7,7 +7,7 @@ import com.genband.kandy.api.services.presence.IKandyPresence;
 import com.genband.kandy.api.services.presence.KandyPresenceResponseListener;
 import com.genband.kandy.api.utils.KandyIllegalArgumentException;
 import io.kandy.KandyModule;
-import io.kandy.KandyUtils;
+import io.kandy.utils.KandyUtils;
 import org.appcelerator.kroll.KrollDict;
 import org.appcelerator.kroll.KrollFunction;
 import org.appcelerator.kroll.KrollProxy;
@@ -25,8 +25,7 @@ import java.util.ArrayList;
 @Kroll.proxy(creatableInModule = KandyModule.class)
 public class PresenceServiceProxy extends KrollProxy {
 
-	public static final String LCAT = PresenceServiceProxy.class
-			.getSimpleName();
+	public static final String LCAT = PresenceServiceProxy.class.getSimpleName();
 
 	public PresenceServiceProxy() {
 		super();
@@ -55,54 +54,45 @@ public class PresenceServiceProxy extends KrollProxy {
 		}
 
 		if (list.size() == 0) {
-			KandyUtils.sendFailResult(getKrollObject(), error,
-					"The user list is empty!");
+			KandyUtils.sendFailResult(getKrollObject(), error, "The user list is empty!");
 			return;
 		}
 
-		Kandy.getServices().getPresenceService()
-				.retrievePresence(list, new KandyPresenceResponseListener() {
+		Kandy.getServices().getPresenceService().retrievePresence(list, new KandyPresenceResponseListener() {
 
-					@Override
-					public void onRequestSucceed(
-							ArrayList<IKandyPresence> presences,
-							ArrayList<KandyRecord> absences) {
-						Log.d(LCAT,
-								"KandyPresenceResponseListener->onRequestSucceeded() was invoked: presences: "
-										+ presences.size() + " and absences: "
-										+ absences.size());
+			@Override
+			public void onRequestSucceed(ArrayList<IKandyPresence> presences, ArrayList<KandyRecord> absences) {
+				Log.d(LCAT,
+						"KandyPresenceResponseListener->onRequestSucceeded() was invoked: presences: "
+								+ presences.size() + " and absences: " + absences.size());
 
-						KrollDict result = new KrollDict();
+				KrollDict result = new KrollDict();
 
-						JSONArray presencesList = new JSONArray();
-						for (IKandyPresence online : presences) {
-							KrollDict obj = new KrollDict();
-							obj.put("user", online.getUser().getUri());
-							obj.put("lastSeen", online.getLastSeenDate()
-									.toString());
-							presencesList.put(obj);
-						}
-						result.put("presences", presencesList);
+				JSONArray presencesList = new JSONArray();
+				for (IKandyPresence online : presences) {
+					KrollDict obj = new KrollDict();
+					obj.put("user", online.getUser().getUri());
+					obj.put("lastSeen", online.getLastSeenDate().toString());
+					presencesList.put(obj);
+				}
+				result.put("presences", presencesList);
 
-						JSONArray absencesList = new JSONArray();
-						for (KandyRecord offline : absences) {
-							absencesList.put(offline.getUri());
-						}
-						result.put("absences", absencesList);
+				JSONArray absencesList = new JSONArray();
+				for (KandyRecord offline : absences) {
+					absencesList.put(offline.getUri());
+				}
+				result.put("absences", absencesList);
 
-						KandyUtils.sendSuccessResult(getKrollObject(), success,
-								result);
-					}
+				KandyUtils.sendSuccessResult(getKrollObject(), success, result);
+			}
 
-					@Override
-					public void onRequestFailed(int code, String err) {
-						Log.d(LCAT,
-								"KandyPresenceResponseListener->onRequestFailed() was invoked: "
-										+ String.valueOf(code) + " - " + err);
-						KandyUtils.sendFailResult(getKrollObject(), error,
-								code, err);
-					}
-				});
+			@Override
+			public void onRequestFailed(int code, String err) {
+				Log.d(LCAT, "KandyPresenceResponseListener->onRequestFailed() was invoked: " + String.valueOf(code)
+						+ " - " + err);
+				KandyUtils.sendFailResult(getKrollObject(), error, code, err);
+			}
+		});
 	}
 
 }
