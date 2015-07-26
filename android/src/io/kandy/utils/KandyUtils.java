@@ -3,6 +3,8 @@ package io.kandy.utils;
 import android.content.Context;
 import android.location.Location;
 import android.util.Log;
+import com.genband.kandy.api.services.billing.IKandyBillingPackage;
+import com.genband.kandy.api.services.billing.IKandyBillingPackageProperty;
 import com.genband.kandy.api.services.calls.IKandyCall;
 import com.genband.kandy.api.services.calls.KandyRecord;
 import io.kandy.KandyModule;
@@ -238,4 +240,33 @@ public final class KandyUtils {
 		}
 		return def;
 	}
+	
+	public static KrollDict getKrollDictFromKandyPackagesCredit(IKandyBillingPackage billingPackage) {
+        KrollDict obj = new KrollDict();
+        obj.put("currency", billingPackage.getCurrency());
+        obj.put("balance", billingPackage.getBalance());
+        obj.put("exiparyDate", billingPackage.getExiparyDate().toString());
+        obj.put("packageId", billingPackage.getPackageId());
+        obj.put("remainingTime", billingPackage.getRemainingTime());
+        obj.put("startDate", billingPackage.getStartDate());
+        obj.put("packageName", billingPackage.getPackageName());
+
+        JSONArray properties = new JSONArray();
+        if(billingPackage.getProperties().size() > 0){
+            ArrayList<IKandyBillingPackageProperty> billingPackageProperties = billingPackage.getProperties();
+            for (IKandyBillingPackageProperty p : billingPackageProperties)
+                properties.put(getKrollDictFromKandyBillingPackageProperty(p));
+        }
+
+        obj.put("properties", properties);
+        return obj;
+    }
+
+    private static KrollDict getKrollDictFromKandyBillingPackageProperty(IKandyBillingPackageProperty property) {
+    	KrollDict obj = new KrollDict();
+    	obj.put("packageName", property.getPackageName());
+        obj.put("quotaUnits", property.getQuotaUnits());
+        obj.put("remainingQuota", property.getRemainingQuota());
+        return obj;
+    }
 }
