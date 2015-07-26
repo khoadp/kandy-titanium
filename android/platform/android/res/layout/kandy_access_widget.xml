@@ -14,9 +14,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/kandy_username_edit"
-                android:textColor="@android:color/black"
                 android:layout_gravity="center_horizontal"
                 android:hint="userID@domain.com"
+                android:textColor="@android:color/black"
                 android:textColorHint="@android:color/darker_gray"/>
         <EditText
                 android:layout_width="match_parent"

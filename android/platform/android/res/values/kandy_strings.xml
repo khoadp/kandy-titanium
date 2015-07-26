@@ -7,6 +7,10 @@
     <string name="kandy_login_empty_username_text">Invalid username (userID@domain.com)</string>
     <string name="kandy_login_empty_password_text">Enter password</string>
 
+	<string name="kandy_call_remote_camera_view_lable">Remote</string>
+    <string name="kandy_call_local_camera_view_lable">Local</string>
+    <string name="kandy_calls_pstn_checkbox_label">Start PSTN call</string>
+    <string name="kandy_calls_sip_trunk_checkbox_label">Start call trough SIP Trunk</string>
     <string name="kandy_calls_local_video_label">Local video</string>
     <string name="kandy_calls_checkbox_label">Start with video</string>
     <string name="kandy_calls_state_video_label">Video state</string>

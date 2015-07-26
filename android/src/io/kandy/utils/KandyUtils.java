@@ -3,6 +3,8 @@ package io.kandy.utils;
 import android.content.Context;
 import android.location.Location;
 import android.util.Log;
+import com.genband.kandy.api.services.calls.IKandyCall;
+import com.genband.kandy.api.services.calls.KandyRecord;
 import io.kandy.KandyModule;
 import org.appcelerator.kroll.KrollDict;
 import org.appcelerator.kroll.KrollFunction;
@@ -86,6 +88,36 @@ public final class KandyUtils {
 		checkAndSendResult(krollObject, krollFunction, result);
 	}
 
+	public static KrollDict getKrollDictFromKandyCall(IKandyCall call) {
+		KrollDict obj = new KrollDict();
+		obj.put("callId", call.getCallId());
+        obj.put("callee", getKrollDictFromKandyRecord(call.getCallee()));
+        obj.put("via", call.getVia());
+        obj.put("type", call.getCallType().name());
+        obj.put("state", call.getCallState().name());
+        obj.put("startTime", call.getStartTime());
+        obj.put("endTime", call.getEndTime());
+        obj.put("duration", call.getDurationString());
+        obj.put("cameraForVideo", call.getCameraForVideo().name());
+        obj.put("isCallStartedWithVideo", call.isCallStartedWithVideo());
+        obj.put("isIncomingCall", call.isIncomingCall());
+        obj.put("isMute", call.isMute());
+        obj.put("isOnHold", call.isOnHold());
+        obj.put("isOtherParticipantOnHold", call.isOtherParticipantOnHold());
+        obj.put("isReceivingVideo", call.isReceivingVideo());
+        obj.put("isSendingVideo", call.isSendingVideo());
+        return obj;
+    }
+	
+	public static KrollDict getKrollDictFromKandyRecord(KandyRecord record) {
+		KrollDict obj = new KrollDict();
+		obj.put("uri", record.getUri());
+        obj.put("type", record.getType().toString());
+        obj.put("domain", record.getDomain());
+        obj.put("username", record.getUserName());
+        return obj;
+    }
+	
 	@SuppressWarnings("unchecked")
 	public static KrollDict JSONObjectToKrollDict(JSONObject object) throws JSONException {
 		KrollDict map = new KrollDict();

@@ -65,6 +65,14 @@ public class KandyModule extends KrollModule {
 	@Kroll.constant
 	public static final String THUMBNAIL_SIZE_LARGE = "LARGE";
 
+	// KandyCameraInfo Constants
+	@Kroll.constant
+	public static final String CAMERA_INFO_FACING_BACK = "FACING_BACK";
+	@Kroll.constant
+	public static final String CAMERA_INFO_FACING_FRONT = "FACING_FRONT";
+	@Kroll.constant
+	public static final String CAMERA_INFO_UNKNOWN = "UNKNOWN";
+	
 	private SharedPreferences prefs;
 
 	public KandyModule() {
