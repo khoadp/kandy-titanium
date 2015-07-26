@@ -17,8 +17,6 @@ import java.util.HashMap;
 
 public class AccessViewProxy extends TiUIView {
 
-	private AccessServiceProxy proxy;
-
 	private View loginView, logoutView;
 	private TextView userInfo;
 	private EditText username, password;
