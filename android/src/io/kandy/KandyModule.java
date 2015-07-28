@@ -93,7 +93,7 @@ public class KandyModule extends KrollModule {
 		IKandyGlobalSettings settings = Kandy.getGlobalSettings();
 		settings.setKandyHostURL(prefs.getString(KandyConstant.KANDY_HOST_PREFS_KEY, settings.getKandyHostURL()));
 	}
-
+	
 	@Kroll.onAppCreate
 	public static void onAppCreate(TiApplication app) {
 		Log.d(LCAT, "inside onAppCreate");

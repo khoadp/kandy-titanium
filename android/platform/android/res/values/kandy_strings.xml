@@ -78,4 +78,54 @@
     <string name="msg_pull_events">Pulling pending events...</string>
     <string name="msg_pull_events_succeed">Pulling pending events succeed</string>
 
+	<!-- Kandy Groups -->
+    <!-- Kandy Groups Activity -->
+	<string name="groups_list_activity_add_new_group">Create</string>
+    <string name="groups_list_activity_enter_group_name_hint">Enter Group Name</string>
+    <string name="groups_list_activity_get_groups_msg">Getting groups, please wait...</string>
+    <string name="groups_list_activity_create_group_msg">Creating group, please wait...</string>
+    <string name="groups_list_activity_group_created">Group has been created</string>
+    
+    <!-- Group Settings Activity -->
+    <string name="groups_settings_activity_menu_edit_name">Edit Group Name</string>
+    <string name="groups_settings_activity_menu_edit_img">Edit Group Image</string>
+    <string name="groups_settings_activity_menu_leave_group">Leave Group</string>
+    <string name="groups_settings_activity_menu_destroy_group">Destroy Group</string>
+    <string name="groups_settings_activity_menu_mute_group">Mute Group</string>
+    <string name="groups_settings_activity_menu_unmute_group">Unmute Group</string>
+    <string name="groups_settings_activity_group_name_label">Group Name:</string>
+    <string name="groups_settings_activity_participants_label">Participants:</string>
+    <string name="groups_settings_activity_participants_admin_label">Admin:</string>
+    <string name="groups_settings_activity_participants_muted_label">Muted:</string>
+    <string name="groups_settings_activity_participants_hint">participant@domain</string>
+    <string name="groups_settings_activity_chat_btn">Chat Room</string>
+    <string name="groups_settings_activity_add_participant_btn">Add</string>
+    <string name="groups_list_activity_participant_added_msg">Participant has been added</string>
+    <string name="action_settings_leave">Leave Group</string>
+    <string name="action_settings_destroy">Destroy Group</string>
+    <string name="action_settings_mute">(Un)Mute Group</string>
+    <string name="groups_settings_activity_action_settings_applying_msg">Applying action...</string>
+    <string name="groups_settings_activity_action_image_action_msg">Image actions</string>
+    <string name="groups_settings_activity_action_participant_action_msg">Participant actions</string>
+    
+    <!-- Group Chat Activity -->
+
+    <string name="title_activity_group_creator">GroupCreatorActivity</string>
+    <string name="groups_settings_activity_action_image_has_been_removed">Image has been removed</string>
+    <string name="groups_settings_activity_action_image_has_been_changed">Image has been changed</string>
+    <string name="groups_settings_activity_action_group_muted">You\'ve muted the group</string>
+    <string name="groups_settings_activity_action_group_unmuted">You\'ve unmuted the group</string>
+    <string name="groups_settings_activity_action_group_destroyed">You\'ve destroyed the group</string>
+    <string name="groups_settings_activity_action_group_left">You\'ve left the group</string>
+    <string name="groups_settings_activity_action_group_kicked">You\'ve kicked out of the group</string>
+    <string name="groups_settings_activity_action_participant_removed">Participant has been removed</string>
+    <string name="groups_settings_activity_action_participant_unmuted">Participant has been unmuted</string>
+    <string name="groups_settings_activity_action_participant_muted">Participant has been muted</string>
+    <string name="groups_settings_activity_action_getting_group_data">Getting the selected group\'s data</string>
+    <string name="groups_settings_activity_action_group_data_got">Got the group</string>
+    <string name="groups_settings_activity_action_no_group_image">No group image</string>
+    <string name="groups_settings_activity_action_updating_group_name_">Updating group name...</string>
+    <string name="groups_settings_activity_action_updating_group_image_">Updating group image...</string>
+    <string name="groups_settings_activity_action_group_name_changed">Group name has been changed</string>
+
 </resources>

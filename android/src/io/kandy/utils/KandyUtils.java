@@ -7,6 +7,8 @@ import com.genband.kandy.api.services.billing.IKandyBillingPackage;
 import com.genband.kandy.api.services.billing.IKandyBillingPackageProperty;
 import com.genband.kandy.api.services.calls.IKandyCall;
 import com.genband.kandy.api.services.calls.KandyRecord;
+import com.genband.kandy.api.services.groups.KandyGroup;
+import com.genband.kandy.api.services.groups.KandyGroupParticipant;
 import io.kandy.KandyModule;
 import org.appcelerator.kroll.KrollDict;
 import org.appcelerator.kroll.KrollFunction;
@@ -90,36 +92,64 @@ public final class KandyUtils {
 		checkAndSendResult(krollObject, krollFunction, result);
 	}
 
+	public static KrollDict getKrollDictFromKandyGroup(KandyGroup group) {
+		KrollDict obj = new KrollDict();
+
+		obj.put("id", getKrollDictFromKandyRecord(group.getGroupId()));
+		obj.put("name", group.getGroupName());
+		obj.put("creationDate", group.getCreationDate().getTime());
+		obj.put("maxParticipantsNumber", group.getMaxParticipantsNumber());
+		obj.put("selfParticipant", getKrollDictFromKandyGroupParticipant(group.getSelfParticipant()));
+		obj.put("isGroupMuted", group.isGroupMuted());
+		JSONArray list = new JSONArray();
+		if (group.getGroupParticipants() != null) {
+			for (KandyGroupParticipant participant : group.getGroupParticipants())
+				list.put(getKrollDictFromKandyGroupParticipant(participant));
+		}
+		obj.put("participants", list);
+
+		return obj;
+	}
+
+	public static KrollDict getKrollDictFromKandyGroupParticipant(KandyGroupParticipant participant) {
+		KrollDict obj = getKrollDictFromKandyRecord(participant.getParticipant());
+
+		obj.put("isAdmin", participant.isAdmin());
+		obj.put("isMuted", participant.isMuted());
+
+		return obj;
+	}
+
 	public static KrollDict getKrollDictFromKandyCall(IKandyCall call) {
 		KrollDict obj = new KrollDict();
 		obj.put("callId", call.getCallId());
-        obj.put("callee", getKrollDictFromKandyRecord(call.getCallee()));
-        obj.put("via", call.getVia());
-        obj.put("type", call.getCallType().name());
-        obj.put("state", call.getCallState().name());
-        obj.put("startTime", call.getStartTime());
-        obj.put("endTime", call.getEndTime());
-        obj.put("duration", call.getDurationString());
-        obj.put("cameraForVideo", call.getCameraForVideo().name());
-        obj.put("isCallStartedWithVideo", call.isCallStartedWithVideo());
-        obj.put("isIncomingCall", call.isIncomingCall());
-        obj.put("isMute", call.isMute());
-        obj.put("isOnHold", call.isOnHold());
-        obj.put("isOtherParticipantOnHold", call.isOtherParticipantOnHold());
-        obj.put("isReceivingVideo", call.isReceivingVideo());
-        obj.put("isSendingVideo", call.isSendingVideo());
-        return obj;
-    }
-	
+		obj.put("callee", getKrollDictFromKandyRecord(call.getCallee()));
+		obj.put("via", call.getVia());
+		obj.put("type", call.getCallType().name());
+		obj.put("state", call.getCallState().name());
+		obj.put("startTime", call.getStartTime());
+		obj.put("endTime", call.getEndTime());
+		obj.put("duration", call.getDurationString());
+		obj.put("cameraForVideo", call.getCameraForVideo().name());
+		obj.put("isCallStartedWithVideo", call.isCallStartedWithVideo());
+		obj.put("isIncomingCall", call.isIncomingCall());
+		obj.put("isMute", call.isMute());
+		obj.put("isOnHold", call.isOnHold());
+		obj.put("isOtherParticipantOnHold", call.isOtherParticipantOnHold());
+		obj.put("isReceivingVideo", call.isReceivingVideo());
+		obj.put("isSendingVideo", call.isSendingVideo());
+		return obj;
+	}
+
 	public static KrollDict getKrollDictFromKandyRecord(KandyRecord record) {
 		KrollDict obj = new KrollDict();
 		obj.put("uri", record.getUri());
-        obj.put("type", record.getType().toString());
-        obj.put("domain", record.getDomain());
-        obj.put("username", record.getUserName());
-        return obj;
-    }
-	
+		obj.put("type", record.getType().toString());
+		obj.put("domain", record.getDomain());
+		obj.put("username", record.getUserName());
+		return obj;
+	}
+
 	@SuppressWarnings("unchecked")
 	public static KrollDict JSONObjectToKrollDict(JSONObject object) throws JSONException {
 		KrollDict map = new KrollDict();
@@ -240,33 +270,33 @@ public final class KandyUtils {
 		}
 		return def;
 	}
-	
+
 	public static KrollDict getKrollDictFromKandyPackagesCredit(IKandyBillingPackage billingPackage) {
-        KrollDict obj = new KrollDict();
-        obj.put("currency", billingPackage.getCurrency());
-        obj.put("balance", billingPackage.getBalance());
-        obj.put("exiparyDate", billingPackage.getExiparyDate().toString());
-        obj.put("packageId", billingPackage.getPackageId());
-        obj.put("remainingTime", billingPackage.getRemainingTime());
-        obj.put("startDate", billingPackage.getStartDate());
-        obj.put("packageName", billingPackage.getPackageName());
+		KrollDict obj = new KrollDict();
+		obj.put("currency", billingPackage.getCurrency());
+		obj.put("balance", billingPackage.getBalance());
+		obj.put("exiparyDate", billingPackage.getExiparyDate().toString());
+		obj.put("packageId", billingPackage.getPackageId());
+		obj.put("remainingTime", billingPackage.getRemainingTime());
+		obj.put("startDate", billingPackage.getStartDate());
+		obj.put("packageName", billingPackage.getPackageName());
 
-        JSONArray properties = new JSONArray();
-        if(billingPackage.getProperties().size() > 0){
-            ArrayList<IKandyBillingPackageProperty> billingPackageProperties = billingPackage.getProperties();
-            for (IKandyBillingPackageProperty p : billingPackageProperties)
-                properties.put(getKrollDictFromKandyBillingPackageProperty(p));
-        }
+		JSONArray properties = new JSONArray();
+		if (billingPackage.getProperties().size() > 0) {
+			ArrayList<IKandyBillingPackageProperty> billingPackageProperties = billingPackage.getProperties();
+			for (IKandyBillingPackageProperty p : billingPackageProperties)
+				properties.put(getKrollDictFromKandyBillingPackageProperty(p));
+		}
 
-        obj.put("properties", properties);
-        return obj;
-    }
+		obj.put("properties", properties);
+		return obj;
+	}
 
-    private static KrollDict getKrollDictFromKandyBillingPackageProperty(IKandyBillingPackageProperty property) {
-    	KrollDict obj = new KrollDict();
-    	obj.put("packageName", property.getPackageName());
-        obj.put("quotaUnits", property.getQuotaUnits());
-        obj.put("remainingQuota", property.getRemainingQuota());
-        return obj;
-    }
+	private static KrollDict getKrollDictFromKandyBillingPackageProperty(IKandyBillingPackageProperty property) {
+		KrollDict obj = new KrollDict();
+		obj.put("packageName", property.getPackageName());
+		obj.put("quotaUnits", property.getQuotaUnits());
+		obj.put("remainingQuota", property.getRemainingQuota());
+		return obj;
+	}
 }
