@@ -1,6 +1,7 @@
 package io.kandy.proxy;
 
 import android.app.Activity;
+import android.os.Bundle;
 import android.util.Log;
 import com.genband.kandy.api.Kandy;
 import com.genband.kandy.api.access.KandyConnectServiceNotificationListener;
@@ -32,7 +33,7 @@ public class AccessServiceProxy extends TiViewProxy implements KandyConnectServi
 	public static final String ACCESS_TYPE_PASSWORD = "password";
 	public static final String ACCESS_TYPE_TOKEN = "token";
 
-	private KrollDict callbacks = null;
+	private KrollDict callbacks = new KrollDict();
 
 	private AccessViewProxy viewProxy;
 
@@ -59,6 +60,17 @@ public class AccessServiceProxy extends TiViewProxy implements KandyConnectServi
 		return viewProxy;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void onCreate(Activity activity, Bundle savedInstanceState) {
+		super.onCreate(activity, savedInstanceState);
+		if (viewProxy != null)
+			viewProxy.registerNotificationListener();
+		Kandy.getAccess().registerNotificationListener(this);
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 */
@@ -203,7 +215,7 @@ public class AccessServiceProxy extends TiViewProxy implements KandyConnectServi
 
 	@Override
 	public void onConnectionStateChanged(KandyConnectionState state) {
-		Log.d(LCAT, "onConnectionStateChanged() was invoked: " + state.name());
+		Log.i(LCAT, "onConnectionStateChanged() was invoked: " + state.name());
 		KandyUtils.sendSuccessResult(getKrollObject(), (KrollFunction) callbacks.get("onConnectionStateChanged"),
 				state.name());
 	}

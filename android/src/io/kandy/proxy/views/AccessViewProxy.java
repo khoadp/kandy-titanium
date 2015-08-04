@@ -124,14 +124,27 @@ public class AccessViewProxy extends TiUIView implements KandyConnectServiceNoti
 		});
 	}
 
-	private void loginEnabled(boolean enabled) {
-		username.setEnabled(enabled);
-		password.setEnabled(enabled);
-		loginBtn.setClickable(enabled);
+	private void loginEnabled(final boolean enabled) {
+		activity.runOnUiThread(new Runnable() {
+
+			@Override
+			public void run() {
+				username.setEnabled(enabled);
+				password.setEnabled(enabled);
+				accessToken.setEnabled(enabled);
+				loginBtn.setClickable(enabled);
+			}
+		});
 	}
 
-	private void logoutEnabled(boolean enabled) {
-		logoutBtn.setClickable(enabled);
+	private void logoutEnabled(final boolean enabled) {
+		activity.runOnUiThread(new Runnable() {
+
+			@Override
+			public void run() {
+				logoutBtn.setClickable(enabled);
+			}
+		});
 	}
 
 	private String getUsername() {
@@ -144,7 +157,7 @@ public class AccessViewProxy extends TiUIView implements KandyConnectServiceNoti
 
 	private void startLoginProcess() {
 		UIUtils.showProgressDialogWithMessage(activity, KandyUtils.getString("kandy_login_login_process"));
-
+		loginEnabled(false);
 		// if user access token is define we login without user and password
 		String token = accessToken.getText().toString();
 		if (!TextUtils.isEmpty(token)) {
@@ -154,7 +167,7 @@ public class AccessViewProxy extends TiUIView implements KandyConnectServiceNoti
 		}
 	}
 
-	private void login(String username, String password) {
+	private void login(final String username, String password) {
 		KandyRecord kandyUser;
 
 		try {
@@ -162,11 +175,13 @@ public class AccessViewProxy extends TiUIView implements KandyConnectServiceNoti
 
 		} catch (KandyIllegalArgumentException ex) {
 			UIUtils.showDialogWithErrorMessage(activity, KandyUtils.getString("kandy_login_empty_username_text"));
+			loginEnabled(true);
 			return;
 		}
 
 		if (password == null || password.isEmpty()) {
 			UIUtils.showDialogWithErrorMessage(activity, KandyUtils.getString("kandy_login_empty_password_text"));
+			loginEnabled(true);
 			return;
 		}
 
@@ -177,13 +192,15 @@ public class AccessViewProxy extends TiUIView implements KandyConnectServiceNoti
 				Log.i(LCAT, "Kandy.getAccess().login:onRequestFailed error: " + err + ". Response code: "
 						+ responseCode);
 				UIUtils.handleResultOnUiThread(activity, true, err);
+				loginEnabled(true);
 			}
 
 			@Override
 			public void onLoginSucceeded() {
 				Log.i(LCAT, "Kandy.getAccess().login:onLoginSucceeded");
 				UIUtils.handleResultOnUiThread(activity, false, KandyUtils.getString("kandy_login_login_success"));
-				activity.finish();
+				logoutEnabled(true);
+				displayLogoutView(username);
 			}
 		});
 	}
@@ -196,13 +213,15 @@ public class AccessViewProxy extends TiUIView implements KandyConnectServiceNoti
 				Log.i(LCAT, "Kandy.getAccess().login:onRequestFailed error: " + err + ". Response code: "
 						+ responseCode);
 				UIUtils.handleResultOnUiThread(activity, true, err);
+				loginEnabled(true);
 			}
 
 			@Override
 			public void onLoginSucceeded() {
 				Log.i(LCAT, "Kandy.getAccess().login:onLoginSucceeded");
 				UIUtils.handleResultOnUiThread(activity, false, KandyUtils.getString("kandy_login_login_success"));
-				activity.finish();
+				logoutEnabled(true);
+				displayLogoutView(Kandy.getSession().getKandyUser().getUser());
 			}
 		});
 	}
@@ -210,11 +229,11 @@ public class AccessViewProxy extends TiUIView implements KandyConnectServiceNoti
 	private void startLogoutProcess() {
 		UIUtils.showProgressDialogWithMessage(getProxy().getActivity(),
 				KandyUtils.getString("kandy_login_logout_process"));
+		logoutEnabled(false);
 		logout();
 	}
 
 	private void logout() {
-		logoutEnabled(false);
 		Kandy.getAccess().logout(new KandyLogoutResponseListener() {
 
 			@Override
