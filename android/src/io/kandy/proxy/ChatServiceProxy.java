@@ -70,6 +70,8 @@ public class ChatServiceProxy extends TiViewProxy {
 			viewProxy.registerChatsNotifications();
 	}
 
+	
+	
 	@Kroll.method
 	@Kroll.setProperty
 	public void setCallbacks(KrollDict callbacks) {

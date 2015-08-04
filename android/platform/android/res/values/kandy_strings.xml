@@ -4,6 +4,8 @@
     <string name="kandy_error_message" formatted="false">Response code: %d - %s</string>
     <string name="kandy_login_login_success">Login succeed</string>
     <string name="kandy_login_logout_success">Logout succeed</string>
+    <string name="kandy_login_login_process">Login, please wait...</string>
+    <string name="kandy_login_logout_process">Logout, please wait...</string>
     <string name="kandy_login_empty_username_text">Invalid username (userID@domain.com)</string>
     <string name="kandy_login_empty_password_text">Enter password</string>
 

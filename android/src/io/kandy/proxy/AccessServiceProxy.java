@@ -3,6 +3,8 @@ package io.kandy.proxy;
 import android.app.Activity;
 import android.util.Log;
 import com.genband.kandy.api.Kandy;
+import com.genband.kandy.api.access.KandyConnectServiceNotificationListener;
+import com.genband.kandy.api.access.KandyConnectionState;
 import com.genband.kandy.api.access.KandyLoginResponseListener;
 import com.genband.kandy.api.access.KandyLogoutResponseListener;
 import com.genband.kandy.api.services.calls.KandyRecord;
@@ -17,17 +19,16 @@ import org.appcelerator.titanium.proxy.TiViewProxy;
 import org.appcelerator.titanium.view.TiUIView;
 
 /**
- * Access service
+ * Access service proxy.
  * 
  * @author kodeplusdev
- * 
+ * @version 1.2.0
  */
 @Kroll.proxy(creatableInModule = KandyModule.class)
-public class AccessServiceProxy extends TiViewProxy {
+public class AccessServiceProxy extends TiViewProxy implements KandyConnectServiceNotificationListener {
 
 	public static final String LCAT = AccessServiceProxy.class.getSimpleName();
 
-	// Callbacks Be used by widget
 	private KrollDict callbacks = null;
 
 	private AccessViewProxy viewProxy;
@@ -42,6 +43,8 @@ public class AccessServiceProxy extends TiViewProxy {
 	@Override
 	public void handleCreationDict(KrollDict options) {
 		super.handleCreationDict(options);
+		if (options.containsKey("callbacks"))
+			callbacks = options.getKrollDict("callbacks");
 	}
 
 	/**
@@ -54,9 +57,32 @@ public class AccessServiceProxy extends TiViewProxy {
 	}
 
 	/**
-	 * Set callbacks for login action
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void onPause(Activity activity) {
+		super.onPause(activity);
+		if (viewProxy != null)
+			viewProxy.unregisterNotificationListener();
+		Kandy.getAccess().unregisterNotificationListener(this);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void onResume(Activity activity) {
+		super.onResume(activity);
+		if (viewProxy != null)
+			viewProxy.registerNotificationListener();
+		Kandy.getAccess().registerNotificationListener(this);
+	}
+
+	/**
+	 * Set callbacks for access service.
 	 * 
 	 * @param callbacks
+	 *            The access callbacks.
 	 */
 	@Kroll.setProperty
 	@Kroll.method
@@ -69,6 +95,7 @@ public class AccessServiceProxy extends TiViewProxy {
 	 * admin.
 	 * 
 	 * @param args
+	 *            The argument login.
 	 */
 	@Kroll.method
 	public void login(KrollDict args) {
@@ -114,33 +141,15 @@ public class AccessServiceProxy extends TiViewProxy {
 	}
 
 	/**
-	 * Register/login the user on the server with credentials received from
-	 * admin.
-	 * 
-	 * @param username
-	 * @param password
-	 */
-	public void login(KrollFunction success, KrollFunction error, String username, String password) {
-		KrollDict loginArgs = KandyUtils.getKrollDictFromCallbacks(callbacks, "login");
-
-		loginArgs.put("success", KandyUtils.joinKrollFunctions(success, (KrollFunction) loginArgs.get("success")));
-		loginArgs.put("error", KandyUtils.joinKrollFunctions(success, (KrollFunction) loginArgs.get("error")));
-
-		loginArgs.put("username", username);
-		loginArgs.put("password", password);
-
-		this.login(loginArgs);
-	}
-
-	/**
 	 * This method unregisters user from the Kandy server.
 	 * 
-	 * @param callbacks
+	 * @param args
+	 *            The arguments logout.
 	 */
 	@Kroll.method
-	public void logout(KrollDict callbacks) {
-		final KrollFunction success = (KrollFunction) callbacks.get("success");
-		final KrollFunction error = (KrollFunction) callbacks.get("error");
+	public void logout(KrollDict args) {
+		final KrollFunction success = (KrollFunction) args.get("success");
+		final KrollFunction error = (KrollFunction) args.get("error");
 
 		Kandy.getAccess().logout(new KandyLogoutResponseListener() {
 
@@ -159,15 +168,57 @@ public class AccessServiceProxy extends TiViewProxy {
 		});
 	}
 
-	/**
-	 * This method unregisters user from the Kandy server.
-	 */
-	public void logout(KrollFunction success, KrollFunction error) {
-		KrollDict logoutArgs = KandyUtils.getKrollDictFromCallbacks(callbacks, "logout");
+	@Kroll.method
+	public boolean isLoggedIn() {
+		return (KandyConnectionState.CONNECTED.equals(Kandy.getAccess().getConnectionState()));
+	}
 
-		logoutArgs.put("success", KandyUtils.joinKrollFunctions(success, (KrollFunction) logoutArgs.get("success")));
-		logoutArgs.put("error", KandyUtils.joinKrollFunctions(success, (KrollFunction) logoutArgs.get("error")));
+	@Override
+	public void onConnectionStateChanged(KandyConnectionState state) {
+		Log.d(LCAT, "onConnectionStateChanged() was invoked: " + state.name());
+		KandyUtils.sendSuccessResult(getKrollObject(), (KrollFunction) callbacks.get("onConnectionStateChanged"),
+				state.name());
+	}
 
-		logout(logoutArgs);
+	@Override
+	public void onInvalidUser(String error) {
+		Log.d(LCAT, "onInvalidUser() was invoked: " + error);
+		KandyUtils.sendFailResult(getKrollObject(), (KrollFunction) callbacks.get("onInvalidUser"), error);
+	}
+
+	@Override
+	public void onSDKNotSupported(String error) {
+		Log.d(LCAT, "onSDKNotSupported() was invoked: " + error);
+		KandyUtils.sendFailResult(getKrollObject(), (KrollFunction) callbacks.get("onSDKNotSupported"), error);
+	}
+
+	@Override
+	public void onSessionExpired(String error) {
+		Log.d(LCAT, "onSessionExpired() was invoked: " + error);
+		KandyUtils.sendFailResult(getKrollObject(), (KrollFunction) callbacks.get("onSessionExpired"), error);
+	}
+
+	@Override
+	public void onSocketConnected() {
+		Log.d(LCAT, "onSocketConnected() was invoked.");
+		KandyUtils.sendFailResult(getKrollObject(), (KrollFunction) callbacks.get("onSocketConnected"));
+	}
+
+	@Override
+	public void onSocketConnecting() {
+		Log.d(LCAT, "onSocketConnecting() was invoked.");
+		KandyUtils.sendFailResult(getKrollObject(), (KrollFunction) callbacks.get("onSocketConnecting"));
+	}
+
+	@Override
+	public void onSocketDisconnected() {
+		Log.d(LCAT, "onSocketDisconnected() was invoked.");
+		KandyUtils.sendFailResult(getKrollObject(), (KrollFunction) callbacks.get("onSocketDisconnected"));
+	}
+
+	@Override
+	public void onSocketFailedWithError(String error) {
+		Log.d(LCAT, "onSocketFailedWithError() was invoked: " + error);
+		KandyUtils.sendFailResult(getKrollObject(), (KrollFunction) callbacks.get("onSocketFailedWithError"), error);
 	}
 }

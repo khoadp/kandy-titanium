@@ -22,6 +22,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * Common utils for Kandy module.
+ * 
+ * @author kodeplusdev
+ * @version 1.2.0
+ */
 public final class KandyUtils {
 
 	private static Context _context;
@@ -200,51 +206,6 @@ public final class KandyUtils {
 		}
 
 		return result;
-	}
-
-	public static KrollFunction joinKrollFunctions(final KrollFunction... functions) {
-		return new KrollFunction() {
-
-			@Override
-			public void callAsync(KrollObject arg0, Object[] arg1) {
-				for (KrollFunction krollFunction : functions) {
-					if (krollFunction != null)
-						krollFunction.callAsync(arg0, arg1);
-				}
-			}
-
-			@Override
-			public void callAsync(KrollObject arg0, HashMap arg1) {
-				for (KrollFunction krollFunction : functions) {
-					if (krollFunction != null)
-						krollFunction.callAsync(arg0, arg1);
-				}
-			}
-
-			@Override
-			public Object call(KrollObject arg0, Object[] arg1) {
-				HashMap<KrollFunction, Object> obj = new HashMap<KrollFunction, Object>();
-
-				for (KrollFunction krollFunction : functions) {
-					if (krollFunction != null)
-						obj.put(krollFunction, krollFunction.call(arg0, arg1));
-				}
-
-				return obj;
-			}
-
-			@Override
-			public Object call(KrollObject arg0, HashMap arg1) {
-				HashMap<KrollFunction, Object> obj = new HashMap<KrollFunction, Object>();
-
-				for (KrollFunction krollFunction : functions) {
-					if (krollFunction != null)
-						obj.put(krollFunction, krollFunction.call(arg0, arg1));
-				}
-
-				return obj;
-			}
-		};
 	}
 
 	public static Location getLocationFromJson(JSONObject obj) {

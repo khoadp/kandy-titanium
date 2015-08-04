@@ -140,8 +140,10 @@ public class ProvisioningServiceProxy extends TiViewProxy {
 	public void requestCode(final KrollFunction success, KrollFunction error, final String phoneNumber) {
 		KrollDict requestArgs = KandyUtils.getKrollDictFromCallbacks(callbacks, "request");
 
-		requestArgs.put("success", KandyUtils.joinKrollFunctions(success, (KrollFunction) requestArgs.get("success")));
-		requestArgs.put("error", KandyUtils.joinKrollFunctions(error, (KrollFunction) requestArgs.get("error")));
+		// requestArgs.put("success", KandyUtils.joinKrollFunctions(success,
+		// (KrollFunction) requestArgs.get("success")));
+		// requestArgs.put("error", KandyUtils.joinKrollFunctions(error,
+		// (KrollFunction) requestArgs.get("error")));
 
 		requestArgs.put("phoneNumber", phoneNumber);
 
@@ -196,9 +198,11 @@ public class ProvisioningServiceProxy extends TiViewProxy {
 	public void validate(KrollFunction success, KrollFunction error, String phoneNumber, String otp) {
 		KrollDict validateArgs = KandyUtils.getKrollDictFromCallbacks(callbacks, "validate");
 
-		validateArgs
-				.put("success", KandyUtils.joinKrollFunctions(success, (KrollFunction) validateArgs.get("success")));
-		validateArgs.put("error", KandyUtils.joinKrollFunctions(error, (KrollFunction) validateArgs.get("error")));
+		// validateArgs
+		// .put("success", KandyUtils.joinKrollFunctions(success,
+		// (KrollFunction) validateArgs.get("success")));
+		// validateArgs.put("error", KandyUtils.joinKrollFunctions(error,
+		// (KrollFunction) validateArgs.get("error")));
 
 		validateArgs.put("phoneNumber", phoneNumber);
 		validateArgs.put("otp", otp);
@@ -239,9 +243,11 @@ public class ProvisioningServiceProxy extends TiViewProxy {
 	public void deactivate(KrollFunction success, KrollFunction error) {
 		KrollDict deactivateArgs = KandyUtils.getKrollDictFromCallbacks(callbacks, "deactivate");
 
-		deactivateArgs.put("success",
-				KandyUtils.joinKrollFunctions(success, (KrollFunction) deactivateArgs.get("success")));
-		deactivateArgs.put("error", KandyUtils.joinKrollFunctions(error, (KrollFunction) deactivateArgs.get("error")));
+		// deactivateArgs.put("success",
+		// KandyUtils.joinKrollFunctions(success, (KrollFunction)
+		// deactivateArgs.get("success")));
+		// deactivateArgs.put("error", KandyUtils.joinKrollFunctions(error,
+		// (KrollFunction) deactivateArgs.get("error")));
 
 		deactivate(deactivateArgs);
 	}

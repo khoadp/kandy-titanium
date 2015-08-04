@@ -6,6 +6,11 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import com.genband.kandy.api.IKandyGlobalSettings;
 import com.genband.kandy.api.Kandy;
+import com.genband.kandy.api.services.chats.KandyChatSettings;
+import com.genband.kandy.api.services.chats.KandyThumbnailSize;
+import com.genband.kandy.api.services.common.ConnectionType;
+import com.genband.kandy.api.utils.KandyIllegalArgumentException;
+import io.kandy.utils.FileUtils;
 import io.kandy.utils.KandyUtils;
 import org.appcelerator.kroll.KrollDict;
 import org.appcelerator.kroll.KrollModule;
@@ -13,11 +18,13 @@ import org.appcelerator.kroll.annotations.Kroll;
 import org.appcelerator.kroll.common.Log;
 import org.appcelerator.titanium.TiApplication;
 
+import java.io.File;
+
 /**
  * Kandy module
  * 
  * @author kodeplusdev
- * 
+ * @version 1.2.0 
  */
 @Kroll.module(name = "Kandy", id = "io.kandy")
 public class KandyModule extends KrollModule {
@@ -26,6 +33,7 @@ public class KandyModule extends KrollModule {
 	private static final String LCAT = KandyModule.class.getSimpleName();
 	// private static final boolean DBG = TiConfig.LOGD;
 
+	// Status Constants
 	@Kroll.constant
 	public static final int STATUS_ERROR = 0;
 	@Kroll.constant
@@ -72,13 +80,30 @@ public class KandyModule extends KrollModule {
 	public static final String CAMERA_INFO_FACING_FRONT = "FACING_FRONT";
 	@Kroll.constant
 	public static final String CAMERA_INFO_UNKNOWN = "UNKNOWN";
-	
+
+	// KandyConnectionState Constants
+	@Kroll.constant
+	public static final String CONNECTION_STATE_UNKNOWN = "UNKNOWN";
+	@Kroll.constant
+	public static final String CONNECTION_STATE_DISCONNECTED = "DISCONNECTED";
+	@Kroll.constant
+	public static final String CONNECTION_STATE_CONNECTED = "CONNECTED";
+	@Kroll.constant
+	public static final String CONNECTION_STATE_DISCONNECTING = "DISCONNECTING";
+	@Kroll.constant
+	public static final String CONNECTION_STATE_CONNECTING = "CONNECTING";
+	@Kroll.constant
+	public static final String CONNECTION_STATE_FAILED = "FAILED";
+
 	private SharedPreferences prefs;
 
 	public KandyModule() {
 		super();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void onCreate(Activity activity, Bundle savedInstanceState) {
 		super.onCreate(activity, savedInstanceState);
@@ -90,10 +115,17 @@ public class KandyModule extends KrollModule {
 				prefs.getString(KandyConstant.API_KEY_PREFS_KEY, KandyUtils.getString("kandy_api_key")),
 				prefs.getString(KandyConstant.API_SECRET_PREFS_KEY, KandyUtils.getString("kandy_api_secret")));
 
+		applyKandyChatSettings();
+
 		IKandyGlobalSettings settings = Kandy.getGlobalSettings();
 		settings.setKandyHostURL(prefs.getString(KandyConstant.KANDY_HOST_PREFS_KEY, settings.getKandyHostURL()));
+
+		prepareLocalStorage();
 	}
-	
+
+	/**
+	 * {@inheritDoc}
+	 */
 	@Kroll.onAppCreate
 	public static void onAppCreate(TiApplication app) {
 		Log.d(LCAT, "inside onAppCreate");
@@ -102,10 +134,54 @@ public class KandyModule extends KrollModule {
 		KandyUtils.initialize(app);
 	}
 
+	private void prepareLocalStorage() {
+		File localStorageDirectory = FileUtils.getFilesDirectory(KandyConstant.LOCAL_STORAGE);
+		FileUtils.clearDirectory(localStorageDirectory);
+		FileUtils.copyAssets(getActivity().getApplicationContext(), localStorageDirectory);
+	}
+
+	public void applyKandyChatSettings() {
+
+		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
+		KandyChatSettings settings = Kandy.getServices().getChatService().getSettings();
+
+		String value = sp.getString(KandyConstant.PREF_KEY_POLICY, null);
+		if (value != null) { // otherwise will be used default setting from SDK
+			ConnectionType downloadPolicy = ConnectionType.valueOf(value);
+			settings.setAutoDownloadMediaConnectionType(downloadPolicy);
+		}
+
+		int uploadSize = sp.getInt(KandyConstant.PREF_KEY_MAX_SIZE, -1);
+
+		if (uploadSize != -1) { // otherwise will be used default setting from
+								// SDK
+			try {
+				settings.setMediaMaxSize(uploadSize);
+			} catch (KandyIllegalArgumentException e) {
+				Log.d(LCAT, "applyKandyChatSettings: " + e.getMessage());
+			}
+		}
+
+		value = sp.getString(KandyConstant.PREF_KEY_PATH, null);
+		if (value != null) { // otherwise will be used default setting from SDK
+			File downloadPath = new File(value);
+			settings.setDownloadMediaPath(downloadPath);
+		}
+
+		value = sp.getString(KandyConstant.PREF_KEY_THUMB_SIZE, null);
+		if (value != null) { // otherwise will be used default setting from SDK
+			KandyThumbnailSize thumbnailSize = KandyThumbnailSize.valueOf(value);
+			settings.setAutoDownloadThumbnailSize(thumbnailSize);
+		}
+	}
+
 	/**
-	 * Setup Kandy API
+	 * Set Kandy api keys.
 	 * 
-	 * @param args
+	 * @param apiKey
+	 *            The api key.
+	 * @param apiSecret
+	 *            The secret key.
 	 */
 	@Kroll.method
 	public void setKey(String apiKey, String apiSecret) {
@@ -113,6 +189,12 @@ public class KandyModule extends KrollModule {
 		Kandy.initialize(getActivity(), apiKey, apiSecret);
 	}
 
+	/**
+	 * Set Kandy host url.
+	 * 
+	 * @param url
+	 *            The host url.
+	 */
 	@Kroll.setProperty
 	@Kroll.method
 	public void setHostUrl(String url) {
@@ -125,17 +207,32 @@ public class KandyModule extends KrollModule {
 		settings.setKandyHostURL(prefs.getString(KandyConstant.KANDY_HOST_PREFS_KEY, settings.getKandyHostURL()));
 	}
 
+	/**
+	 * Get Kandy host url.
+	 * 
+	 * @return The host url.
+	 */
 	@Kroll.getProperty
 	@Kroll.method
 	public String getHostUrl() {
 		return Kandy.getGlobalSettings().getKandyHostURL();
 	}
 
+	/**
+	 * Get Kandy report.
+	 * 
+	 * @return The Kandy report.
+	 */
 	@Kroll.method
 	public String getReport() {
 		return Kandy.getGlobalSettings().getReport();
 	}
 
+	/**
+	 * Get current session.
+	 * 
+	 * @return The session information.
+	 */
 	@Kroll.method
 	public KrollDict getSession() {
 		KrollDict obj = new KrollDict();
