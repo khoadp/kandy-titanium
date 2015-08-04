@@ -15,6 +15,7 @@ import com.genband.kandy.api.access.KandyLoginResponseListener;
 import com.genband.kandy.api.access.KandyLogoutResponseListener;
 import com.genband.kandy.api.services.calls.KandyRecord;
 import com.genband.kandy.api.utils.KandyIllegalArgumentException;
+import io.kandy.proxy.AccessServiceProxy;
 import io.kandy.utils.KandyUtils;
 import io.kandy.utils.UIUtils;
 import org.appcelerator.kroll.KrollDict;
@@ -60,6 +61,15 @@ public class AccessViewProxy extends TiUIView implements KandyConnectServiceNoti
 
 		userInfo = (TextView) layoutWraper.findViewById(KandyUtils.getId("kandy_user_info_edit"));
 		logoutBtn = (Button) layoutWraper.findViewById(KandyUtils.getId("kandy_logout_button"));
+
+		String type = (String) proxy.getProperty("type");
+
+		if (type != null && type.equals(AccessServiceProxy.ACCESS_TYPE_TOKEN)) {
+			username.setVisibility(View.GONE);
+			password.setVisibility(View.GONE);
+		} else {
+			accessToken.setVisibility(View.GONE);
+		}
 
 		// Set click events
 		loginBtn.setOnClickListener(new View.OnClickListener() {

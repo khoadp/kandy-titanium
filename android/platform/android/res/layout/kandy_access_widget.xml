@@ -33,7 +33,7 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/kandy_access_token_edit"
                 android:layout_gravity="center_horizontal"
-                android:hint="AccessToken (Optional)"
+                android:hint="access token"
                 android:textColor="@android:color/black"
                 android:textColorHint="@android:color/darker_gray"/>
         <Button

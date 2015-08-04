@@ -24,10 +24,13 @@ import org.appcelerator.titanium.view.TiUIView;
  * @author kodeplusdev
  * @version 1.2.0
  */
-@Kroll.proxy(creatableInModule = KandyModule.class)
+@Kroll.proxy(creatableInModule = KandyModule.class, propertyAccessors = { "type" })
 public class AccessServiceProxy extends TiViewProxy implements KandyConnectServiceNotificationListener {
 
 	public static final String LCAT = AccessServiceProxy.class.getSimpleName();
+
+	public static final String ACCESS_TYPE_PASSWORD = "password";
+	public static final String ACCESS_TYPE_TOKEN = "token";
 
 	private KrollDict callbacks = null;
 
@@ -90,6 +93,12 @@ public class AccessServiceProxy extends TiViewProxy implements KandyConnectServi
 		this.callbacks = callbacks;
 	}
 
+	@Kroll.getProperty
+	@Kroll.method
+	public KrollDict getCallbacks() {
+		return this.callbacks;
+	}
+
 	/**
 	 * Register/login the user on the server with credentials received from
 	 * admin.
@@ -103,41 +112,60 @@ public class AccessServiceProxy extends TiViewProxy implements KandyConnectServi
 		final KrollFunction error = (KrollFunction) args.get("error");
 		final String username = args.getString("username");
 		final String password = args.getString("username");
+		final String token = args.getString("token");
 
-		KandyRecord kandyUser;
+		if (token != null && token != "") {
+			Kandy.getAccess().login(token, new KandyLoginResponseListener() {
 
-		try {
-			kandyUser = new KandyRecord(username);
+				@Override
+				public void onRequestFailed(int code, String err) {
+					Log.d(LCAT, "KandyLoginResponseListener->onRequestFailed() was invoked: " + String.valueOf(code)
+							+ " - " + err);
+					KandyUtils.sendFailResult(getKrollObject(), error, code, err);
+				}
 
-		} catch (KandyIllegalArgumentException ex) {
-			String err = KandyUtils.getString("kandy_login_empty_username_text");
-			KandyUtils.sendFailResult(getKrollObject(), error, err);
-			Log.d(LCAT, err);
-			return;
-		}
+				@Override
+				public void onLoginSucceeded() {
+					Log.d(LCAT, "KandyLoginResponseListener->onLoginSucceeded() was invoked.");
+					KandyUtils.sendSuccessResult(getKrollObject(), success);
+				}
+			});
+		} else {
+			KandyRecord kandyUser;
 
-		if (password == null || password.isEmpty()) {
-			String err = KandyUtils.getString("kandy_login_empty_password_text");
-			KandyUtils.sendFailResult(getKrollObject(), error, err);
-			Log.d(LCAT, err);
-			return;
-		}
+			try {
+				kandyUser = new KandyRecord(username);
 
-		Kandy.getAccess().login(kandyUser, password, new KandyLoginResponseListener() {
-
-			@Override
-			public void onRequestFailed(int code, String err) {
-				Log.d(LCAT, "KandyLoginResponseListener->onRequestFailed() was invoked: " + String.valueOf(code)
-						+ " - " + err);
-				KandyUtils.sendFailResult(getKrollObject(), error, code, err);
+			} catch (KandyIllegalArgumentException ex) {
+				String err = KandyUtils.getString("kandy_login_empty_username_text");
+				KandyUtils.sendFailResult(getKrollObject(), error, err);
+				Log.d(LCAT, err);
+				return;
 			}
 
-			@Override
-			public void onLoginSucceeded() {
-				Log.d(LCAT, "KandyLoginResponseListener->onLoginSucceeded() was invoked.");
-				KandyUtils.sendSuccessResult(getKrollObject(), success);
+			if (password == null || password.isEmpty()) {
+				String err = KandyUtils.getString("kandy_login_empty_password_text");
+				KandyUtils.sendFailResult(getKrollObject(), error, err);
+				Log.d(LCAT, err);
+				return;
 			}
-		});
+
+			Kandy.getAccess().login(kandyUser, password, new KandyLoginResponseListener() {
+
+				@Override
+				public void onRequestFailed(int code, String err) {
+					Log.d(LCAT, "KandyLoginResponseListener->onRequestFailed() was invoked: " + String.valueOf(code)
+							+ " - " + err);
+					KandyUtils.sendFailResult(getKrollObject(), error, code, err);
+				}
+
+				@Override
+				public void onLoginSucceeded() {
+					Log.d(LCAT, "KandyLoginResponseListener->onLoginSucceeded() was invoked.");
+					KandyUtils.sendSuccessResult(getKrollObject(), success);
+				}
+			});
+		}
 	}
 
 	/**
