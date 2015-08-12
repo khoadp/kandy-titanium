@@ -170,6 +170,15 @@ public class KandyModule extends KrollModule {
 		}
 	}
 
+	@Kroll.method
+	public void setKandyChatSettings(KrollDict options) {
+		SharedPreferences.Editor edit = prefs.edit();
+		edit.putString(KandyConstant.PREF_KEY_POLICY, options.getString(KandyConstant.PREF_KEY_POLICY)).apply();
+		edit.putString(KandyConstant.PREF_KEY_MAX_SIZE, options.getString(KandyConstant.PREF_KEY_MAX_SIZE)).apply();
+		edit.putString(KandyConstant.PREF_KEY_PATH, options.getString(KandyConstant.PREF_KEY_PATH)).apply();
+		edit.putString(KandyConstant.PREF_KEY_THUMB_SIZE, options.getString(KandyConstant.PREF_KEY_THUMB_SIZE)).apply();
+	}
+
 	/**
 	 * Set Kandy api keys.
 	 * 
@@ -181,6 +190,11 @@ public class KandyModule extends KrollModule {
 	@Kroll.method
 	public void setKey(String apiKey, String apiSecret) {
 		Log.d(LCAT, "Initializing...");
+
+		SharedPreferences.Editor edit = prefs.edit();
+		edit.putString(KandyConstant.API_KEY_PREFS_KEY, apiKey).apply();
+		edit.putString(KandyConstant.API_SECRET_PREFS_KEY, apiSecret).apply();
+
 		Kandy.initialize(getActivity(), apiKey, apiSecret);
 	}
 
