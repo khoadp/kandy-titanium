@@ -10,8 +10,6 @@ import android.widget.Toast;
 
 /**
  * Handles notification on UI thread from other threads
- * 
- * @version 1.2.0
  */
 public class UIUtils {
 

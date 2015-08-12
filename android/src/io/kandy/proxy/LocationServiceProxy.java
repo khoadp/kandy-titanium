@@ -25,10 +25,6 @@ public class LocationServiceProxy extends KrollProxy {
 
 	private static final String LCAT = LocationServiceProxy.class.getSimpleName();
 
-	public LocationServiceProxy() {
-		super();
-	}
-
 	/**
 	 * Get country info
 	 * 

@@ -1,27 +1,46 @@
 package io.kandy.proxy.views;
 
+import android.app.Activity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import io.kandy.proxy.ProvisioningServiceProxy;
+import com.genband.kandy.api.Kandy;
+import com.genband.kandy.api.provisioning.IKandyValidationResponse;
+import com.genband.kandy.api.provisioning.KandyValidationResponseListener;
+import com.genband.kandy.api.services.common.KandyResponseListener;
+import io.kandy.KandyConstant;
 import io.kandy.utils.KandyUtils;
-import org.appcelerator.kroll.KrollFunction;
-import org.appcelerator.kroll.KrollObject;
+import io.kandy.utils.UIUtils;
+import org.appcelerator.kroll.KrollDict;
 import org.appcelerator.titanium.proxy.TiViewProxy;
 import org.appcelerator.titanium.view.TiUIView;
 
-import java.util.HashMap;
-
+/**
+ * Provisioning view proxy.
+ * 
+ * @author kodeplusdev
+ * 
+ */
 public class ProvisioningViewProxy extends TiUIView {
+
+	private static final String LCAT = ProvisioningViewProxy.class.getSimpleName();
+
+	private Activity activity;
 
 	private TextView signedPhoneNumber;
 	private Button requestBtn, validateBtn, deactivateBtn;
 	private EditText phoneNumber, otpCode;
 
+	private String twoLetterISOCountryCode = KandyConstant.DEFAULT_TWO_LETTER_ISO_COUNTRY_CODE;
+
+	private String mUserId;
+
 	public ProvisioningViewProxy(TiViewProxy proxy) {
 		super(proxy);
+		this.activity = proxy.getActivity();
 
 		View layoutWraper;
 
@@ -44,195 +63,140 @@ public class ProvisioningViewProxy extends TiUIView {
 		requestBtn.setOnClickListener(new View.OnClickListener() {
 
 			public void onClick(View v) {
-				((ProvisioningServiceProxy) getProxy()).requestCode(requestSuccessCallback, requestErrorCallback,
-						phoneNumber.getText().toString());
+				startSignupProcess();
 			}
 		});
 
 		validateBtn.setOnClickListener(new View.OnClickListener() {
 
 			public void onClick(View v) {
-				((ProvisioningServiceProxy) getProxy()).validate(validateSuccessCallback, validateErrorCallback,
-						phoneNumber.getText().toString(), otpCode.getText().toString());
+				startValidationProcess();
 			}
 		});
 
 		deactivateBtn.setOnClickListener(new View.OnClickListener() {
 
 			public void onClick(View v) {
-				((ProvisioningServiceProxy) getProxy()).deactivate(deactivateSuccessCallback, deactivateErrorCallback);
+				deactivate();
 			}
 		});
 
 		setNativeView(layoutWraper);
 	}
 
-	public void setSignedPhoneNumber(final String phoneNumber) {
-		if (phoneNumber != null) {
-			getProxy().getActivity().runOnUiThread(new Runnable() {
-
-				public void run() {
-					signedPhoneNumber.setText(phoneNumber);
-				}
-			});
-		}
+	@Override
+	public void processProperties(KrollDict options) {
+		super.processProperties(options);
+		if (options.containsKey("twoLetterISOCountryCode"))
+			setTwoLetterISOCountryCode(options.getString("twoLetterISOCountryCode"));
 	}
 
-	private KrollFunction requestSuccessCallback = new KrollFunction() {
+	public void setTwoLetterISOCountryCode(String code) {
+		this.twoLetterISOCountryCode = code;
+	}
 
-		@Override
-		public void callAsync(KrollObject arg0, Object[] arg1) {
-			// TODO Auto-generated method stub
+	public void startSignupProcess() {
 
+		mUserId = getPhoneNumber();
+		if (mUserId == null || mUserId.isEmpty()) {
+			UIUtils.showToastWithMessage(activity, KandyUtils.getString("kandy_signup_enter_phone_label"));
+			return;
 		}
 
-		@Override
-		public void callAsync(KrollObject arg0, HashMap arg1) {
-			// TODO Auto-generated method stub
+		UIUtils.showProgressDialogWithMessage(activity, KandyUtils.getString("registration_signinup_msg"));
 
+		requestCode(mUserId);
+	}
+
+	public void requestCode(String phoneNumber) {
+		Kandy.getProvisioning().requestCode(phoneNumber, twoLetterISOCountryCode, new KandyResponseListener() {
+
+			@Override
+			public void onRequestFailed(int responseCode, String err) {
+				Log.i(LCAT, "sendSignupRequest: onRequestFailed: " + err + " response code: " + responseCode);
+				UIUtils.handleResultOnUiThread(activity, true, err);
+			}
+
+			@Override
+			public void onRequestSucceded() {
+				Log.i(LCAT, "sendSignupRequest: onRequestSucceded");
+				UIUtils.handleResultOnUiThread(activity, false, KandyUtils.getString("kandy_signup_signup_succeed"));
+			}
+		});
+	}
+
+	private void startValidationProcess() {
+		String otp = getOTPCode();
+
+		if (otp == null || otp.isEmpty()) {
+			UIUtils.handleResultOnUiThread(activity, false, KandyUtils.getString("kandy_signup_enter_otp_label"));
+			return;
 		}
 
-		@Override
-		public Object call(KrollObject arg0, Object[] arg1) {
-			// TODO Auto-generated method stub
-			return null;
-		}
+		UIUtils.showProgressDialogWithMessage(activity, KandyUtils.getString("registration_validation_msg"));
+		validate(otp);
+	}
 
-		@Override
-		public Object call(KrollObject arg0, HashMap arg1) {
-			// TODO Auto-generated method stub
-			return null;
-		}
-	};
+	public void validate(String pOtp) {
+		Kandy.getProvisioning().validateAndProvision(mUserId, pOtp, twoLetterISOCountryCode,
+				new KandyValidationResponseListener() {
 
-	private KrollFunction requestErrorCallback = new KrollFunction() {
+					@Override
+					public void onRequestFailed(int responseCode, String err) {
+						Log.e(LCAT, "sendValidationCode: onRequestFailed: " + err + " response code: " + responseCode);
+						UIUtils.handleResultOnUiThread(activity, true, err);
+					}
 
-		@Override
-		public void callAsync(KrollObject arg0, Object[] arg1) {
-			// TODO Auto-generated method stub
+					@Override
+					public void onRequestSuccess(IKandyValidationResponse response) {
+						mUserId = response.getUserId();
+						setSignedUser(mUserId);
 
-		}
+						String message = "You are now signup to Kandy!\n\nDomain:%s\nUser:%s\nPassword:%s\n\nPlease Login to start using the SDK";
+						message = String.format(message, response.getDomainName(), response.getUser(),
+								response.getUserPassword());
+						UIUtils.showDialogOnUiThread(activity,
+								KandyUtils.getString("kandy_signup_validation_succeed_title"), message);
+					}
+				});
+	}
 
-		@Override
-		public void callAsync(KrollObject arg0, HashMap arg1) {
-			// TODO Auto-generated method stub
+	public void deactivate() {
+		UIUtils.showProgressDialogWithMessage(activity, KandyUtils.getString("registration_signoff_msg"));
 
-		}
+		Kandy.getProvisioning().deactivate(new KandyResponseListener() {
 
-		@Override
-		public Object call(KrollObject arg0, Object[] arg1) {
-			// TODO Auto-generated method stub
-			return null;
-		}
+			@Override
+			public void onRequestFailed(int responseCode, String err) {
+				Log.i(LCAT, "send deactivateRequest: onRequestFailed: " + err + " response code: " + responseCode);
+				UIUtils.handleResultOnUiThread(activity, true, err);
+			}
 
-		@Override
-		public Object call(KrollObject arg0, HashMap arg1) {
-			// TODO Auto-generated method stub
-			return null;
-		}
-	};
+			@Override
+			public void onRequestSucceded() {
+				Log.i(LCAT, "send deactivateRequest: onRequestSucceded");
+				UIUtils.handleResultOnUiThread(activity, false,
+						KandyUtils.getString("kandy_signup_signoff_succeed_label"));
+				setSignedUser("");
+			}
+		});
+	}
 
-	private KrollFunction validateSuccessCallback = new KrollFunction() {
+	public void setSignedUser(final String user) {
+		activity.runOnUiThread(new Runnable() {
 
-		@Override
-		public void callAsync(KrollObject arg0, Object[] arg1) {
-			signedPhoneNumber.setText(phoneNumber.getText().toString());
-		}
+			@Override
+			public void run() {
+				signedPhoneNumber.setText(user);
+			}
+		});
+	}
 
-		@Override
-		public void callAsync(KrollObject arg0, HashMap arg1) {
-			signedPhoneNumber.setText(phoneNumber.getText().toString());
-		}
+	public String getPhoneNumber() {
+		return phoneNumber.getText().toString();
+	}
 
-		@Override
-		public Object call(KrollObject arg0, Object[] arg1) {
-			signedPhoneNumber.setText(phoneNumber.getText().toString());
-			return null;
-		}
-
-		@Override
-		public Object call(KrollObject arg0, HashMap arg1) {
-			signedPhoneNumber.setText(phoneNumber.getText().toString());
-			return null;
-		}
-	};
-
-	private KrollFunction validateErrorCallback = new KrollFunction() {
-
-		@Override
-		public void callAsync(KrollObject arg0, Object[] arg1) {
-			// TODO Auto-generated method stub
-
-		}
-
-		@Override
-		public void callAsync(KrollObject arg0, HashMap arg1) {
-			// TODO Auto-generated method stub
-
-		}
-
-		@Override
-		public Object call(KrollObject arg0, Object[] arg1) {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public Object call(KrollObject arg0, HashMap arg1) {
-			// TODO Auto-generated method stub
-			return null;
-		}
-	};
-
-	private KrollFunction deactivateSuccessCallback = new KrollFunction() {
-
-		@Override
-		public void callAsync(KrollObject arg0, Object[] arg1) {
-			signedPhoneNumber.setText("(none)");
-		}
-
-		@Override
-		public void callAsync(KrollObject arg0, HashMap arg1) {
-			signedPhoneNumber.setText("(none)");
-		}
-
-		@Override
-		public Object call(KrollObject arg0, Object[] arg1) {
-			signedPhoneNumber.setText("(none)");
-			return null;
-		}
-
-		@Override
-		public Object call(KrollObject arg0, HashMap arg1) {
-			signedPhoneNumber.setText("(none)");
-			return null;
-		}
-	};
-
-	private KrollFunction deactivateErrorCallback = new KrollFunction() {
-
-		@Override
-		public void callAsync(KrollObject arg0, Object[] arg1) {
-			// TODO Auto-generated method stub
-
-		}
-
-		@Override
-		public void callAsync(KrollObject arg0, HashMap arg1) {
-			// TODO Auto-generated method stub
-
-		}
-
-		@Override
-		public Object call(KrollObject arg0, Object[] arg1) {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public Object call(KrollObject arg0, HashMap arg1) {
-			// TODO Auto-generated method stub
-			return null;
-		}
-	};
+	public String getOTPCode() {
+		return otpCode.getText().toString();
+	}
 }

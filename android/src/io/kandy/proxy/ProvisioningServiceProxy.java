@@ -29,18 +29,9 @@ public class ProvisioningServiceProxy extends TiViewProxy {
 
 	public static final String LCAT = ProvisioningServiceProxy.class.getSimpleName();
 
-	private KrollDict callbacks = null;
-
 	private String twoLetterISOCountryCode;
 	private ProvisioningViewProxy viewProxy;
 
-	public ProvisioningServiceProxy() {
-		super();
-	}
-
-	/**
-	 * Get two letter ISO of the user's country
-	 */
 	private void getTwoLetterISOCountryCode() {
 		try {
 			Kandy.getServices().getLocationService().getCountryInfo(new KandyCountryInfoResponseListener() {
@@ -50,57 +41,43 @@ public class ProvisioningServiceProxy extends TiViewProxy {
 					Log.d(LCAT,
 							"KandyCountryInfoResponseListener->onRequestFailed() was invoked: " + String.valueOf(code)
 									+ " - " + err);
-					twoLetterISOCountryCode = KandyConstant.DEFAULT_TWO_LETTER_ISO_COUNTRY_CODE;
+					setTwoLetterISOCountryCode(KandyConstant.DEFAULT_TWO_LETTER_ISO_COUNTRY_CODE);
 				}
 
 				@Override
 				public void onRequestSuccess(IKandyAreaCode respond) {
 					Log.d(LCAT, "KandyCountryInfoResponseListener->onRequestSuccess() was invoked.");
-					twoLetterISOCountryCode = respond.getCountryNameShort();
+					setTwoLetterISOCountryCode(respond.getCountryNameShort());
 				}
 			});
 		} catch (Exception e) {
 			e.printStackTrace();
-			twoLetterISOCountryCode = KandyConstant.DEFAULT_TWO_LETTER_ISO_COUNTRY_CODE;
+			setTwoLetterISOCountryCode(KandyConstant.DEFAULT_TWO_LETTER_ISO_COUNTRY_CODE);
 		}
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
-	public TiUIView createView(Activity arg0) {
+	public TiUIView createView(Activity activity) {
 		viewProxy = new ProvisioningViewProxy(this);
-		this.getTwoLetterISOCountryCode();
 		return viewProxy;
 	}
 
-	/**
-	 * Set request callbacks
-	 * 
-	 * @param callbacks
-	 */
-	@Kroll.setProperty
-	@Kroll.method
-	public void setCallbacks(KrollDict callbacks) {
-		this.callbacks = callbacks;
+	@Override
+	public void handleCreationDict(KrollDict options) {
+		super.handleCreationDict(options);
+		if (options.containsKey("twoLetterISOCountryCode")) {
+			setTwoLetterISOCountryCode(options.getString("twoLetterISOCountryCode"));
+		} else {
+			this.getTwoLetterISOCountryCode();
+		}
 	}
 
-	/**
-	 * Set the signed phone number text above deactivate button
-	 * 
-	 * @param phoneNumber
-	 */
-	@Kroll.method
-	public void setSignedPhoneNumber(String phoneNumber) {
-		viewProxy.setSignedPhoneNumber(phoneNumber);
+	private void setTwoLetterISOCountryCode(String code) {
+		this.twoLetterISOCountryCode = code;
+		if (viewProxy != null)
+			viewProxy.setTwoLetterISOCountryCode(code);
 	}
 
-	/**
-	 * Request code
-	 * 
-	 * @param args
-	 */
 	@Kroll.method
 	public void requestCode(KrollDict args) {
 		final KrollFunction success = (KrollFunction) args.get("success");
@@ -131,30 +108,6 @@ public class ProvisioningServiceProxy extends TiViewProxy {
 		});
 	}
 
-	/**
-	 * Request code
-	 * 
-	 * @param phoneNumber
-	 * @param twoLetterISOCountryCode
-	 */
-	public void requestCode(final KrollFunction success, KrollFunction error, final String phoneNumber) {
-		KrollDict requestArgs = KandyUtils.getKrollDictFromCallbacks(callbacks, "request");
-
-		// requestArgs.put("success", KandyUtils.joinKrollFunctions(success,
-		// (KrollFunction) requestArgs.get("success")));
-		// requestArgs.put("error", KandyUtils.joinKrollFunctions(error,
-		// (KrollFunction) requestArgs.get("error")));
-
-		requestArgs.put("phoneNumber", phoneNumber);
-
-		requestCode(requestArgs);
-	}
-
-	/**
-	 * Validate the OTP code
-	 * 
-	 * @param args
-	 */
 	@Kroll.method
 	public void validate(KrollDict args) {
 		final KrollFunction success = (KrollFunction) args.get("success");
@@ -188,33 +141,6 @@ public class ProvisioningServiceProxy extends TiViewProxy {
 				});
 	}
 
-	/**
-	 * Validate the otp code
-	 * 
-	 * @param phoneNumber
-	 * @param twoLetterISOCountryCode
-	 * @param otp
-	 */
-	public void validate(KrollFunction success, KrollFunction error, String phoneNumber, String otp) {
-		KrollDict validateArgs = KandyUtils.getKrollDictFromCallbacks(callbacks, "validate");
-
-		// validateArgs
-		// .put("success", KandyUtils.joinKrollFunctions(success,
-		// (KrollFunction) validateArgs.get("success")));
-		// validateArgs.put("error", KandyUtils.joinKrollFunctions(error,
-		// (KrollFunction) validateArgs.get("error")));
-
-		validateArgs.put("phoneNumber", phoneNumber);
-		validateArgs.put("otp", otp);
-
-		validate(validateArgs);
-	}
-
-	/**
-	 * Deactivate phone number
-	 * 
-	 * @param callbacks
-	 */
 	@Kroll.method
 	public void deactivate(KrollDict callbacks) {
 		final KrollFunction success = (KrollFunction) callbacks.get("success");
@@ -235,20 +161,5 @@ public class ProvisioningServiceProxy extends TiViewProxy {
 				KandyUtils.sendSuccessResult(getKrollObject(), success);
 			}
 		});
-	}
-
-	/**
-	 * Deactivate phone number
-	 */
-	public void deactivate(KrollFunction success, KrollFunction error) {
-		KrollDict deactivateArgs = KandyUtils.getKrollDictFromCallbacks(callbacks, "deactivate");
-
-		// deactivateArgs.put("success",
-		// KandyUtils.joinKrollFunctions(success, (KrollFunction)
-		// deactivateArgs.get("success")));
-		// deactivateArgs.put("error", KandyUtils.joinKrollFunctions(error,
-		// (KrollFunction) deactivateArgs.get("error")));
-
-		deactivate(deactivateArgs);
 	}
 }

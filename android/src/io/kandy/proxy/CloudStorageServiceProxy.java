@@ -1,6 +1,5 @@
 package io.kandy.proxy;
 
-import android.app.Activity;
 import android.net.Uri;
 import android.util.Log;
 import com.genband.kandy.api.Kandy;
@@ -18,22 +17,16 @@ import io.kandy.utils.FileUtils;
 import io.kandy.utils.KandyUtils;
 import org.appcelerator.kroll.KrollDict;
 import org.appcelerator.kroll.KrollFunction;
+import org.appcelerator.kroll.KrollProxy;
 import org.appcelerator.kroll.annotations.Kroll;
-import org.appcelerator.titanium.proxy.TiViewProxy;
-import org.appcelerator.titanium.view.TiUIView;
 
 import java.util.Calendar;
 import java.util.UUID;
 
 @Kroll.proxy(creatableInModule = KandyModule.class)
-public class CloudStorageServiceProxy extends TiViewProxy {
+public class CloudStorageServiceProxy extends KrollProxy {
 
 	private static final String LCAT = CloudStorageServiceProxy.class.getSimpleName();
-
-	@Override
-	public TiUIView createView(Activity activity) {
-		return null;
-	}
 
 	@Kroll.method
 	public void uploadMedia(KrollDict args) {

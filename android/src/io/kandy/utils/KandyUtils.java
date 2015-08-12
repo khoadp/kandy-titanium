@@ -26,7 +26,6 @@ import java.util.List;
  * Common utils for Kandy module.
  * 
  * @author kodeplusdev
- * @version 1.2.0
  */
 public final class KandyUtils {
 

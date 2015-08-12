@@ -40,10 +40,6 @@ public class CallServiceProxy extends TiViewProxy {
 	private KrollDict localVideoViews = new KrollDict();
 	private KrollDict remoteVideoViews = new KrollDict();
 
-	public CallServiceProxy() {
-		super();
-	}
-
 	@Override
 	public void onPause(Activity activity) {
 		if (viewProxy != null)

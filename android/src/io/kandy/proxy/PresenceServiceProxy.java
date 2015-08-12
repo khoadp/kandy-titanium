@@ -27,10 +27,6 @@ public class PresenceServiceProxy extends KrollProxy {
 
 	public static final String LCAT = PresenceServiceProxy.class.getSimpleName();
 
-	public PresenceServiceProxy() {
-		super();
-	}
-
 	/**
 	 * Start watch users
 	 * 

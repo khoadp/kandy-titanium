@@ -24,10 +24,6 @@ public class PushServiceProxy extends KrollProxy {
 
 	private static final String LCAT = PushServiceProxy.class.getSimpleName();
 
-	public PushServiceProxy() {
-		super();
-	}
-
 	/**
 	 * Enable push notification
 	 * 
@@ -73,7 +69,7 @@ public class PushServiceProxy extends KrollProxy {
 	public void disablePushNotification(KrollDict args) {
 		final KrollFunction success = (KrollFunction) args.get("success");
 		final KrollFunction error = (KrollFunction) args.get("error");
-		
+
 		Kandy.getServices().getPushService().disablePushNotification(new KandyResponseListener() {
 
 			@Override

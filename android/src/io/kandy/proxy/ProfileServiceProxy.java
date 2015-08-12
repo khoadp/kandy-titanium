@@ -1,6 +1,5 @@
 package io.kandy.proxy;
 
-import android.app.Activity;
 import android.util.Log;
 import com.genband.kandy.api.Kandy;
 import com.genband.kandy.api.services.common.KandyResponseListener;
@@ -11,22 +10,22 @@ import io.kandy.KandyModule;
 import io.kandy.utils.KandyUtils;
 import org.appcelerator.kroll.KrollDict;
 import org.appcelerator.kroll.KrollFunction;
+import org.appcelerator.kroll.KrollProxy;
 import org.appcelerator.kroll.annotations.Kroll;
-import org.appcelerator.titanium.proxy.TiViewProxy;
-import org.appcelerator.titanium.view.TiUIView;
 import org.json.JSONArray;
 
 import java.util.ArrayList;
 
+/**
+ * Profile service proxy.
+ * 
+ * @author kodeplusdev
+ * 
+ */
 @Kroll.proxy(creatableInModule = KandyModule.class)
-public class ProfileServiceProxy extends TiViewProxy {
+public class ProfileServiceProxy extends KrollProxy {
 
 	private static final String LCAT = ProfileServiceProxy.class.getSimpleName();
-
-	@Override
-	public TiUIView createView(Activity activity) {
-		return null;
-	}
 
 	@Kroll.method
 	public void getUserDeviceProfiles(KrollDict args) {
