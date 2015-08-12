@@ -23,7 +23,6 @@ import org.appcelerator.titanium.view.TiUIView;
  * Access service proxy.
  * 
  * @author kodeplusdev
- * @version 1.2.0
  */
 @Kroll.proxy(creatableInModule = KandyModule.class, propertyAccessors = { "type" })
 public class AccessServiceProxy extends TiViewProxy implements KandyConnectServiceNotificationListener {
@@ -36,10 +35,6 @@ public class AccessServiceProxy extends TiViewProxy implements KandyConnectServi
 	private KrollDict callbacks = new KrollDict();
 
 	private AccessViewProxy viewProxy;
-
-	public AccessServiceProxy() {
-		super();
-	}
 
 	/**
 	 * {@inheritDoc}
@@ -60,26 +55,39 @@ public class AccessServiceProxy extends TiViewProxy implements KandyConnectServi
 		return viewProxy;
 	}
 
+	@Override
+	protected void initActivity(Activity activity) {
+		attachActivityLifecycle(activity);
+	}
+
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public void onCreate(Activity activity, Bundle savedInstanceState) {
+		Log.i(LCAT, "onCreate() was invoked.");
 		super.onCreate(activity, savedInstanceState);
-		if (viewProxy != null)
+		
+		if (viewProxy != null) {
 			viewProxy.registerNotificationListener();
-		Kandy.getAccess().registerNotificationListener(this);
+		} else {
+			Kandy.getAccess().registerNotificationListener(this);	
+		}
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public void onPause(Activity activity) {
+		Log.i(LCAT, "onPause() was invoked.");
 		super.onPause(activity);
-		if (viewProxy != null)
+		
+		if (viewProxy != null) {
 			viewProxy.unregisterNotificationListener();
-		Kandy.getAccess().unregisterNotificationListener(this);
+		} else {
+			Kandy.getAccess().unregisterNotificationListener(this);	
+		}
 	}
 
 	/**
@@ -88,9 +96,12 @@ public class AccessServiceProxy extends TiViewProxy implements KandyConnectServi
 	@Override
 	public void onResume(Activity activity) {
 		super.onResume(activity);
-		if (viewProxy != null)
+		
+		if (viewProxy != null) {
 			viewProxy.registerNotificationListener();
-		Kandy.getAccess().registerNotificationListener(this);
+		} else {
+			Kandy.getAccess().registerNotificationListener(this);	
+		}
 	}
 
 	/**
@@ -102,13 +113,21 @@ public class AccessServiceProxy extends TiViewProxy implements KandyConnectServi
 	@Kroll.setProperty
 	@Kroll.method
 	public void setCallbacks(KrollDict callbacks) {
-		this.callbacks = callbacks;
+		if (viewProxy != null) {
+			viewProxy.setCallbacks(callbacks);
+		} else {
+			this.callbacks = callbacks;
+		}
 	}
 
 	@Kroll.getProperty
 	@Kroll.method
 	public KrollDict getCallbacks() {
-		return this.callbacks;
+		if (viewProxy != null) {
+			return viewProxy.getCallbacks();
+		} else {
+			return this.callbacks;
+		}
 	}
 
 	/**
@@ -215,7 +234,7 @@ public class AccessServiceProxy extends TiViewProxy implements KandyConnectServi
 
 	@Override
 	public void onConnectionStateChanged(KandyConnectionState state) {
-		Log.i(LCAT, "onConnectionStateChanged() was invoked: " + state.name());
+		Log.d(LCAT, "onConnectionStateChanged() was invoked: " + state.name());
 		KandyUtils.sendSuccessResult(getKrollObject(), (KrollFunction) callbacks.get("onConnectionStateChanged"),
 				state.name());
 	}

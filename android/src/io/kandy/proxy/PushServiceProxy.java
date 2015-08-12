@@ -73,7 +73,7 @@ public class PushServiceProxy extends KrollProxy {
 	public void disablePushNotification(KrollDict args) {
 		final KrollFunction success = (KrollFunction) args.get("success");
 		final KrollFunction error = (KrollFunction) args.get("error");
-
+		
 		Kandy.getServices().getPushService().disablePushNotification(new KandyResponseListener() {
 
 			@Override

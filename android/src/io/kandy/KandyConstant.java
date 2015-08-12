@@ -4,7 +4,6 @@ package io.kandy;
  * The Kandy constant to use.
  * 
  * @author kodeplusdev
- * @version 1.2.0
  */
 public abstract class KandyConstant {
 

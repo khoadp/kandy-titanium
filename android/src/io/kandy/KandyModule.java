@@ -24,7 +24,6 @@ import java.io.File;
  * Kandy module
  * 
  * @author kodeplusdev
- * @version 1.2.0 
  */
 @Kroll.module(name = "Kandy", id = "io.kandy")
 public class KandyModule extends KrollModule {
@@ -96,10 +95,6 @@ public class KandyModule extends KrollModule {
 	public static final String CONNECTION_STATE_FAILED = "FAILED";
 
 	private SharedPreferences prefs;
-
-	public KandyModule() {
-		super();
-	}
 
 	/**
 	 * {@inheritDoc}

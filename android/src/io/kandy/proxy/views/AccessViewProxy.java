@@ -19,6 +19,7 @@ import io.kandy.proxy.AccessServiceProxy;
 import io.kandy.utils.KandyUtils;
 import io.kandy.utils.UIUtils;
 import org.appcelerator.kroll.KrollDict;
+import org.appcelerator.kroll.KrollFunction;
 import org.appcelerator.titanium.proxy.TiViewProxy;
 import org.appcelerator.titanium.view.TiUIView;
 
@@ -26,13 +27,13 @@ import org.appcelerator.titanium.view.TiUIView;
  * The view for access proxy.
  * 
  * @author kodeplusdev
- * @version 1.2.0
  */
 public class AccessViewProxy extends TiUIView implements KandyConnectServiceNotificationListener {
 
 	private static final String LCAT = AccessViewProxy.class.getSimpleName();
 
 	private Activity activity;
+	private KrollDict callbacks = new KrollDict();
 
 	private View loginView, logoutView;
 	private TextView userInfo;
@@ -95,6 +96,16 @@ public class AccessViewProxy extends TiUIView implements KandyConnectServiceNoti
 	@Override
 	public void processProperties(KrollDict options) {
 		super.processProperties(options);
+		if (options.containsKey("callbacks"))
+			callbacks = options.getKrollDict("callbacks");
+	}
+
+	public void setCallbacks(KrollDict callbacks) {
+		this.callbacks = callbacks;
+	}
+
+	public KrollDict getCallbacks() {
+		return this.callbacks;
 	}
 
 	/**
@@ -255,55 +266,64 @@ public class AccessViewProxy extends TiUIView implements KandyConnectServiceNoti
 	}
 
 	public void registerNotificationListener() {
-		Log.d(LCAT, "registerNotificationListener() was invoked.");
+		Log.d(LCAT, "viewProxy->registerNotificationListener() was invoked.");
 		Kandy.getAccess().registerNotificationListener(this);
+		UIUtils.handleResultOnUiThread(activity, false, "registerNotificationListener() was invoked.");
 	}
 
 	public void unregisterNotificationListener() {
-		Log.d(LCAT, "unregisterNotificationListener() was invoked.");
+		Log.d(LCAT, "viewProxy->unregisterNotificationListener() was invoked.");
 		Kandy.getAccess().unregisterNotificationListener(this);
 	}
 
 	@Override
 	public void onSocketFailedWithError(String error) {
-		Log.w(LCAT, "onSocketFailedWithError(): " + error);
+		Log.d(LCAT, "onSocketFailedWithError() was invoked: " + error);
+		KandyUtils.sendFailResult(proxy.getKrollObject(), (KrollFunction) callbacks.get("onSocketFailedWithError"),
+				error);
 	}
 
 	@Override
 	public void onSocketDisconnected() {
-		Log.i(LCAT, "onSocketDisconnected() fired");
+		Log.d(LCAT, "onSocketDisconnected() was invoked.");
+		KandyUtils.sendFailResult(proxy.getKrollObject(), (KrollFunction) callbacks.get("onSocketDisconnected"));
 	}
 
 	@Override
 	public void onSocketConnecting() {
-		Log.i(LCAT, "onSocketConnecting() fired");
+		Log.d(LCAT, "onSocketConnecting() was invoked.");
+		KandyUtils.sendFailResult(proxy.getKrollObject(), (KrollFunction) callbacks.get("onSocketConnecting"));
 	}
 
 	@Override
 	public void onSocketConnected() {
-		Log.i(LCAT, "onSocketConnected() fired");
+		Log.d(LCAT, "onSocketConnected() was invoked.");
+		KandyUtils.sendFailResult(proxy.getKrollObject(), (KrollFunction) callbacks.get("onSocketConnected"));
 	}
 
 	@Override
 	public void onConnectionStateChanged(KandyConnectionState state) {
-		Log.i(LCAT, "onRegistrationStateChanged() fired with state: " + state.name());
+		Log.d(LCAT, "onConnectionStateChanged() was invoked: " + state.name());
+		KandyUtils.sendSuccessResult(proxy.getKrollObject(), (KrollFunction) callbacks.get("onConnectionStateChanged"),
+				state.name());
 	}
 
 	@Override
 	public void onInvalidUser(String error) {
-		Log.i(LCAT, "onInvalidUser() fired with error: " + error);
+		Log.d(LCAT, "onInvalidUser() was invoked: " + error);
+		KandyUtils.sendFailResult(proxy.getKrollObject(), (KrollFunction) callbacks.get("onInvalidUser"), error);
 		UIUtils.handleResultOnUiThread(getProxy().getActivity(), true, error);
 	}
 
 	@Override
 	public void onSessionExpired(String error) {
-		// TODO Auto-generated method stub
-
+		Log.d(LCAT, "onSessionExpired() was invoked: " + error);
+		KandyUtils.sendFailResult(proxy.getKrollObject(), (KrollFunction) callbacks.get("onSessionExpired"), error);
 	}
 
 	@Override
 	public void onSDKNotSupported(String error) {
-		// TODO Auto-generated method stub
-
+		Log.d(LCAT, "onSDKNotSupported() was invoked: " + error);
+		KandyUtils.sendFailResult(proxy.getKrollObject(), (KrollFunction) callbacks.get("onSDKNotSupported"), error);
 	}
 }
