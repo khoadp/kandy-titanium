@@ -17,6 +17,7 @@ import org.appcelerator.kroll.KrollModule;
 import org.appcelerator.kroll.annotations.Kroll;
 import org.appcelerator.kroll.common.Log;
 import org.appcelerator.titanium.TiApplication;
+import org.appcelerator.titanium.TiContext;
 
 import java.io.File;
 
@@ -96,14 +97,17 @@ public class KandyModule extends KrollModule {
 
 	private SharedPreferences prefs;
 
+	public KandyModule(TiContext context){
+		prefs = PreferenceManager.getDefaultSharedPreferences(context.getActivity());
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public void onCreate(Activity activity, Bundle savedInstanceState) {
+		Log.i(LCAT, "onCreate() was invoked.");
 		super.onCreate(activity, savedInstanceState);
-
-		prefs = PreferenceManager.getDefaultSharedPreferences(activity);
 
 		// Initialize Kandy SDK
 		Kandy.initialize(activity,
@@ -118,6 +122,18 @@ public class KandyModule extends KrollModule {
 		prepareLocalStorage();
 	}
 
+	@Override
+	public void onResume(Activity activity) {
+		Log.i(LCAT, "onResume() was invoked.");
+		super.onResume(activity);
+	}
+	
+	@Override
+	public void onPause(Activity activity) {
+		Log.i(LCAT, "onPause() was invoked.");
+		super.onPause(activity);
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 */

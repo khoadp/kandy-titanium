@@ -95,6 +95,7 @@ public class AccessServiceProxy extends TiViewProxy implements KandyConnectServi
 	 */
 	@Override
 	public void onResume(Activity activity) {
+		Log.i(LCAT, "onResume() was invoked.");
 		super.onResume(activity);
 		
 		if (viewProxy != null) {

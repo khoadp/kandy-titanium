@@ -27,6 +27,7 @@ import org.appcelerator.kroll.KrollFunction;
 import org.appcelerator.kroll.annotations.Kroll;
 import org.appcelerator.titanium.proxy.TiViewProxy;
 import org.appcelerator.titanium.view.TiUIView;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.UUID;
@@ -38,11 +39,12 @@ import java.util.UUID;
  * 
  */
 @Kroll.proxy(creatableInModule = KandyModule.class)
-public class ChatServiceProxy extends TiViewProxy {
+public class ChatServiceProxy extends TiViewProxy implements KandyChatServiceNotificationListener {
 
 	private static final String LCAT = ChatServiceProxy.class.getSimpleName();
 
-	ChatViewProxy viewProxy;
+	private ChatViewProxy viewProxy;
+	private KrollDict callbacks = new KrollDict();
 
 	@Override
 	public TiUIView createView(Activity activity) {
@@ -51,32 +53,48 @@ public class ChatServiceProxy extends TiViewProxy {
 	}
 
 	@Override
+	protected void initActivity(Activity activity) {
+		attachActivityLifecycle(activity);
+	}
+
+	@Override
 	public void onCreate(Activity activity, Bundle savedInstanceState) {
 		super.onCreate(activity, savedInstanceState);
 		activity.requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+		if (viewProxy != null) {
+			viewProxy.registerNotificationListener();
+		} else {
+			Kandy.getServices().getChatService().registerNotificationListener(this);
+		}
 	}
 
 	@Override
 	public void onPause(Activity activity) {
 		super.onPause(activity);
-		if (viewProxy != null)
-			viewProxy.unRegisterChatsNotifications();
+		if (viewProxy != null) {
+			viewProxy.unregisterNotificationListener();
+		} else {
+			Kandy.getServices().getChatService().unregisterNotificationListener(this);
+		}
 	}
 
 	@Override
 	public void onResume(Activity activity) {
 		super.onResume(activity);
-		if (viewProxy != null)
-			viewProxy.registerChatsNotifications();
+		if (viewProxy != null) {
+			viewProxy.registerNotificationListener();
+		} else {
+			Kandy.getServices().getChatService().registerNotificationListener(this);
+		}
 	}
 
-	
-	
 	@Kroll.method
 	@Kroll.setProperty
 	public void setCallbacks(KrollDict callbacks) {
 		if (viewProxy != null) {
 			viewProxy.setCallbacks(callbacks);
+		} else {
+			this.callbacks = callbacks;
 		}
 	}
 
@@ -86,7 +104,7 @@ public class ChatServiceProxy extends TiViewProxy {
 		if (viewProxy != null) {
 			return viewProxy.getCallbacks();
 		}
-		return new KrollDict();
+		return callbacks;
 	}
 
 	@Kroll.method
@@ -518,5 +536,82 @@ public class ChatServiceProxy extends TiViewProxy {
 			KandyUtils.sendFailResult(getKrollObject(), error, code, err);
 		}
 
+	}
+
+	@Override
+	public void onChatDelivered(KandyDeliveryAck ack) {
+		Log.d(LCAT, "KandyChatServiceNotificationListener->onChatDelivered() was invoked: " + ack.getUUID());
+		KandyUtils.sendSuccessResult(getKrollObject(), (KrollFunction) callbacks.get("onChatDelivered"), ack.toJson());
+	}
+
+	@Override
+	public void onChatMediaAutoDownloadFailed(IKandyMessage message, int code, String error) {
+		Log.d(LCAT, "KandyChatServiceNotificationListener->onChatMediaAutoDownloadFailed() was invoked.");
+
+		KrollDict result = new KrollDict();
+		result.put("error", error);
+		result.put("code", code);
+		try {
+			result.put("message", message.toJson().getJSONObject("message"));
+		} catch (JSONException e) {
+			e.printStackTrace();
+			result.put("message", "Error parse message json!");
+		}
+
+		KandyUtils.sendSuccessResult(getKrollObject(), (KrollFunction) callbacks.get("onChatMediaAutoDownloadFailed"),
+				result);
+	}
+
+	@Override
+	public void onChatMediaAutoDownloadProgress(IKandyMessage message, IKandyTransferProgress progress) {
+		Log.d(LCAT, "KandyChatServiceNotificationListener->onChatMediaAutoDownloadProgress() was invoked: " + progress);
+
+		KrollDict result = new KrollDict();
+		result.put("process", progress.getProgress());
+		result.put("state", progress.getState());
+		result.put("byteTransfer", progress.getByteTransfer());
+		result.put("byteExpected", progress.getByteExpected());
+		try {
+			result.put("message", message.toJson().get("message"));
+		} catch (JSONException e) {
+			e.printStackTrace();
+			result.put("message", "Error parse message json!");
+		}
+
+		KandyUtils.sendSuccessResult(getKrollObject(),
+				(KrollFunction) callbacks.get("onChatMediaAutoDownloadProgress"), result);
+	}
+
+	@Override
+	public void onChatMediaAutoDownloadSucceded(IKandyMessage message, Uri uri) {
+		Log.d(LCAT, "KandyChatServiceNotificationListener->onChatMediaAutoDownloadSucceded() was invoked: " + uri);
+
+		KrollDict result = new KrollDict();
+		result.put("uri", uri);
+		try {
+			result.put("message", message.toJson().get("message"));
+		} catch (JSONException e) {
+			e.printStackTrace();
+			result.put("message", "Error parse message json!");
+		}
+
+		KandyUtils.sendSuccessResult(getKrollObject(),
+				(KrollFunction) callbacks.get("onChatMediaAutoDownloadSucceded"), result);
+	}
+
+	@Override
+	public void onChatReceived(IKandyMessage message, KandyRecordType type) {
+		Log.d(LCAT, "KandyChatServiceNotificationListener->onChatReceived() was invoked: " + type.name());
+
+		KrollDict result = new KrollDict();
+		result.put("type", type.name());
+		try {
+			result.put("message", message.toJson().get("message"));
+		} catch (JSONException e) {
+			e.printStackTrace();
+			result.put("message", "Error parse message json!");
+		}
+
+		KandyUtils.sendSuccessResult(getKrollObject(), (KrollFunction) callbacks.get("onChatReceived"), result);
 	}
 }

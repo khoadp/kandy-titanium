@@ -62,8 +62,7 @@
             android:id="@+id/kandy_chat_get_incoming_msgs_button"
             style="?android:attr/buttonStyleSmall"
             android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:background="@drawable/chat_action_btn_selector"
+            android:layout_height="wrap_content"
             android:text="@string/kandy_chat_pull_label" />
 
         <TextView
@@ -79,8 +78,7 @@
             android:id="@+id/kandy_chat_send_sms_button"
             style="?android:attr/buttonStyleSmall"
             android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:background="@drawable/chat_action_btn_selector"
+            android:layout_height="wrap_content"
             android:text="@string/kandy_chat_send_sms_label" />
 
         <TextView

@@ -30,10 +30,12 @@ import io.kandy.proxy.adapters.MessagesAdapter;
 import io.kandy.utils.KandyUtils;
 import io.kandy.utils.UIUtils;
 import org.appcelerator.kroll.KrollDict;
+import org.appcelerator.kroll.KrollFunction;
 import org.appcelerator.titanium.TiBaseActivity;
 import org.appcelerator.titanium.TiLifecycle.OnActivityResultEvent;
 import org.appcelerator.titanium.proxy.TiViewProxy;
 import org.appcelerator.titanium.view.TiUIView;
+import org.json.JSONException;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -64,7 +66,7 @@ public class ChatViewProxy extends TiUIView implements OnItemClickListener, OnAc
 	private Message mSelectedMessage = null;
 	private boolean isGroupChatMode;
 
-	private KrollDict callbacks;
+	private KrollDict callbacks = new KrollDict();
 	private Activity activity;
 
 	public ChatViewProxy(TiViewProxy proxy) {
@@ -187,13 +189,13 @@ public class ChatViewProxy extends TiUIView implements OnItemClickListener, OnAc
 		return this.callbacks;
 	}
 
-	public void registerChatsNotifications() {
+	public void registerNotificationListener() {
 
 		Log.d(TAG, "registerNotifications");
 		Kandy.getServices().getChatService().registerNotificationListener(this);
 	}
 
-	public void unRegisterChatsNotifications() {
+	public void unregisterNotificationListener() {
 		Log.d(TAG, "unRegisterNotifications");
 		Kandy.getServices().getChatService().unregisterNotificationListener(this);
 	}
@@ -753,6 +755,8 @@ public class ChatViewProxy extends TiUIView implements OnItemClickListener, OnAc
 	@Override
 	public void onChatDelivered(KandyDeliveryAck message) {
 		Log.d(TAG, "ChatsActivity:onChatDelivered " + message.getEventType().name() + " uuid: " + message.getUUID());
+		KandyUtils.sendSuccessResult(proxy.getKrollObject(), (KrollFunction) callbacks.get("onChatDelivered"),
+				message.toJson());
 		markAsDeliveredOnUI(message);
 	}
 
@@ -760,6 +764,20 @@ public class ChatViewProxy extends TiUIView implements OnItemClickListener, OnAc
 	public void onChatMediaAutoDownloadFailed(IKandyMessage message, int errorCode, String err) {
 		Log.d(TAG, "onChatMediaDownloadFailed: messageUUID: " + message.getUUID() + " error: " + err + " error code: "
 				+ errorCode);
+
+		KrollDict result = new KrollDict();
+		result.put("error", err);
+		result.put("code", errorCode);
+		try {
+			result.put("message", message.toJson().getJSONObject("message"));
+		} catch (JSONException e) {
+			e.printStackTrace();
+			result.put("message", "Error parse message json!");
+		}
+
+		KandyUtils.sendSuccessResult(proxy.getKrollObject(),
+				(KrollFunction) callbacks.get("onChatMediaAutoDownloadFailed"), result);
+
 		activity.runOnUiThread(new Runnable() {
 
 			@Override
@@ -773,6 +791,22 @@ public class ChatViewProxy extends TiUIView implements OnItemClickListener, OnAc
 	public void onChatMediaAutoDownloadProgress(IKandyMessage message, IKandyTransferProgress progress) {
 		Log.d(TAG, "onChatMediaDownloadProgress: messageUUID: " + message.getUUID().toString() + " progress: "
 				+ progress);
+
+		KrollDict result = new KrollDict();
+		result.put("process", progress.getProgress());
+		result.put("state", progress.getState());
+		result.put("byteTransfer", progress.getByteTransfer());
+		result.put("byteExpected", progress.getByteExpected());
+		try {
+			result.put("message", message.toJson().get("message"));
+		} catch (JSONException e) {
+			e.printStackTrace();
+			result.put("message", "Error parse message json!");
+		}
+
+		KandyUtils.sendSuccessResult(proxy.getKrollObject(),
+				(KrollFunction) callbacks.get("onChatMediaAutoDownloadProgress"), result);
+
 		activity.runOnUiThread(new Runnable() {
 
 			@Override
@@ -785,6 +819,19 @@ public class ChatViewProxy extends TiUIView implements OnItemClickListener, OnAc
 	@Override
 	public void onChatMediaAutoDownloadSucceded(IKandyMessage message, Uri path) {
 		Log.d(TAG, "onChatMediaDownloadSucceded: messageUUID: " + message.getUUID() + " uri path: " + path.getPath());
+
+		KrollDict result = new KrollDict();
+		result.put("uri", path);
+		try {
+			result.put("message", message.toJson().get("message"));
+		} catch (JSONException e) {
+			e.printStackTrace();
+			result.put("message", "Error parse message json!");
+		}
+
+		KandyUtils.sendSuccessResult(proxy.getKrollObject(),
+				(KrollFunction) callbacks.get("onChatMediaAutoDownloadSucceded"), result);
+
 		activity.runOnUiThread(new Runnable() {
 
 			@Override
@@ -797,6 +844,18 @@ public class ChatViewProxy extends TiUIView implements OnItemClickListener, OnAc
 	@Override
 	public void onChatReceived(IKandyMessage message, KandyRecordType type) {
 		Log.d(TAG, "onChatReceived: message: " + message + " type: " + type);
+
+		KrollDict result = new KrollDict();
+		result.put("type", type.name());
+		try {
+			result.put("message", message.toJson().get("message"));
+		} catch (JSONException e) {
+			e.printStackTrace();
+			result.put("message", "Error parse message json!");
+		}
+
+		KandyUtils.sendSuccessResult(proxy.getKrollObject(), (KrollFunction) callbacks.get("onChatReceived"), result);
+
 		addUniqueMessageOnUI((KandyChatMessage) message);
 		mMessagesUUIDQueue.add((KandyChatMessage) message);
 	}
