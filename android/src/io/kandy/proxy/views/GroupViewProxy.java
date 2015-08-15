@@ -5,7 +5,7 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
-import io.kandy.proxy.fragments.DetailGroupFragment;
+import io.kandy.proxy.fragments.GroupsFragment;
 import io.kandy.utils.KandyUtils;
 import org.appcelerator.titanium.proxy.TiViewProxy;
 import org.appcelerator.titanium.view.TiUIView;
@@ -28,7 +28,7 @@ public class GroupViewProxy extends TiUIView {
 		FragmentManager fragmentManager = activity.getFragmentManager();
 		FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
-		fragmentTransaction.add(KandyUtils.getId("kandy_group_fragment_container"), new DetailGroupFragment())
+		fragmentTransaction.add(KandyUtils.getId("kandy_group_fragment_container"), new GroupsFragment())
 				.addToBackStack(null);
 		fragmentTransaction.commit();
 

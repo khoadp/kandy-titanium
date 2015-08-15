@@ -57,10 +57,9 @@
                 android:id="@+id/ui_activity_group_settings_chat_button"
                 style="?android:attr/buttonStyleSmall"
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
+                android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
                 android:layout_marginTop="10dp"
-                android:background="@drawable/chat_action_btn_selector"
                 android:text="@string/groups_settings_activity_chat_btn" />
         </LinearLayout>
     </RelativeLayout>
@@ -100,11 +99,10 @@
             android:id="@+id/ui_activity_group_settings_add_participant_button"
             style="?android:attr/buttonStyleSmall"
             android:layout_width="wrap_content"
-            android:layout_height="40dp"
+            android:layout_height="wrap_content"
             android:layout_alignBottom="@+id/ui_activity_group_settings_add_participants"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
-            android:background="@drawable/chat_action_btn_selector"
             android:text="@string/groups_settings_activity_add_participant_btn" />
     </RelativeLayout>
 
@@ -121,7 +119,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/ui_activity_group_settings_participants_list"
-        android:background="@drawable/chat_action_btn_selector"
         android:text="Back" />
 
 </RelativeLayout>

@@ -31,6 +31,7 @@ public class GroupsFragment extends Fragment implements OnItemClickListener, Kan
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		getListOfGroupsOnUiThread();
 	}
 
 	@Override
