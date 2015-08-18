@@ -43,7 +43,7 @@ public class AccessServiceProxy extends TiViewProxy implements KandyConnectServi
 	public void handleCreationDict(KrollDict options) {
 		super.handleCreationDict(options);
 		if (options.containsKey("callbacks"))
-			callbacks = options.getKrollDict("callbacks");
+			setCallbacks(options.getKrollDict("callbacks"));
 	}
 
 	/**
@@ -55,24 +55,14 @@ public class AccessServiceProxy extends TiViewProxy implements KandyConnectServi
 		return viewProxy;
 	}
 
-	@Override
-	protected void initActivity(Activity activity) {
-		attachActivityLifecycle(activity);
-	}
-
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public void onCreate(Activity activity, Bundle savedInstanceState) {
-		Log.i(LCAT, "onCreate() was invoked.");
+		Log.d(LCAT, "onCreate() was invoked.");
 		super.onCreate(activity, savedInstanceState);
-		
-		if (viewProxy != null) {
-			viewProxy.registerNotificationListener();
-		} else {
-			Kandy.getAccess().registerNotificationListener(this);	
-		}
+		registerNotificationListener();
 	}
 
 	/**
@@ -80,14 +70,9 @@ public class AccessServiceProxy extends TiViewProxy implements KandyConnectServi
 	 */
 	@Override
 	public void onPause(Activity activity) {
-		Log.i(LCAT, "onPause() was invoked.");
+		Log.d(LCAT, "onPause() was invoked.");
 		super.onPause(activity);
-		
-		if (viewProxy != null) {
-			viewProxy.unregisterNotificationListener();
-		} else {
-			Kandy.getAccess().unregisterNotificationListener(this);	
-		}
+		unregisterNotificationListener();
 	}
 
 	/**
@@ -95,16 +80,29 @@ public class AccessServiceProxy extends TiViewProxy implements KandyConnectServi
 	 */
 	@Override
 	public void onResume(Activity activity) {
-		Log.i(LCAT, "onResume() was invoked.");
+		Log.d(LCAT, "onResume() was invoked.");
 		super.onResume(activity);
-		
+		registerNotificationListener();
+	}
+
+	@Kroll.method
+	public void registerNotificationListener(){
 		if (viewProxy != null) {
 			viewProxy.registerNotificationListener();
 		} else {
 			Kandy.getAccess().registerNotificationListener(this);	
 		}
 	}
-
+	
+	@Kroll.method
+	public void unregisterNotificationListener(){
+		if (viewProxy != null) {
+			viewProxy.unregisterNotificationListener();
+		} else {
+			Kandy.getAccess().unregisterNotificationListener(this);	
+		}
+	}
+	
 	/**
 	 * Set callbacks for access service.
 	 * 

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="kandy_api_key">Your api key here.</string>
+    <string name="kandy_api_secret">Your secret key here.</string>
+</resources>

@@ -268,7 +268,6 @@ public class AccessViewProxy extends TiUIView implements KandyConnectServiceNoti
 	public void registerNotificationListener() {
 		Log.d(LCAT, "viewProxy->registerNotificationListener() was invoked.");
 		Kandy.getAccess().registerNotificationListener(this);
-		UIUtils.handleResultOnUiThread(activity, false, "registerNotificationListener() was invoked.");
 	}
 
 	public void unregisterNotificationListener() {

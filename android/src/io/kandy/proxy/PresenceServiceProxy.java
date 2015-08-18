@@ -12,7 +12,6 @@ import org.appcelerator.kroll.KrollDict;
 import org.appcelerator.kroll.KrollFunction;
 import org.appcelerator.kroll.KrollProxy;
 import org.appcelerator.kroll.annotations.Kroll;
-import org.json.JSONArray;
 
 import java.util.ArrayList;
 
@@ -37,7 +36,7 @@ public class PresenceServiceProxy extends KrollProxy {
 		final KrollFunction success = (KrollFunction) args.get("success");
 		final KrollFunction error = (KrollFunction) args.get("error");
 
-		String[] arrayList = (String[]) args.get("list");
+		String[] arrayList = args.getStringArray("list");
 
 		ArrayList<KandyRecord> list = new ArrayList<KandyRecord>();
 
@@ -64,20 +63,20 @@ public class PresenceServiceProxy extends KrollProxy {
 
 				KrollDict result = new KrollDict();
 
-				JSONArray presencesList = new JSONArray();
+				ArrayList<KrollDict> presencesList = new ArrayList<KrollDict>();
 				for (IKandyPresence online : presences) {
 					KrollDict obj = new KrollDict();
 					obj.put("user", online.getUser().getUri());
 					obj.put("lastSeen", online.getLastSeenDate().toString());
-					presencesList.put(obj);
+					presencesList.add(obj);
 				}
-				result.put("presences", presencesList);
+				result.put("presences", presencesList.toArray());
 
-				JSONArray absencesList = new JSONArray();
+				ArrayList<String> absencesList = new ArrayList<String>();
 				for (KandyRecord offline : absences) {
-					absencesList.put(offline.getUri());
+					absencesList.add(offline.getUri());
 				}
-				result.put("absences", absencesList);
+				result.put("absences", absencesList.toArray());
 
 				KandyUtils.sendSuccessResult(getKrollObject(), success, result);
 			}

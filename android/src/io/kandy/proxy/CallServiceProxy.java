@@ -69,6 +69,8 @@ public class CallServiceProxy extends TiViewProxy {
 		Log.d(LCAT, "handleCreationDict() invoked.");
 		if (options.containsKey(CALL_START_WITH_VIDEO))
 			videoEnabled = options.getBoolean(CALL_START_WITH_VIDEO);
+		if (options.containsKey("callbacks"))
+			setCallbacks(options.getKrollDict("callbacks"));
 		super.handleCreationDict(options);
 	}
 

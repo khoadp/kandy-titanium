@@ -88,6 +88,13 @@ public class ChatServiceProxy extends TiViewProxy implements KandyChatServiceNot
 		}
 	}
 
+	@Override
+	public void handleCreationDict(KrollDict options) {
+		super.handleCreationDict(options);
+		if (options.containsKey("callbacks"))
+			setCallbacks(options.getKrollDict("callbacks"));
+	}
+	
 	@Kroll.method
 	@Kroll.setProperty
 	public void setCallbacks(KrollDict callbacks) {
