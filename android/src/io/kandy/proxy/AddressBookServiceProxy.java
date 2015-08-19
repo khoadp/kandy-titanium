@@ -10,7 +10,6 @@ import org.appcelerator.kroll.KrollDict;
 import org.appcelerator.kroll.KrollFunction;
 import org.appcelerator.kroll.KrollProxy;
 import org.appcelerator.kroll.annotations.Kroll;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -164,34 +163,34 @@ public class AddressBookServiceProxy extends KrollProxy {
 		return obj;
 	}
 
-	private JSONArray getPhonesFromContact(IKandyContact contact) {
-		JSONArray phones = new JSONArray();
+	private Object[] getPhonesFromContact(IKandyContact contact) {
+		ArrayList<KrollDict> phones = new ArrayList<KrollDict>();
 
 		if (contact.getNumbers() != null) {
 			for (KandyPhoneContactRecord phone : contact.getNumbers()) {
 				KrollDict p = new KrollDict();
 				p.put("number", phone.getNumber());
 				p.put("type", phone.getType().name());
-				phones.put(p);
+				phones.add(p);
 			}
 		}
 
-		return phones;
+		return phones.toArray();
 	}
 
-	private JSONArray getEmailsFromContact(IKandyContact contact) {
-		JSONArray emails = new JSONArray();
+	private Object[] getEmailsFromContact(IKandyContact contact) {
+		ArrayList<KrollDict> emails = new ArrayList<KrollDict>();
 
 		if (contact.getEmails() != null) {
 			for (KandyEmailContactRecord email : contact.getEmails()) {
 				KrollDict e = new KrollDict();
 				e.put("address", email.getAddress());
 				e.put("type", email.getType().name());
-				emails.put(e);
+				emails.add(e);
 			}
 		}
 
-		return emails;
+		return emails.toArray();
 	}
 
 	private class KandyContactsListenerCallback extends KandyContactsListener {
@@ -213,13 +212,13 @@ public class AddressBookServiceProxy extends KrollProxy {
 		public void onRequestSucceded(List<IKandyContact> contacts) {
 			Log.d(LCAT, "KandyContactsListener->onRequestSucceded() was invoked: " + contacts.size());
 
-			JSONArray results = new JSONArray();
+			ArrayList<KrollDict> results = new ArrayList<KrollDict>();
 
 			for (IKandyContact contact : contacts) {
-				results.put(getContactDetails(contact));
+				results.add(getContactDetails(contact));
 			}
 
-			KandyUtils.sendSuccessResult(getKrollObject(), success, results);
+			KandyUtils.sendSuccessResult(getKrollObject(), success, results.toArray());
 		}
 	}
 }

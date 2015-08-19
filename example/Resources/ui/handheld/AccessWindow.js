@@ -4,6 +4,12 @@ function AccessWindow(Kandy) {
 		backgroundColor : 'white'
 	});
 
+	var container = Titanium.UI.createScrollView({
+    	contentHeight:'auto',
+    	scrollType: 'vertical'
+	});
+	self.add(container);
+
 	var access = Kandy.createAccessService({
 		width : 350,
 		height : 500,
@@ -25,8 +31,7 @@ function AccessWindow(Kandy) {
 			access.registerNotificationListener();
 		};
 	};
-
-	self.add(access);
+	container.add(access);
 
 	return self;
 };

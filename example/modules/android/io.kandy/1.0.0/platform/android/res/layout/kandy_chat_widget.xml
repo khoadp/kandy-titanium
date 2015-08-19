@@ -13,6 +13,12 @@
         android:layout_above="@+id/kandy_chat_phone_number_edit"
         android:layout_alignParentTop="true" />
 
+	<TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/kandy_chat_phone_number_edit"
+            android:text="@string/kandy_chat_pull_desc"/>
+
     <EditText
         android:id="@+id/kandy_chat_phone_number_edit"
         android:layout_width="match_parent"

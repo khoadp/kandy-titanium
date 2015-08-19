@@ -86,23 +86,23 @@ public class AccessServiceProxy extends TiViewProxy implements KandyConnectServi
 	}
 
 	@Kroll.method
-	public void registerNotificationListener(){
+	public void registerNotificationListener() {
 		if (viewProxy != null) {
 			viewProxy.registerNotificationListener();
 		} else {
-			Kandy.getAccess().registerNotificationListener(this);	
+			Kandy.getAccess().registerNotificationListener(this);
 		}
 	}
-	
+
 	@Kroll.method
-	public void unregisterNotificationListener(){
+	public void unregisterNotificationListener() {
 		if (viewProxy != null) {
 			viewProxy.unregisterNotificationListener();
 		} else {
-			Kandy.getAccess().unregisterNotificationListener(this);	
+			Kandy.getAccess().unregisterNotificationListener(this);
 		}
 	}
-	
+
 	/**
 	 * Set callbacks for access service.
 	 * 
@@ -112,21 +112,13 @@ public class AccessServiceProxy extends TiViewProxy implements KandyConnectServi
 	@Kroll.setProperty
 	@Kroll.method
 	public void setCallbacks(KrollDict callbacks) {
-		if (viewProxy != null) {
-			viewProxy.setCallbacks(callbacks);
-		} else {
-			this.callbacks = callbacks;
-		}
+		this.callbacks = callbacks;
 	}
 
 	@Kroll.getProperty
 	@Kroll.method
 	public KrollDict getCallbacks() {
-		if (viewProxy != null) {
-			return viewProxy.getCallbacks();
-		} else {
-			return this.callbacks;
-		}
+		return this.callbacks;
 	}
 
 	/**

@@ -14,7 +14,7 @@ import android.widget.TextView;
 import com.genband.kandy.api.Kandy;
 import com.genband.kandy.api.services.chats.*;
 import com.genband.kandy.api.utils.KandyMediaUtils;
-import io.kandy.proxy.views.ChatViewProxy.Message;
+import io.kandy.proxy.fragments.ChatFragment.Message;
 import io.kandy.utils.KandyUtils;
 
 import java.text.SimpleDateFormat;

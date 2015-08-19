@@ -12,9 +12,8 @@ import org.appcelerator.titanium.view.TiUIView;
 
 public class GroupViewProxy extends TiUIView {
 
-	private static final String LCAT = GroupViewProxy.class.getSimpleName();
-
 	private Activity activity;
+	private FragmentManager fragmentManager;
 
 	public GroupViewProxy(TiViewProxy proxy) {
 		super(proxy);
@@ -25,10 +24,10 @@ public class GroupViewProxy extends TiUIView {
 		LayoutInflater layoutInflater = LayoutInflater.from(proxy.getActivity());
 		layoutWraper = layoutInflater.inflate(KandyUtils.getLayout("kandy_group_widget"), null);
 
-		FragmentManager fragmentManager = activity.getFragmentManager();
+		fragmentManager = activity.getFragmentManager();
 		FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
-		fragmentTransaction.add(KandyUtils.getId("kandy_group_fragment_container"), new GroupsFragment())
+		fragmentTransaction.add(KandyUtils.getId("kandy_group_fragment_container"), new GroupsFragment(this))
 				.addToBackStack(null);
 		fragmentTransaction.commit();
 

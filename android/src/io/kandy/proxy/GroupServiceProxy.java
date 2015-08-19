@@ -2,6 +2,7 @@ package io.kandy.proxy;
 
 import android.app.Activity;
 import android.net.Uri;
+import android.os.Bundle;
 import android.util.Log;
 import com.genband.kandy.api.Kandy;
 import com.genband.kandy.api.services.calls.KandyRecord;
@@ -9,10 +10,7 @@ import com.genband.kandy.api.services.chats.IKandyTransferProgress;
 import com.genband.kandy.api.services.chats.KandyThumbnailSize;
 import com.genband.kandy.api.services.common.KandyResponseListener;
 import com.genband.kandy.api.services.common.KandyResponseProgressListener;
-import com.genband.kandy.api.services.groups.KandyGroup;
-import com.genband.kandy.api.services.groups.KandyGroupParams;
-import com.genband.kandy.api.services.groups.KandyGroupResponseListener;
-import com.genband.kandy.api.services.groups.KandyGroupsResponseListener;
+import com.genband.kandy.api.services.groups.*;
 import com.genband.kandy.api.utils.KandyIllegalArgumentException;
 import io.kandy.KandyModule;
 import io.kandy.proxy.views.GroupViewProxy;
@@ -28,16 +26,67 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Kroll.proxy(creatableInModule = KandyModule.class)
-public class GroupServiceProxy extends TiViewProxy {
+public class GroupServiceProxy extends TiViewProxy implements KandyGroupServiceNotificationListener {
 
 	private static final String LCAT = GroupServiceProxy.class.getSimpleName();
 
 	private GroupViewProxy viewProxy;
+	private KrollDict callbacks = new KrollDict();
 
 	@Override
 	public TiUIView createView(Activity activity) {
 		viewProxy = new GroupViewProxy(this);
 		return viewProxy;
+	}
+
+	@Override
+	public void handleCreationDict(KrollDict options) {
+		super.handleCreationDict(options);
+		if (options.containsKey("callbacks"))
+			setCallbacks(options.getKrollDict("callbacks"));
+
+	}
+
+	@Override
+	public void onCreate(Activity activity, Bundle savedInstanceState) {
+		super.onCreate(activity, savedInstanceState);
+		registerNotificationListener();
+	}
+
+	@Override
+	public void onResume(Activity activity) {
+		super.onResume(activity);
+		registerNotificationListener();
+	}
+
+	@Override
+	public void onPause(Activity activity) {
+		super.onPause(activity);
+		unregisterNotificationListener();
+	}
+
+	@Kroll.method
+	public void registerNotificationListener() {
+		if (viewProxy == null)
+			Kandy.getServices().getGroupService().registerNotificationListener(this);
+	}
+
+	@Kroll.method
+	public void unregisterNotificationListener() {
+		if (viewProxy == null)
+			Kandy.getServices().getGroupService().unregisterNotificationListener(this);
+	}
+
+	@Kroll.method
+	@Kroll.setProperty
+	public void setCallbacks(KrollDict callbacks) {
+		this.callbacks = callbacks;
+	}
+
+	@Kroll.method
+	@Kroll.getProperty
+	public KrollDict getCallbacks() {
+		return callbacks;
 	}
 
 	@Kroll.method
@@ -473,5 +522,94 @@ public class GroupServiceProxy extends TiViewProxy {
 			KandyUtils.sendFailResult(getKrollObject(), error, code, err);
 		}
 
+	}
+
+	@Override
+	public void onGroupDestroyed(IKandyGroupDestroyed group) {
+		KrollDict result = new KrollDict();
+
+		result.put("uuid", group.getUUID().toString());
+		result.put("eraser", KandyUtils.getKrollDictFromKandyRecord(group.getEraser()));
+		result.put("groupId", KandyUtils.getKrollDictFromKandyRecord(group.getGroupId()));
+		result.put("eventType", group.getEventType().name());
+		result.put("timestamp", group.getTimestamp());
+
+		KandyUtils.sendSuccessResult(getKrollObject(), (KrollFunction) callbacks.get("onGroupDestroyed"), result);
+	}
+
+	@Override
+	public void onGroupUpdated(IKandyGroupUpdated group) {
+		KrollDict result = new KrollDict();
+
+		result.put("uuid", group.getUUID().toString());
+		result.put("updater", KandyUtils.getKrollDictFromKandyRecord(group.getUpdater()));
+		result.put("groupId", KandyUtils.getKrollDictFromKandyRecord(group.getGroupId()));
+		result.put("eventType", group.getEventType().name());
+		result.put("timestamp", group.getTimestamp());
+
+		KandyUtils.sendSuccessResult(getKrollObject(), (KrollFunction) callbacks.get("onGroupUpdated"), result);
+	}
+
+	@Override
+	public void onParticipantJoined(IKandyGroupParticipantJoined participant) {
+		KrollDict result = new KrollDict();
+
+		result.put("uuid", participant.getUUID().toString());
+		result.put("groupId", KandyUtils.getKrollDictFromKandyRecord(participant.getGroupId()));
+		result.put("inviter", KandyUtils.getKrollDictFromKandyRecord(participant.getInviter()));
+
+		List<KandyRecord> invitess = participant.getInvitees();
+		ArrayList<KrollDict> listInvitess = new ArrayList<KrollDict>();
+		if (invitess != null && invitess.size() > 0) {
+			for (KandyRecord i : invitess)
+				listInvitess.add(KandyUtils.getKrollDictFromKandyRecord(i));
+		}
+		result.put("invitess", listInvitess.toArray());
+		result.put("timestamp", participant.getTimestamp());
+		result.put("eventType", participant.getEventType().name());
+
+		KandyUtils.sendSuccessResult(getKrollObject(), (KrollFunction) callbacks.get("onParticipantJoined"), result);
+	}
+
+	@Override
+	public void onParticipantKicked(IKandyGroupParticipantKicked participant) {
+		KrollDict result = new KrollDict();
+
+		result.put("uuid", participant.getUUID().toString());
+		result.put("groupId", KandyUtils.getKrollDictFromKandyRecord(participant.getGroupId()));
+		result.put("booter", KandyUtils.getKrollDictFromKandyRecord(participant.getBooter()));
+
+		List<KandyRecord> booted = participant.getBooted();
+		ArrayList<KrollDict> listBooted = new ArrayList<KrollDict>();
+		if (booted != null && booted.size() > 0) {
+			for (KandyRecord i : booted)
+				listBooted.add(KandyUtils.getKrollDictFromKandyRecord(i));
+		}
+		result.put("booted", listBooted.toArray());
+		result.put("timestamp", participant.getTimestamp());
+		result.put("eventType", participant.getEventType().name());
+
+		KandyUtils.sendSuccessResult(getKrollObject(), (KrollFunction) callbacks.get("onParticipantKicked"), result);
+	}
+
+	@Override
+	public void onParticipantLeft(IKandyGroupParticipantLeft participant) {
+		KrollDict result = new KrollDict();
+
+		result.put("uuid", participant.getUUID().toString());
+		result.put("groupId", KandyUtils.getKrollDictFromKandyRecord(participant.getGroupId()));
+		result.put("leaver", KandyUtils.getKrollDictFromKandyRecord(participant.getLeaver()));
+
+		List<KandyRecord> admins = participant.getAdmins();
+		ArrayList<KrollDict> listAdmins = new ArrayList<KrollDict>();
+		if (admins != null && admins.size() > 0) {
+			for (KandyRecord i : admins)
+				listAdmins.add(KandyUtils.getKrollDictFromKandyRecord(i));
+		}
+		result.put("admins", listAdmins.toArray());
+		result.put("timestamp", participant.getTimestamp());
+		result.put("eventType", participant.getEventType().name());
+
+		KandyUtils.sendSuccessResult(getKrollObject(), (KrollFunction) callbacks.get("onParticipantKicked"), result);
 	}
 }

@@ -4,6 +4,12 @@ function PresenceWindow(Kandy) {
 		backgroundColor : 'white'
 	});
 
+	var container = Titanium.UI.createScrollView({
+    	contentHeight:'auto',
+    	scrollType: 'vertical'
+	});
+	self.add(container);
+
 	var txtEdit = Ti.UI.createTextField({
 		borderStyle : Ti.UI.INPUT_BORDERSTYLE_ROUNDED,
 		color : '#336699',
@@ -12,7 +18,7 @@ function PresenceWindow(Kandy) {
 		width : 300,
 		height : 60
 	});
-	self.add(txtEdit);
+	container.add(txtEdit);
 
 	var btn = Ti.UI.createButton({
 		height : 44,
@@ -20,7 +26,7 @@ function PresenceWindow(Kandy) {
 		title : L('watch'),
 		top : 90
 	});
-	self.add(btn);
+	container.add(btn);
 
 	var txtPresences = Ti.UI.createLabel({
 		color : 'black',
@@ -31,7 +37,7 @@ function PresenceWindow(Kandy) {
 		width : Ti.UI.SIZE,
 		height : Ti.UI.SIZE
 	});
-	self.add(txtPresences);
+	container.add(txtPresences);
 
 	var presence = Kandy.createPresenceService();
 	var eFn = function(e) {

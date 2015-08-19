@@ -4,13 +4,19 @@ function LocationWindow(Kandy) {
 		backgroundColor : 'white'
 	});
 
+	var container = Titanium.UI.createScrollView({
+    	contentHeight:'auto',
+    	scrollType: 'vertical'
+	});
+	self.add(container);
+
 	var btn1 = Ti.UI.createButton({
 		height : 44,
 		width : 200,
 		title : L('getCountryInfo'),
 		top : 20
 	});
-	self.add(btn1);
+	container.add(btn1);
 
 	var btn2 = Ti.UI.createButton({
 		height : 44,
@@ -18,7 +24,7 @@ function LocationWindow(Kandy) {
 		title : L('getCurrentLocation'),
 		top : 65
 	});
-	self.add(btn2);
+	container.add(btn2);
 
 	var txt = Ti.UI.createLabel({
 		color : 'black',
@@ -29,7 +35,7 @@ function LocationWindow(Kandy) {
 		width : Ti.UI.SIZE,
 		height : Ti.UI.SIZE
 	});
-	self.add(txt);
+	container.add(txt);
 
 	var location = Kandy.createLocationService();
 	var eFn = function(e) {

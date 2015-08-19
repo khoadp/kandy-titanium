@@ -4,6 +4,12 @@ function CallWindow(Kandy) {
 		backgroundColor : 'white'
 	});
 
+	var container = Titanium.UI.createScrollView({
+    	contentHeight:'auto',
+    	scrollType: 'vertical'
+	});
+	self.add(container);
+
 	var call = Kandy.createCallService({
 		width : 350,
 		height : 500,
@@ -11,7 +17,7 @@ function CallWindow(Kandy) {
 			
 		}
 	});
-	self.add(call);
+	container.add(call);
 
 	return self;
 };

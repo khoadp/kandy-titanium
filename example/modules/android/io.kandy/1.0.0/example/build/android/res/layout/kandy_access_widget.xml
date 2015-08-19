@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+    <LinearLayout
+            android:id="@+id/kandy_login_view_container"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/kandy_username_edit"
+                android:layout_gravity="center_horizontal"
+                android:hint="userID@domain.com"
+                android:text="user2@jupiter.kodeplus.net"
+                android:textColor="@android:color/black"
+                android:textColorHint="@android:color/darker_gray"/>
+        <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword"
+                android:ems="10"
+                android:textColor="@android:color/black"
+                android:id="@+id/kandy_password_edit"
+                android:layout_gravity="center_horizontal"
+                android:hint="password"
+                android:text="a1234567"
+                android:textColorHint="@android:color/darker_gray"/>
+        <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/kandy_access_token_edit"
+                android:layout_gravity="center_horizontal"
+                android:hint="access token"
+                android:textColor="@android:color/black"
+                android:textColorHint="@android:color/darker_gray"/>
+        <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Login"
+                android:id="@+id/kandy_login_button"
+                android:layout_gravity="center_horizontal"/>
+    </LinearLayout>
+
+    <LinearLayout
+            android:id="@+id/kandy_logout_view_container"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="userID@domain.com"
+                android:id="@+id/kandy_user_info_edit"
+                android:singleLine="true"
+                android:autoText="false"
+                android:textColor="@android:color/black"
+                android:gravity="center_horizontal"/>
+        <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Logout"
+                android:id="@+id/kandy_logout_button"
+                android:layout_gravity="center_horizontal"/>
+    </LinearLayout>
+</LinearLayout>

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="10dp" >
+
+    <TextView
+        android:id="@+id/ui_group_list_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Group Name"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/ui_group_list_participants_lbl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/ui_group_list_name"
+        android:layout_below="@+id/ui_group_list_name"
+        android:text="Participants:" />
+
+    <TextView
+        android:id="@+id/ui_group_list_participants_number"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/ui_group_list_participants_lbl"
+        android:layout_marginLeft="5dp"
+        android:layout_toRightOf="@+id/ui_group_list_participants_lbl"
+        android:text="5" />
+
+    <TextView
+        android:id="@+id/ui_group_list_created_at_lbl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/ui_group_list_participants_lbl"
+        android:layout_below="@+id/ui_group_list_participants_lbl"
+        android:text="Created at:" />
+
+    <TextView
+        android:id="@+id/ui_group_list_created_at"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/ui_group_list_created_at_lbl"
+        android:layout_marginLeft="5dp"
+        android:layout_toRightOf="@+id/ui_group_list_created_at_lbl"
+        android:text="Sunday 21:34" />
+
+    <TextView
+        android:id="@+id/ui_group_list_muted_lbl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/ui_group_list_created_at_lbl"
+        android:layout_below="@+id/ui_group_list_created_at_lbl"
+        android:text="Muted:" />
+
+    <TextView
+        android:id="@+id/ui_group_list_muted"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/ui_group_list_muted_lbl"
+        android:layout_marginLeft="5dp"
+        android:layout_toRightOf="@+id/ui_group_list_muted_lbl"
+        android:text="false" />
+
+    <TextView
+        android:id="@+id/ui_group_list_permissions_lbl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/ui_group_list_muted_lbl"
+        android:layout_below="@+id/ui_group_list_muted_lbl"
+        android:text="Permissions:" />
+
+    <TextView
+        android:id="@+id/ui_group_list_permissions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/ui_group_list_permissions_lbl"
+        android:layout_marginLeft="5dp"
+        android:layout_toRightOf="@+id/ui_group_list_permissions_lbl"
+        android:text="false" />
+
+</RelativeLayout>

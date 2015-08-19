@@ -7,6 +7,9 @@ import com.genband.kandy.api.services.billing.IKandyBillingPackage;
 import com.genband.kandy.api.services.billing.IKandyBillingPackageProperty;
 import com.genband.kandy.api.services.calls.IKandyCall;
 import com.genband.kandy.api.services.calls.KandyRecord;
+import com.genband.kandy.api.services.chats.IKandyMediaItem;
+import com.genband.kandy.api.services.chats.IKandyMessage;
+import com.genband.kandy.api.services.chats.KandyDeliveryAck;
 import com.genband.kandy.api.services.groups.KandyGroup;
 import com.genband.kandy.api.services.groups.KandyGroupParticipant;
 import io.kandy.KandyModule;
@@ -106,10 +109,10 @@ public final class KandyUtils {
 		obj.put("maxParticipantsNumber", group.getMaxParticipantsNumber());
 		obj.put("selfParticipant", getKrollDictFromKandyGroupParticipant(group.getSelfParticipant()));
 		obj.put("isGroupMuted", group.isGroupMuted());
-		JSONArray list = new JSONArray();
+		ArrayList<KrollDict> list = new ArrayList<KrollDict>();
 		if (group.getGroupParticipants() != null) {
 			for (KandyGroupParticipant participant : group.getGroupParticipants())
-				list.put(getKrollDictFromKandyGroupParticipant(participant));
+				list.add(getKrollDictFromKandyGroupParticipant(participant));
 		}
 		obj.put("participants", list);
 
@@ -241,14 +244,14 @@ public final class KandyUtils {
 		obj.put("startDate", billingPackage.getStartDate());
 		obj.put("packageName", billingPackage.getPackageName());
 
-		JSONArray properties = new JSONArray();
+		ArrayList<KrollDict> properties = new ArrayList<KrollDict>();
 		if (billingPackage.getProperties().size() > 0) {
 			ArrayList<IKandyBillingPackageProperty> billingPackageProperties = billingPackage.getProperties();
 			for (IKandyBillingPackageProperty p : billingPackageProperties)
-				properties.put(getKrollDictFromKandyBillingPackageProperty(p));
+				properties.add(getKrollDictFromKandyBillingPackageProperty(p));
 		}
 
-		obj.put("properties", properties);
+		obj.put("properties", properties.toArray());
 		return obj;
 	}
 
@@ -257,6 +260,40 @@ public final class KandyUtils {
 		obj.put("packageName", property.getPackageName());
 		obj.put("quotaUnits", property.getQuotaUnits());
 		obj.put("remainingQuota", property.getRemainingQuota());
+		return obj;
+	}
+
+	public static KrollDict getKrollDictFromKandyMessage(IKandyMessage message) {
+		KrollDict obj = new KrollDict();
+
+		obj.put("messageType", message.getMessageType().name());
+		obj.put("recipient", getKrollDictFromKandyRecord(message.getRecipient()));
+		obj.put("sender", getKrollDictFromKandyRecord(message.getSender()));
+		obj.put("timestamp", message.getTimestamp());
+		obj.put("uuid", message.getUUID().toString());
+		obj.put("eventType", message.getEventType().name());
+		obj.put("mediaItem", getKrollDictFromKandyMediaItem(message.getMediaItem()));
+
+		return obj;
+	}
+
+	private static KrollDict getKrollDictFromKandyMediaItem(IKandyMediaItem item) {
+		KrollDict obj = new KrollDict();
+
+		obj.put("mediaItemType", item.getMediaItemType().name());
+		obj.put("message", item.getMessage());
+		obj.put("mimeType", item.getMimeType());
+
+		return obj;
+	}
+
+	public static KrollDict getKrollDictFromKandyDeliveryAck(KandyDeliveryAck ack) {
+		KrollDict obj = new KrollDict();
+
+		obj.put("uuid", ack.getUUID().toString());
+		obj.put("eventType", ack.getEventType().name());
+		obj.put("timestamp", ack.getTimestamp());
+		
 		return obj;
 	}
 }

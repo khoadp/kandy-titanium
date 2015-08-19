@@ -4,12 +4,17 @@ function ProvisioningWindow(Kandy) {
 		backgroundColor:'white'
 	});
 
+	var container = Titanium.UI.createScrollView({
+    	contentHeight:'auto',
+    	scrollType: 'vertical'
+	});
+	self.add(container);
+
 	var provisioning = Kandy.createProvisioningService({
 		width: 350,
 		height: 500
 	});
-
-	self.add(provisioning);
+	container.add(provisioning);
 	
 	return self;
 };

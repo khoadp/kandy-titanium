@@ -9,12 +9,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Group Name"
+        android:textColor="@android:color/black"
         android:textSize="20sp" />
 
     <TextView
         android:id="@+id/ui_group_list_participants_lbl"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textColor="@android:color/black"
         android:layout_alignLeft="@+id/ui_group_list_name"
         android:layout_below="@+id/ui_group_list_name"
         android:text="Participants:" />
@@ -25,6 +27,7 @@
         android:layout_height="wrap_content"
         android:layout_alignBottom="@+id/ui_group_list_participants_lbl"
         android:layout_marginLeft="5dp"
+        android:textColor="@android:color/black"
         android:layout_toRightOf="@+id/ui_group_list_participants_lbl"
         android:text="5" />
 
@@ -32,6 +35,7 @@
         android:id="@+id/ui_group_list_created_at_lbl"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textColor="@android:color/black"
         android:layout_alignLeft="@+id/ui_group_list_participants_lbl"
         android:layout_below="@+id/ui_group_list_participants_lbl"
         android:text="Created at:" />
@@ -42,6 +46,7 @@
         android:layout_height="wrap_content"
         android:layout_alignBottom="@+id/ui_group_list_created_at_lbl"
         android:layout_marginLeft="5dp"
+        android:textColor="@android:color/black"
         android:layout_toRightOf="@+id/ui_group_list_created_at_lbl"
         android:text="Sunday 21:34" />
 
@@ -49,6 +54,7 @@
         android:id="@+id/ui_group_list_muted_lbl"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textColor="@android:color/black"
         android:layout_alignLeft="@+id/ui_group_list_created_at_lbl"
         android:layout_below="@+id/ui_group_list_created_at_lbl"
         android:text="Muted:" />
@@ -59,6 +65,7 @@
         android:layout_height="wrap_content"
         android:layout_alignBottom="@+id/ui_group_list_muted_lbl"
         android:layout_marginLeft="5dp"
+        android:textColor="@android:color/black"
         android:layout_toRightOf="@+id/ui_group_list_muted_lbl"
         android:text="false" />
 
@@ -66,6 +73,7 @@
         android:id="@+id/ui_group_list_permissions_lbl"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textColor="@android:color/black"
         android:layout_alignLeft="@+id/ui_group_list_muted_lbl"
         android:layout_below="@+id/ui_group_list_muted_lbl"
         android:text="Permissions:" />
@@ -74,6 +82,7 @@
         android:id="@+id/ui_group_list_permissions"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textColor="@android:color/black"
         android:layout_alignBottom="@+id/ui_group_list_permissions_lbl"
         android:layout_marginLeft="5dp"
         android:layout_toRightOf="@+id/ui_group_list_permissions_lbl"
