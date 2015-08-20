@@ -1,21 +1,76 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical" >
-    
-    <TextView 
-        android:id="@+id/ui_message_sender_text"
+    android:padding="8dp" >
+
+    <ImageView
+        android:id="@+id/ui_message_direction"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:src="@drawable/ic_incoming" />
+
+    <LinearLayout
+        android:id="@+id/ui_texts"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/ui_message_direction"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="-2dp"
+        android:layout_toRightOf="@+id/ui_message_direction"
+        android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/ui_message_sender_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="972363279384"
+            android:textColor="@android:color/black"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/ui_message_body_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/black"
+            android:text="@string/ui_message_listview_item_message" />
+
+        <TextView
+            android:id="@+id/ui_message_body_time"
+            android:textColor="@android:color/black"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            />
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/ui_thumbnail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerInParent="true"
+        android:background="@android:color/transparent"
+        android:maxHeight="150dp"
+        android:maxWidth="150dp" />
+
+    <ImageView
+        android:id="@+id/ui_thumbnail_video_indicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/ui_thumbnail"
+        android:layout_alignLeft="@+id/ui_thumbnail"
+        android:src="@drawable/ic_action_video" />
+
+    <TextView
+        android:id="@+id/ui_thumbnail_video_duration"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@android:color/black"
-        android:text="@string/ui_message_listview_item_sender"/>
-    
-    <TextView 
-        android:id="@+id/ui_message_body_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@android:color/black"
-        android:text="@string/ui_message_listview_item_message" />
-  
-</LinearLayout>
+        android:layout_alignBottom="@+id/ui_thumbnail_video_indicator"
+        android:layout_alignRight="@+id/ui_thumbnail"
+        android:layout_marginBottom="7dp"
+        android:layout_marginRight="2dp" />
+
+</RelativeLayout>

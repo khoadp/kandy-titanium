@@ -128,7 +128,6 @@ public class GroupsFragment extends Fragment implements OnItemClickListener, Kan
 			@Override
 			public void onRequestSucceded(List<KandyGroup> groupList) {
 				mGroups.clear();
-				Log.i(LCAT, String.valueOf(groupList.size()));
 				mGroups.addAll(groupList);
 				updateUI();
 				// UIUtils.dismissProgressDialog();

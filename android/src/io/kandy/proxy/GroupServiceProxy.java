@@ -6,8 +6,8 @@ import android.os.Bundle;
 import android.util.Log;
 import com.genband.kandy.api.Kandy;
 import com.genband.kandy.api.services.calls.KandyRecord;
-import com.genband.kandy.api.services.chats.IKandyTransferProgress;
-import com.genband.kandy.api.services.chats.KandyThumbnailSize;
+import com.genband.kandy.api.services.calls.KandyRecordType;
+import com.genband.kandy.api.services.chats.*;
 import com.genband.kandy.api.services.common.KandyResponseListener;
 import com.genband.kandy.api.services.common.KandyResponseProgressListener;
 import com.genband.kandy.api.services.groups.*;
@@ -26,11 +26,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Kroll.proxy(creatableInModule = KandyModule.class)
-public class GroupServiceProxy extends TiViewProxy implements KandyGroupServiceNotificationListener {
+public class GroupServiceProxy extends TiViewProxy implements KandyGroupServiceNotificationListener,
+		KandyChatServiceNotificationListener {
 
 	private static final String LCAT = GroupServiceProxy.class.getSimpleName();
 
 	private GroupViewProxy viewProxy;
+	private ChatServiceProxy chatListener = new ChatServiceProxy();
 	private KrollDict callbacks = new KrollDict();
 
 	@Override
@@ -81,6 +83,7 @@ public class GroupServiceProxy extends TiViewProxy implements KandyGroupServiceN
 	@Kroll.setProperty
 	public void setCallbacks(KrollDict callbacks) {
 		this.callbacks = callbacks;
+		chatListener.setCallbacks(callbacks);
 	}
 
 	@Kroll.method
@@ -611,5 +614,30 @@ public class GroupServiceProxy extends TiViewProxy implements KandyGroupServiceN
 		result.put("eventType", participant.getEventType().name());
 
 		KandyUtils.sendSuccessResult(getKrollObject(), (KrollFunction) callbacks.get("onParticipantKicked"), result);
+	}
+
+	@Override
+	public void onChatDelivered(KandyDeliveryAck message) {
+		chatListener.onChatDelivered(message);
+	}
+
+	@Override
+	public void onChatMediaAutoDownloadFailed(IKandyMessage message, int code, String error) {
+		chatListener.onChatMediaAutoDownloadFailed(message, code, error);
+	}
+
+	@Override
+	public void onChatMediaAutoDownloadProgress(IKandyMessage message, IKandyTransferProgress progress) {
+		chatListener.onChatMediaAutoDownloadProgress(message, progress);
+	}
+
+	@Override
+	public void onChatMediaAutoDownloadSucceded(IKandyMessage message, Uri uri) {
+		chatListener.onChatMediaAutoDownloadSucceded(message, uri);
+	}
+
+	@Override
+	public void onChatReceived(IKandyMessage message, KandyRecordType type) {
+		chatListener.onChatReceived(message, type);
 	}
 }

@@ -1,0 +1,183 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingBottom="@dimen/kandy_vertical_margin"
+                android:paddingLeft="@dimen/kandy_horizontal_margin"
+                android:paddingRight="@dimen/kandy_horizontal_margin"
+                android:paddingTop="@dimen/kandy_vertical_margin">
+
+    <ListView
+        android:id="@+id/kandy_chat_messages_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/kandy_chat_phone_number_edit"
+        android:layout_alignParentTop="true" />
+
+    <EditText
+        android:id="@+id/kandy_chat_phone_number_edit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/black"
+        android:textColorHint="@android:color/darker_gray"
+        android:layout_above="@+id/kandy_chat_message_container"
+        android:text="user3@jupiter.kodeplus.net"
+        android:hint="@string/kandy_chat_phone_number_hint_text" />
+
+    <LinearLayout
+        android:id="@+id/kandy_chat_message_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/kandy_chat_buttons"
+        android:layout_marginBottom="8dp"
+        android:orientation="horizontal"
+        android:weightSum="1" >
+
+        <EditText
+            android:id="@+id/kandy_chat_message_edit"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_weight="0.85"
+            android:textColor="@android:color/black"
+        	android:textColorHint="@android:color/darker_gray"
+            android:hint="@string/kandy_chat_message_hint_text" />
+
+        <ImageButton
+            android:id="@+id/kandy_chat_send_msg_button"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="0.15"
+            android:background="@null"
+            android:src="@drawable/send_icon" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/kandy_chat_buttons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical" >
+
+        <Button
+            android:id="@+id/kandy_chat_get_incoming_msgs_button"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/kandy_chat_pull_label" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:gravity="center_horizontal"
+            android:textColor="@android:color/black"
+            android:text="@string/kandy_chat_pull_desc"
+            android:textSize="9sp" />
+
+        <Button
+            android:id="@+id/kandy_chat_send_sms_button"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/kandy_chat_send_sms_label" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:gravity="center_horizontal"
+            android:textColor="@android:color/black"
+            android:text="@string/kandy_chat_sms_label"
+            android:textSize="9sp" />
+
+        <LinearLayout
+            android:id="@+id/ui_file_buttons"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <Button
+                android:id="@+id/kandy_chat_img_button"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/chat_action_image_selector" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+            <Button
+                android:id="@+id/kandy_chat_audio_button"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/chat_action_audio_selector" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+            <Button
+                android:id="@+id/kandy_chat_video_button"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/chat_action_video_selector" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+            <Button
+                android:id="@+id/kandy_chat_contact_button"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/chat_action_contact_selector" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+            <Button
+                android:id="@+id/kandy_chat_file_button"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/chat_action_file_selector" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+            <Button
+                android:id="@+id/kandy_chat_location_button"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/chat_action_location_selector" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/kandy_chat_download_img_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="download img"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/kandy_chat_download_thumb_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="download thumbnail"
+            android:visibility="gone" />
+    </LinearLayout>
+
+</RelativeLayout>

@@ -96,7 +96,7 @@ public class ChatFragment extends Fragment implements OnItemClickListener, OnAct
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		View layoutWraper = inflater.inflate(KandyUtils.getLayout("kandy_chat_widget"), container, false);
+		View layoutWraper = inflater.inflate(KandyUtils.getLayout("kandy_chat_fragment"), container, false);
 
 		mInputMethodManager = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
 
@@ -108,7 +108,7 @@ public class ChatFragment extends Fragment implements OnItemClickListener, OnAct
 		mAdapter = new MessagesAdapter(activity, KandyUtils.getLayout("message_listview_item"),
 				new ArrayList<Message>());
 		uiMessagesListView.setAdapter(mAdapter);
-
+		
 		ImageButton uiSendButton = (ImageButton) layoutWraper.findViewById(KandyUtils
 				.getId("kandy_chat_send_msg_button"));
 		uiSendButton.setOnClickListener(new OnClickListener() {

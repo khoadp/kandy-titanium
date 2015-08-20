@@ -164,7 +164,7 @@ public class DetailGroupFragment extends Fragment implements KandyGroupServiceNo
 						FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 						fragmentTransaction.hide(DetailGroupFragment.this);
 						fragmentTransaction.add(KandyUtils.getId("kandy_group_fragment_container"),
-								new DetailGroupFragment(groupViewProxy, getKandyGroupInstance().getGroupId().getUri()))
+								new ChatFragment(groupViewProxy, getKandyGroupInstance().getGroupId().getUri(), true))
 								.addToBackStack(null);
 						fragmentTransaction.commit();
 					}

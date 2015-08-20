@@ -104,8 +104,8 @@
             android:id="@+id/kandy_calls_call_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/chat_action_btn_selector"
             android:padding="5dp"
+            android:background="@drawable/chat_action_btn_selector"
             android:src="@drawable/ic_action_call" />
 
         <LinearLayout
@@ -157,8 +157,8 @@
             android:id="@+id/kandy_calls_hangup_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/chat_action_btn_selector"
             android:padding="5dp"
+            android:background="@drawable/chat_action_btn_selector"
             android:src="@drawable/ic_action_end_call" />
     </LinearLayout>
 

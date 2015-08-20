@@ -22,15 +22,14 @@ public class ChatViewProxy extends TiUIView {
 		View layoutWraper;
 
 		LayoutInflater layoutInflater = LayoutInflater.from(proxy.getActivity());
-		layoutWraper = layoutInflater.inflate(KandyUtils.getLayout("kandy_group_widget"), null);
+		layoutWraper = layoutInflater.inflate(KandyUtils.getLayout("kandy_chat_widget"), null);
 
 		fragmentManager = activity.getFragmentManager();
 		FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-		fragmentTransaction.add(KandyUtils.getId("kandy_group_fragment_container"), new ChatFragment(this, "", false))
+		fragmentTransaction.add(KandyUtils.getId("kandy_chat_fragment_container"), new ChatFragment(this, "", false))
 				.addToBackStack(null);
 		fragmentTransaction.commit();
 
 		setNativeView(layoutWraper);
 	}
-
 }

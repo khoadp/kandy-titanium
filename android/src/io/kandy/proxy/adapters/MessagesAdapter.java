@@ -276,7 +276,7 @@ public class MessagesAdapter extends ArrayAdapter<Message> {
 			}
 		}
 	}
-
+	
 	static class ViewHolder {
 		TextView uiNumberText;
 		TextView uiMessageText;
