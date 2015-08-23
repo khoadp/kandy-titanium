@@ -7,6 +7,8 @@ import android.util.Log;
 import com.genband.kandy.api.Kandy;
 import com.genband.kandy.api.services.calls.*;
 import com.genband.kandy.api.services.common.KandyCameraInfo;
+import com.genband.kandy.api.services.common.KandyMissedCallMessage;
+import com.genband.kandy.api.services.common.KandyWaitingVoiceMailMessage;
 import com.genband.kandy.api.utils.KandyIllegalArgumentException;
 import io.kandy.KandyModule;
 import io.kandy.proxy.views.CallViewProxy;
@@ -25,7 +27,7 @@ import org.appcelerator.titanium.view.TiUIView;
  * 
  */
 @Kroll.proxy(creatableInModule = KandyModule.class)
-public class CallServiceProxy extends TiViewProxy {
+public class CallServiceProxy extends TiViewProxy implements KandyCallServiceNotificationListener {
 
 	public static final String LCAT = CallServiceProxy.class.getSimpleName();
 
@@ -35,6 +37,7 @@ public class CallServiceProxy extends TiViewProxy {
 	private boolean videoEnabled = true;
 
 	private CallViewProxy viewProxy;
+	private KrollDict callbacks = new KrollDict();
 
 	private KrollDict calls = new KrollDict();
 	private KrollDict localVideoViews = new KrollDict();
@@ -66,7 +69,6 @@ public class CallServiceProxy extends TiViewProxy {
 	 */
 	@Override
 	public void handleCreationDict(KrollDict options) {
-		Log.d(LCAT, "handleCreationDict() invoked.");
 		if (options.containsKey(CALL_START_WITH_VIDEO))
 			videoEnabled = options.getBoolean(CALL_START_WITH_VIDEO);
 		if (options.containsKey("callbacks"))
@@ -80,28 +82,19 @@ public class CallServiceProxy extends TiViewProxy {
 	@Override
 	public TiUIView createView(Activity activity) {
 		viewProxy = new CallViewProxy(this);
-		Log.d(LCAT, "createView() invoked.");
 		return viewProxy;
 	}
 
-	/**
-	 * Set call callbacks
-	 * 
-	 * @param args
-	 */
 	@Kroll.setProperty
 	@Kroll.method
-	public void setCallbacks(KrollDict args) {
-		if (viewProxy != null)
-			viewProxy.setCallbacks(args);
+	public void setCallbacks(KrollDict callbacks) {
+		this.callbacks = callbacks;
 	}
 
 	@Kroll.getProperty
 	@Kroll.method
 	public KrollDict getCallbacks() {
-		if (viewProxy != null)
-			return viewProxy.getCallbacks();
-		return new KrollDict();
+		return callbacks;
 	}
 
 	@Kroll.method
@@ -486,5 +479,70 @@ public class CallServiceProxy extends TiViewProxy {
 			KandyUtils.sendSuccessResult(getKrollObject(), success, KandyUtils.getKrollDictFromKandyCall(call));
 		}
 
+	}
+
+	@Override
+	public void onCallStateChanged(KandyCallState state, IKandyCall call) {
+		KandyUtils.sendSuccessResult(getKrollObject(), (KrollFunction) callbacks.get("onCallStateChanged"),
+				KandyUtils.getKrollDictFromKandyCall(call));
+	}
+
+	@Override
+	public void onGSMCallConnected(IKandyCall call) {
+		KandyUtils.sendSuccessResult(getKrollObject(), (KrollFunction) callbacks.get("onGSMCallConnected"),
+				KandyUtils.getKrollDictFromKandyCall(call));
+	}
+
+	@Override
+	public void onGSMCallDisconnected(IKandyCall call) {
+		KandyUtils.sendSuccessResult(getKrollObject(), (KrollFunction) callbacks.get("onGSMCallDisconnected"),
+				KandyUtils.getKrollDictFromKandyCall(call));
+	}
+
+	@Override
+	public void onGSMCallIncoming(IKandyCall call) {
+		KandyUtils.sendSuccessResult(getKrollObject(), (KrollFunction) callbacks.get("onGSMCallIncoming"),
+				KandyUtils.getKrollDictFromKandyCall(call));
+	}
+
+	@Override
+	public void onIncomingCall(IKandyIncomingCall call) {
+		KandyUtils.sendSuccessResult(getKrollObject(), (KrollFunction) callbacks.get("onIncomingCall"),
+				KandyUtils.getKrollDictFromKandyCall(call));
+	}
+
+	@Override
+	public void onMissedCall(KandyMissedCallMessage call) {
+		KrollDict result = new KrollDict();
+
+		result.put("uuid", call.getUUID().toString());
+		result.put("timestamp", call.getTimestamp());
+		result.put("via", call.getVia());
+		result.put("source", KandyUtils.getKrollDictFromKandyRecord(call.getSource()));
+		result.put("eventType", call.getEventType().name());
+
+		KandyUtils.sendSuccessResult(getKrollObject(), (KrollFunction) callbacks.get("onMissedCall"), result);
+	}
+
+	@Override
+	public void onVideoStateChanged(IKandyCall call, boolean isReceivingVideo, boolean isSendingVideo) {
+		KrollDict result = KandyUtils.getKrollDictFromKandyCall(call);
+		result.put("isSendingVideo", isSendingVideo);
+		result.put("isReceivingVideo", isReceivingVideo);
+
+		KandyUtils.sendSuccessResult(getKrollObject(), (KrollFunction) callbacks.get("onVideoStateChanged"), result);
+	}
+
+	@Override
+	public void onWaitingVoiceMailCall(KandyWaitingVoiceMailMessage call) {
+		KrollDict result = new KrollDict();
+
+		result.put("uuid", call.getUUID().toString());
+		result.put("totalMessages", call.getTotalMessages());
+		result.put("numOfUnreadMessages", call.getNumOfUnreadMessages());
+		result.put("timestamp", call.getTimestamp());
+		result.put("eventType", call.getEventType().name());
+
+		KandyUtils.sendSuccessResult(getKrollObject(), (KrollFunction) callbacks.get("onWaitingVoiceMailCall"), result);
 	}
 }

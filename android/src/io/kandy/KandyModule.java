@@ -95,12 +95,34 @@ public class KandyModule extends KrollModule {
 	@Kroll.constant
 	public static final String CONNECTION_STATE_FAILED = "FAILED";
 
+	// KandyCallState
+	@Kroll.constant
+	public static final String CALL_STATE_INITIAL = "INITIAL";
+	@Kroll.constant
+	public static final String CALL_STATE_DIALING = "DIALING";
+	@Kroll.constant
+	public static final String CALL_STATE_SESSION_PROGRESS = "SESSION_PROGRESS";
+	@Kroll.constant
+	public static final String CALL_STATE_RINGING = "RINGING";
+	@Kroll.constant
+	public static final String CALL_STATE_ANSWERING = "ANSWERING";
+	@Kroll.constant
+	public static final String CALL_STATE_TALKING = "TALKING";
+	@Kroll.constant
+	public static final String CALL_STATE_TERMINATED = "TERMINATED";
+	@Kroll.constant
+	public static final String CALL_STATE_ON_DOUBLE_HOLD = "ON_DOUBLE_HOLD";
+	@Kroll.constant
+	public static final String CALL_STATE_REMOTELY_HELD = "REMOTELY_HELD";
+	@Kroll.constant
+	public static final String CALL_STATE_ON_HOLD = "ON_HOLD";
+
 	private SharedPreferences prefs;
 
-	public KandyModule(TiContext context){
+	public KandyModule(TiContext context) {
 		prefs = PreferenceManager.getDefaultSharedPreferences(context.getActivity());
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -127,13 +149,13 @@ public class KandyModule extends KrollModule {
 		Log.i(LCAT, "onResume() was invoked.");
 		super.onResume(activity);
 	}
-	
+
 	@Override
 	public void onPause(Activity activity) {
 		Log.i(LCAT, "onPause() was invoked.");
 		super.onPause(activity);
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */

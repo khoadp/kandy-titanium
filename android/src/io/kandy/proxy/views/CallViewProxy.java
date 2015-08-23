@@ -17,7 +17,6 @@ import com.genband.kandy.api.services.common.KandyWaitingVoiceMailMessage;
 import com.genband.kandy.api.utils.KandyIllegalArgumentException;
 import io.kandy.utils.KandyUtils;
 import io.kandy.utils.UIUtils;
-import org.appcelerator.kroll.KrollDict;
 import org.appcelerator.titanium.proxy.TiViewProxy;
 import org.appcelerator.titanium.view.TiUIView;
 
@@ -27,8 +26,6 @@ public class CallViewProxy extends TiUIView implements KandyCallServiceNotificat
 
 	private Activity activity;
 
-	private KrollDict callbacks;
-	
 	private EditText uiPhoneNumberEdit;
 
 	private ImageView uiCallButton;
@@ -182,12 +179,10 @@ public class CallViewProxy extends TiUIView implements KandyCallServiceNotificat
 				.getId("kandy_calls_video_sip_trunk_checkbox"));
 		uiSipTrunkCheckBox.setOnCheckedChangeListener(onSipTrunkCheckBoxChecked);
 
-		uiAudioStateTextView = (TextView) layoutWraper
-				.findViewById(KandyUtils.getId("kandy_calls_state_audio_text"));
+		uiAudioStateTextView = (TextView) layoutWraper.findViewById(KandyUtils.getId("kandy_calls_state_audio_text"));
 		setAudioState(mIsMute);
 
-		uiVideoStateTextView = (TextView) layoutWraper
-				.findViewById(KandyUtils.getId("kandy_calls_state_video_text"));
+		uiVideoStateTextView = (TextView) layoutWraper.findViewById(KandyUtils.getId("kandy_calls_state_video_text"));
 		setVideoState(false, false);
 
 		uiCallsStateTextView = (TextView) layoutWraper.findViewById(KandyUtils.getId("kandy_calls_state_call_text"));
@@ -202,14 +197,6 @@ public class CallViewProxy extends TiUIView implements KandyCallServiceNotificat
 		setNativeView(layoutWraper);
 	}
 
-	public void setCallbacks(KrollDict callbacks){
-		this.callbacks = callbacks;
-	}
-	
-	public KrollDict getCallbacks(){
-		return callbacks;
-	}
-	
 	protected void switchCamera(IKandyCall currentCall, boolean isChecked) {
 		currentCall.getCameraForVideo();
 		KandyCameraInfo cameraInfo = isChecked ? KandyCameraInfo.FACING_FRONT : KandyCameraInfo.FACING_BACK;
@@ -227,9 +214,9 @@ public class CallViewProxy extends TiUIView implements KandyCallServiceNotificat
 
 	private void setVideoState(boolean isReceiving, boolean isSending) {
 
-		final String state = String.format("%s %s, %s %s",
-				KandyUtils.getString("kandy_calls_receiving_video_state"), String.valueOf(isReceiving),
-				KandyUtils.getString("kandy_calls_sending_video_state"), String.valueOf(isSending));
+		final String state = String.format("%s %s, %s %s", KandyUtils.getString("kandy_calls_receiving_video_state"),
+				String.valueOf(isReceiving), KandyUtils.getString("kandy_calls_sending_video_state"),
+				String.valueOf(isSending));
 		setStateForTextViewOnUIThread(uiVideoStateTextView, state);
 	}
 
@@ -420,12 +407,12 @@ public class CallViewProxy extends TiUIView implements KandyCallServiceNotificat
 		});
 	}
 
-	public void destroyCurrentCall(){
-		if(mCurrentCall != null) {
+	public void destroyCurrentCall() {
+		if (mCurrentCall != null) {
 			doHangup(mCurrentCall);
 		}
 	}
-	
+
 	/**
 	 * Start calling process
 	 */
@@ -708,6 +695,7 @@ public class CallViewProxy extends TiUIView implements KandyCallServiceNotificat
 	@Override
 	public void onVideoStateChanged(IKandyCall call, boolean isReceivingVideo, boolean isSendingVideo) {
 		Log.i(TAG, "onVideoStateChanged: Receiving: " + isReceivingVideo + " Sending: " + isSendingVideo);
+		((KandyCallServiceNotificationListener) proxy).onVideoStateChanged(call, isReceivingVideo, isSendingVideo);
 		setVideoState(isReceivingVideo, isSendingVideo);
 		setAudioState(call.isMute());
 	}
@@ -715,6 +703,7 @@ public class CallViewProxy extends TiUIView implements KandyCallServiceNotificat
 	@Override
 	public void onGSMCallIncoming(IKandyCall call) {
 		// Here you can implement the GSMCallIncoming behavior/actions
+		((KandyCallServiceNotificationListener) proxy).onGSMCallIncoming(call);
 		Log.i(TAG, "onGSMCallIncoming");
 	}
 
@@ -722,6 +711,7 @@ public class CallViewProxy extends TiUIView implements KandyCallServiceNotificat
 	public void onGSMCallConnected(IKandyCall call) {
 		// Here you can implement the GSMCallConnected behavior/actions
 		Log.i(TAG, "onGSMCallConnected");
+		((KandyCallServiceNotificationListener) proxy).onGSMCallConnected(call);
 		doHold(mCurrentCall);
 	}
 
@@ -729,6 +719,7 @@ public class CallViewProxy extends TiUIView implements KandyCallServiceNotificat
 	public void onGSMCallDisconnected(IKandyCall call) {
 		// Here you can implement the GSMCallDisconnection behavior/actions
 		Log.i(TAG, "onGSMCallDisconnected");
+		((KandyCallServiceNotificationListener) proxy).onGSMCallDisconnected(call);
 		doUnHold(mCurrentCall);
 	}
 
@@ -736,24 +727,28 @@ public class CallViewProxy extends TiUIView implements KandyCallServiceNotificat
 	public void onIncomingCall(IKandyIncomingCall call) {
 		// Here while state is KandyCallState.RINGING you can play a ringtone
 		Log.i(TAG, "onIncomingCall: " + call.getCallId());
+		((KandyCallServiceNotificationListener) proxy).onIncomingCall(call);
 		answerCall(call);
 	}
 
 	@Override
 	public void onMissedCall(KandyMissedCallMessage call) {
 		Log.d(TAG, "onMissedCall: call: " + call);
+		((KandyCallServiceNotificationListener) proxy).onMissedCall(call);
 	}
 
 	@Override
 	public void onWaitingVoiceMailCall(KandyWaitingVoiceMailMessage event) {
 		Log.d(TAG, "onWaitingVoiceMailCall: event: " + event);
-
+		((KandyCallServiceNotificationListener) proxy).onWaitingVoiceMailCall(event);
 	}
 
 	@Override
 	public void onCallStateChanged(KandyCallState state, IKandyCall call) {
 		// Here while state is KandyCallState.DIALING you can play a ringback
 		Log.i(TAG, "onCallStatusChanged: " + state.name());
+
+		((KandyCallServiceNotificationListener) proxy).onCallStateChanged(state, call);
 
 		setCallSettingsOnUIThread(state);
 
