@@ -82,6 +82,7 @@ function LoggedInApplicationTabGroup(Kandy) {
 	var activity = self.activity;
 	
 	win2.setActivityForListener(activity);
+	win1.setActivityForListener(activity);
 
 	activity.onCreateOptionsMenu = function(e) {
 		var menu = e.menu;

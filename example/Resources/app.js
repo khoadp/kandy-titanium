@@ -42,7 +42,7 @@ if (Ti.version < 1.8) {
 
 	var Kandy = require('io.kandy');
 
-	Kandy.setKey("DAK81e603cf961e4c0295aa8e665828913d", "DAS89933b8fc32949dc84eeebfabadfddee");
+	Kandy.setKey("your api key here", "your secret key here");
 
 	var NotLoggedInApplicationTabGroup = require('ui/common/NotLoggedInApplicationTabGroup');
 	new NotLoggedInApplicationTabGroup(Kandy).open();

@@ -11,78 +11,53 @@ import com.genband.kandy.api.services.common.KandyMissedCallMessage;
 import com.genband.kandy.api.services.common.KandyWaitingVoiceMailMessage;
 import com.genband.kandy.api.utils.KandyIllegalArgumentException;
 import io.kandy.KandyModule;
-import io.kandy.proxy.views.CallViewProxy;
-import io.kandy.proxy.views.KandyVideoView;
 import io.kandy.utils.KandyUtils;
 import org.appcelerator.kroll.KrollDict;
 import org.appcelerator.kroll.KrollFunction;
+import org.appcelerator.kroll.KrollProxy;
 import org.appcelerator.kroll.annotations.Kroll;
-import org.appcelerator.titanium.proxy.TiViewProxy;
-import org.appcelerator.titanium.view.TiUIView;
 
-/**
- * Call service
- * 
- * @author kodeplusdev
- * 
- */
+import java.util.HashMap;
+
 @Kroll.proxy(creatableInModule = KandyModule.class)
-public class CallServiceProxy extends TiViewProxy implements KandyCallServiceNotificationListener {
+public class CallServiceProxy extends KrollProxy implements KandyCallServiceNotificationListener {
 
-	public static final String LCAT = CallServiceProxy.class.getSimpleName();
+	private static final String LCAT = CallServiceProxy.class.getSimpleName();
 
-	@Kroll.constant
-	public static final String CALL_START_WITH_VIDEO = "startWithVideo";
-
-	private boolean videoEnabled = true;
-
-	private CallViewProxy viewProxy;
+	private static final HashMap<String, IKandyCall> calls = new HashMap<String, IKandyCall>();
 	private KrollDict callbacks = new KrollDict();
-
-	private KrollDict calls = new KrollDict();
-	private KrollDict localVideoViews = new KrollDict();
-	private KrollDict remoteVideoViews = new KrollDict();
 
 	@Override
 	public void onPause(Activity activity) {
-		if (viewProxy != null)
-			viewProxy.unregisterCallListener();
 		super.onPause(activity);
+		unregisterNotificationListener();
 	}
 
 	@Override
 	public void onResume(Activity activity) {
-		if (viewProxy != null)
-			viewProxy.registerCallListener();
 		super.onResume(activity);
+		registerNotificationListener();
 	}
 
-	@Override
-	public void onDestroy(Activity activity) {
-		if (viewProxy != null)
-			viewProxy.destroyCurrentCall();
-		super.onDestroy(activity);
+	@Kroll.method
+	public void registerNotificationListener() {
+		Kandy.getServices().getCallService().registerNotificationListener(this);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	@Kroll.method
+	public void unregisterNotificationListener() {
+		Kandy.getServices().getCallService().unregisterNotificationListener(this);
+	}
+
+	public static IKandyCall getKandyCall(String id) {
+		return calls.get(id);
+	}
+
 	@Override
 	public void handleCreationDict(KrollDict options) {
-		if (options.containsKey(CALL_START_WITH_VIDEO))
-			videoEnabled = options.getBoolean(CALL_START_WITH_VIDEO);
+		super.handleCreationDict(options);
 		if (options.containsKey("callbacks"))
 			setCallbacks(options.getKrollDict("callbacks"));
-		super.handleCreationDict(options);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public TiUIView createView(Activity activity) {
-		viewProxy = new CallViewProxy(this);
-		return viewProxy;
 	}
 
 	@Kroll.setProperty
@@ -102,7 +77,7 @@ public class CallServiceProxy extends TiViewProxy implements KandyCallServiceNot
 		KrollFunction success = (KrollFunction) args.get("success");
 		KrollFunction error = (KrollFunction) args.get("error");
 
-		String username = args.getString("username");
+		String username = args.getString("callee");
 		boolean startWithVieo = args.getBoolean("startWithVideo");
 
 		KandyRecord callee;
@@ -126,7 +101,7 @@ public class CallServiceProxy extends TiViewProxy implements KandyCallServiceNot
 		KrollFunction success = (KrollFunction) args.get("success");
 		KrollFunction error = (KrollFunction) args.get("error");
 
-		String number = args.getString("numberPhone");
+		String number = args.getString("callee");
 
 		number = number.replace("+", "");
 		number = number.replace("-", "");
@@ -140,7 +115,7 @@ public class CallServiceProxy extends TiViewProxy implements KandyCallServiceNot
 		KrollFunction success = (KrollFunction) args.get("success");
 		KrollFunction error = (KrollFunction) args.get("error");
 
-		String number = args.getString("numberPhone");
+		String number = args.getString("callee");
 
 		KandyRecord callee = null;
 
@@ -158,17 +133,17 @@ public class CallServiceProxy extends TiViewProxy implements KandyCallServiceNot
 	}
 
 	private void setKandyVideoViewsAndEstablishCall(IKandyCall call, KrollFunction success, KrollFunction error) {
-		KandyVideoView localVideo = new KandyVideoView(getActivity());
-		KandyVideoView remoteVideo = new KandyVideoView(getActivity());
-
-		localVideo.setLocalVideoView(call);
-		remoteVideo.setRemoteVideoView(call);
+		setDummyKandyVideoView(call);
 
 		calls.put(call.getCallee().getUri(), call);
-		localVideoViews.put(call.getCallee().getUri(), localVideo);
-		remoteVideoViews.put(call.getCallee().getUri(), remoteVideo);
 
 		((IKandyOutgoingCall) call).establish(new KandyCallResponseListenerCallBack(success, error));
+	}
+
+	private void setDummyKandyVideoView(IKandyCall call) {
+		KandyView kView = new KandyView(getActivity(), null);
+		call.setLocalVideoView(kView);
+		call.setRemoteVideoView(kView);
 	}
 
 	private boolean checkActiveCall(String id, KrollFunction error) {
@@ -183,94 +158,6 @@ public class CallServiceProxy extends TiViewProxy implements KandyCallServiceNot
 	private void removeCall(String id) {
 		if (calls.containsKey(id))
 			calls.remove(id);
-		if (localVideoViews.containsKey(id)) {
-			((KandyVideoView) localVideoViews.get(id)).dismiss();
-			localVideoViews.remove(id);
-		}
-		if (remoteVideoViews.containsKey(id)) {
-			((KandyVideoView) remoteVideoViews.get(id)).dismiss();
-			remoteVideoViews.remove(id);
-		}
-	}
-
-	@Kroll.method
-	public void showLocalVideo(KrollDict args) {
-		String id = args.getString("id");
-		int top = args.getInt("top");
-		int left = args.getInt("left");
-		int width = args.getInt("width");
-		int height = args.getInt("height");
-		KrollFunction success = (KrollFunction) args.get("success");
-		KrollFunction error = (KrollFunction) args.get("error");
-
-		if (!checkActiveCall(id, error))
-			return;
-
-		KandyVideoView localVideo = (KandyVideoView) localVideoViews.get(id);
-		localVideo.layout(left, top, width, height);
-		localVideo.show();
-
-		KandyUtils.sendSuccessResult(getKrollObject(), success);
-	}
-
-	@Kroll.method
-	public void showRemoteVideo(KrollDict args) {
-		String id = args.getString("id");
-		int top = args.getInt("top");
-		int left = args.getInt("left");
-		int width = args.getInt("width");
-		int height = args.getInt("height");
-		KrollFunction success = (KrollFunction) args.get("success");
-		KrollFunction error = (KrollFunction) args.get("error");
-
-		if (!checkActiveCall(id, error))
-			return;
-
-		KandyVideoView remoteVideo = (KandyVideoView) remoteVideoViews.get(id);
-		remoteVideo.layout(left, top, width, height);
-		remoteVideo.show();
-
-		KandyUtils.sendSuccessResult(getKrollObject(), success);
-	}
-
-	@Kroll.method
-	public void hideLocalVideo(KrollDict args) {
-		String id = args.getString("id");
-		int top = args.getInt("top");
-		int left = args.getInt("left");
-		int width = args.getInt("width");
-		int height = args.getInt("height");
-		KrollFunction success = (KrollFunction) args.get("success");
-		KrollFunction error = (KrollFunction) args.get("error");
-
-		if (!checkActiveCall(id, error))
-			return;
-
-		KandyVideoView localVideo = (KandyVideoView) localVideoViews.get(id);
-		localVideo.layout(left, top, width, height);
-		localVideo.hide();
-
-		KandyUtils.sendSuccessResult(getKrollObject(), success);
-	}
-
-	@Kroll.method
-	public void hideRemoteVideo(KrollDict args) {
-		String id = args.getString("id");
-		int top = args.getInt("top");
-		int left = args.getInt("left");
-		int width = args.getInt("width");
-		int height = args.getInt("height");
-		KrollFunction success = (KrollFunction) args.get("success");
-		KrollFunction error = (KrollFunction) args.get("error");
-
-		if (!checkActiveCall(id, error))
-			return;
-
-		KandyVideoView remoteVideo = (KandyVideoView) remoteVideoViews.get(id);
-		remoteVideo.layout(left, top, width, height);
-		remoteVideo.hide();
-
-		KandyUtils.sendSuccessResult(getKrollObject(), success);
 	}
 
 	@Kroll.method
@@ -278,21 +165,15 @@ public class CallServiceProxy extends TiViewProxy implements KandyCallServiceNot
 		KrollFunction success = (KrollFunction) args.get("success");
 		KrollFunction error = (KrollFunction) args.get("error");
 		String id = args.getString("id");
+		boolean startWithVideo = args.getBoolean("startWithVideo");
 
 		if (!checkActiveCall(id, error))
 			return;
 
 		IKandyIncomingCall call = (IKandyIncomingCall) calls.get(id);
-		KandyVideoView localVideo = new KandyVideoView(getActivity());
-		KandyVideoView remoteVideo = new KandyVideoView(getActivity());
+		setDummyKandyVideoView((IKandyCall) calls);
 
-		localVideo.setLocalVideoView(call);
-		remoteVideo.setRemoteVideoView(call);
-
-		localVideoViews.put(call.getCallee().getUri(), localVideo);
-		remoteVideoViews.put(call.getCallee().getUri(), remoteVideo);
-
-		call.accept(videoEnabled, new KandyCallResponseListenerCallBack(success, error));
+		call.accept(startWithVideo, new KandyCallResponseListenerCallBack(success, error));
 	}
 
 	@Kroll.method
@@ -387,7 +268,7 @@ public class CallServiceProxy extends TiViewProxy implements KandyCallServiceNot
 	}
 
 	@Kroll.method
-	public void enableVideo(KrollDict args) {
+	public void switchVideoOn(KrollDict args) {
 		KrollFunction success = (KrollFunction) args.get("success");
 		KrollFunction error = (KrollFunction) args.get("error");
 		String id = args.getString("id");
@@ -400,7 +281,7 @@ public class CallServiceProxy extends TiViewProxy implements KandyCallServiceNot
 	}
 
 	@Kroll.method
-	public void disableVideo(KrollDict args) {
+	public void switchVideoOff(KrollDict args) {
 		KrollFunction success = (KrollFunction) args.get("success");
 		KrollFunction error = (KrollFunction) args.get("error");
 		String id = args.getString("id");
@@ -410,6 +291,18 @@ public class CallServiceProxy extends TiViewProxy implements KandyCallServiceNot
 
 		IKandyCall call = (IKandyCall) calls.get(id);
 		call.stopVideoSharing(new KandyCallResponseListenerCallBack(success, error));
+	}
+
+	@Kroll.method
+	public void switchCameraFront(KrollDict args) {
+		args.put("camera", KandyCameraInfo.FACING_FRONT);
+		switchCamera(args);
+	}
+
+	@Kroll.method
+	public void switchCameraBack(KrollDict args) {
+		args.put("camera", KandyCameraInfo.FACING_BACK);
+		switchCamera(args);
 	}
 
 	@Kroll.method
@@ -428,6 +321,7 @@ public class CallServiceProxy extends TiViewProxy implements KandyCallServiceNot
 
 		if (!checkActiveCall(id, error))
 			return;
+
 		IKandyCall call = (IKandyCall) calls.get(id);
 		call.switchCamera(cameraInfo);
 
