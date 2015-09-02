@@ -144,18 +144,6 @@ public class KandyModule extends KrollModule {
 		prepareLocalStorage();
 	}
 
-	@Override
-	public void onResume(Activity activity) {
-		Log.i(LCAT, "onResume() was invoked.");
-		super.onResume(activity);
-	}
-
-	@Override
-	public void onPause(Activity activity) {
-		Log.i(LCAT, "onPause() was invoked.");
-		super.onPause(activity);
-	}
-
 	/**
 	 * {@inheritDoc}
 	 */

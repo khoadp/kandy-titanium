@@ -29,6 +29,7 @@
                     android:id="@+id/kandy_calls_video_checkbox"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:visibility="gone"
                     android:textColor="@android:color/black"
                     android:text="@string/kandy_calls_checkbox_label"
                     android:textSize="10sp"/>
@@ -37,6 +38,7 @@
                     android:id="@+id/kandy_calls_video_pstn_checkbox"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:visibility="gone"
                     android:textColor="@android:color/black"
                     android:text="@string/kandy_calls_pstn_checkbox_label"
                     android:textSize="10sp"/>
@@ -44,35 +46,19 @@
             <CheckBox
                     android:id="@+id/kandy_calls_video_sip_trunk_checkbox"
                     android:layout_width="wrap_content"
-                    android:textColor="@android:color/black"
+                    android:visibility="gone"
                     android:layout_height="wrap_content"
+                    android:textColor="@android:color/black"
                     android:text="@string/kandy_calls_sip_trunk_checkbox_label"
                     android:textSize="10sp"/>
         </LinearLayout>
 
-        <ImageView
-                android:id="@+id/kandy_calls_call_button"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/chat_action_btn_selector"
-                android:padding="5dp"
-                android:src="@drawable/ic_action_call"/>
-
     </LinearLayout>
 
-    <LinearLayout
-            android:id="@+id/kandy_calls_widget"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            android:orientation="vertical">
-
-        <Button
-                android:id="@+id/kandy_calls_call_widget_button"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/chat_action_btn_selector"
-                android:text="Call"/>
-    </LinearLayout>
+	<Button
+        android:id="@+id/kandy_calls_call_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Call"/>
 
 </LinearLayout>

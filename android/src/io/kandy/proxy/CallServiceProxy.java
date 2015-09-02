@@ -53,6 +53,16 @@ public class CallServiceProxy extends KrollProxy implements KandyCallServiceNoti
 		return calls.get(id);
 	}
 
+	public static void addKandyCall(IKandyCall callee) {
+		calls.put(callee.getCallee().getUri(), callee);
+	}
+
+	public static void removeKandyCall(String id) {
+		if (calls.containsKey(id)) {
+			calls.remove(id);
+		}
+	}
+
 	@Override
 	public void handleCreationDict(KrollDict options) {
 		super.handleCreationDict(options);
@@ -155,11 +165,6 @@ public class CallServiceProxy extends KrollProxy implements KandyCallServiceNoti
 		return true;
 	}
 
-	private void removeCall(String id) {
-		if (calls.containsKey(id))
-			calls.remove(id);
-	}
-
 	@Kroll.method
 	public void accept(KrollDict args) {
 		KrollFunction success = (KrollFunction) args.get("success");
@@ -212,7 +217,7 @@ public class CallServiceProxy extends KrollProxy implements KandyCallServiceNoti
 
 		IKandyCall call = (IKandyCall) calls.get(id);
 		call.hangup(new KandyCallResponseListenerCallBack(success, error));
-		removeCall(id);
+		removeKandyCall(id);
 	}
 
 	@Kroll.method
@@ -363,6 +368,7 @@ public class CallServiceProxy extends KrollProxy implements KandyCallServiceNoti
 		public void onRequestFailed(IKandyCall call, int code, String err) {
 			Log.d(LCAT, "KandyCallResponseListenerCallBack->onRequestFailed() was invoked: "
 					+ call.getCallee().getUri() + " - " + String.valueOf(code) + " - " + err);
+			removeKandyCall(call.getCallee().getUri());
 			KandyUtils.sendFailResult(getKrollObject(), error, code, err);
 		}
 
@@ -377,32 +383,28 @@ public class CallServiceProxy extends KrollProxy implements KandyCallServiceNoti
 
 	@Override
 	public void onCallStateChanged(KandyCallState state, IKandyCall call) {
-		KandyUtils.sendSuccessResult(getKrollObject(), (KrollFunction) callbacks.get("onCallStateChanged"),
-				KandyUtils.getKrollDictFromKandyCall(call));
+		Log.i("KandyCallServiceProxyNotificationListener", "onCallStateChanged was invoked.");
+		fireEvent("onCallStateChanged", KandyUtils.getKrollDictFromKandyCall(call));
 	}
 
 	@Override
 	public void onGSMCallConnected(IKandyCall call) {
-		KandyUtils.sendSuccessResult(getKrollObject(), (KrollFunction) callbacks.get("onGSMCallConnected"),
-				KandyUtils.getKrollDictFromKandyCall(call));
+		fireEvent("onGSMCallConnected", KandyUtils.getKrollDictFromKandyCall(call));
 	}
 
 	@Override
 	public void onGSMCallDisconnected(IKandyCall call) {
-		KandyUtils.sendSuccessResult(getKrollObject(), (KrollFunction) callbacks.get("onGSMCallDisconnected"),
-				KandyUtils.getKrollDictFromKandyCall(call));
+		fireEvent("onGSMCallDisconnected", KandyUtils.getKrollDictFromKandyCall(call));
 	}
 
 	@Override
 	public void onGSMCallIncoming(IKandyCall call) {
-		KandyUtils.sendSuccessResult(getKrollObject(), (KrollFunction) callbacks.get("onGSMCallIncoming"),
-				KandyUtils.getKrollDictFromKandyCall(call));
+		fireEvent("onGSMCallIncoming", KandyUtils.getKrollDictFromKandyCall(call));
 	}
 
 	@Override
 	public void onIncomingCall(IKandyIncomingCall call) {
-		KandyUtils.sendSuccessResult(getKrollObject(), (KrollFunction) callbacks.get("onIncomingCall"),
-				KandyUtils.getKrollDictFromKandyCall(call));
+		fireEvent("onIncomingCall", KandyUtils.getKrollDictFromKandyCall(call));
 	}
 
 	@Override
@@ -415,7 +417,7 @@ public class CallServiceProxy extends KrollProxy implements KandyCallServiceNoti
 		result.put("source", KandyUtils.getKrollDictFromKandyRecord(call.getSource()));
 		result.put("eventType", call.getEventType().name());
 
-		KandyUtils.sendSuccessResult(getKrollObject(), (KrollFunction) callbacks.get("onMissedCall"), result);
+		fireEvent("onMissedCall", result);
 	}
 
 	@Override
@@ -424,7 +426,7 @@ public class CallServiceProxy extends KrollProxy implements KandyCallServiceNoti
 		result.put("isSendingVideo", isSendingVideo);
 		result.put("isReceivingVideo", isReceivingVideo);
 
-		KandyUtils.sendSuccessResult(getKrollObject(), (KrollFunction) callbacks.get("onVideoStateChanged"), result);
+		fireEvent("onVideoStateChanged", result);
 	}
 
 	@Override
@@ -437,6 +439,6 @@ public class CallServiceProxy extends KrollProxy implements KandyCallServiceNoti
 		result.put("timestamp", call.getTimestamp());
 		result.put("eventType", call.getEventType().name());
 
-		KandyUtils.sendSuccessResult(getKrollObject(), (KrollFunction) callbacks.get("onWaitingVoiceMailCall"), result);
+		fireEvent("onWaitingVoiceMailCall", result);
 	}
 }
