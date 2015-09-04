@@ -25,7 +25,6 @@ public class CallServiceProxy extends KrollProxy implements KandyCallServiceNoti
 	private static final String LCAT = CallServiceProxy.class.getSimpleName();
 
 	private static final HashMap<String, IKandyCall> calls = new HashMap<String, IKandyCall>();
-	private KrollDict callbacks = new KrollDict();
 
 	@Override
 	public void onPause(Activity activity) {
@@ -61,25 +60,6 @@ public class CallServiceProxy extends KrollProxy implements KandyCallServiceNoti
 		if (calls.containsKey(id)) {
 			calls.remove(id);
 		}
-	}
-
-	@Override
-	public void handleCreationDict(KrollDict options) {
-		super.handleCreationDict(options);
-		if (options.containsKey("callbacks"))
-			setCallbacks(options.getKrollDict("callbacks"));
-	}
-
-	@Kroll.setProperty
-	@Kroll.method
-	public void setCallbacks(KrollDict callbacks) {
-		this.callbacks = callbacks;
-	}
-
-	@Kroll.getProperty
-	@Kroll.method
-	public KrollDict getCallbacks() {
-		return callbacks;
 	}
 
 	@Kroll.method
@@ -384,61 +364,72 @@ public class CallServiceProxy extends KrollProxy implements KandyCallServiceNoti
 	@Override
 	public void onCallStateChanged(KandyCallState state, IKandyCall call) {
 		Log.i("KandyCallServiceProxyNotificationListener", "onCallStateChanged was invoked.");
-		fireEvent("onCallStateChanged", KandyUtils.getKrollDictFromKandyCall(call));
+		if (hasListeners("onCallStateChanged"))
+			fireEvent("onCallStateChanged", KandyUtils.getKrollDictFromKandyCall(call));
 	}
 
 	@Override
 	public void onGSMCallConnected(IKandyCall call) {
-		fireEvent("onGSMCallConnected", KandyUtils.getKrollDictFromKandyCall(call));
+		if (hasListeners("onGSMCallConnected"))
+			fireEvent("onGSMCallConnected", KandyUtils.getKrollDictFromKandyCall(call));
 	}
 
 	@Override
 	public void onGSMCallDisconnected(IKandyCall call) {
-		fireEvent("onGSMCallDisconnected", KandyUtils.getKrollDictFromKandyCall(call));
+		if (hasListeners("onGSMCallDisconnected"))
+			fireEvent("onGSMCallDisconnected", KandyUtils.getKrollDictFromKandyCall(call));
 	}
 
 	@Override
 	public void onGSMCallIncoming(IKandyCall call) {
-		fireEvent("onGSMCallIncoming", KandyUtils.getKrollDictFromKandyCall(call));
+		if (hasListeners("onGSMCallIncoming"))
+			fireEvent("onGSMCallIncoming", KandyUtils.getKrollDictFromKandyCall(call));
 	}
 
 	@Override
 	public void onIncomingCall(IKandyIncomingCall call) {
-		fireEvent("onIncomingCall", KandyUtils.getKrollDictFromKandyCall(call));
+		if (hasListeners("onIncomingCall"))
+			fireEvent("onIncomingCall", KandyUtils.getKrollDictFromKandyCall(call));
 	}
 
 	@Override
 	public void onMissedCall(KandyMissedCallMessage call) {
-		KrollDict result = new KrollDict();
+		if (hasListeners("onMissedCall")) {
+			KrollDict result = new KrollDict();
 
-		result.put("uuid", call.getUUID().toString());
-		result.put("timestamp", call.getTimestamp());
-		result.put("via", call.getVia());
-		result.put("source", KandyUtils.getKrollDictFromKandyRecord(call.getSource()));
-		result.put("eventType", call.getEventType().name());
+			result.put("uuid", call.getUUID().toString());
+			result.put("timestamp", call.getTimestamp());
+			result.put("via", call.getVia());
+			result.put("source", KandyUtils.getKrollDictFromKandyRecord(call.getSource()));
+			result.put("eventType", call.getEventType().name());
 
-		fireEvent("onMissedCall", result);
+			fireEvent("onMissedCall", result);
+		}
 	}
 
 	@Override
 	public void onVideoStateChanged(IKandyCall call, boolean isReceivingVideo, boolean isSendingVideo) {
-		KrollDict result = KandyUtils.getKrollDictFromKandyCall(call);
-		result.put("isSendingVideo", isSendingVideo);
-		result.put("isReceivingVideo", isReceivingVideo);
+		if (hasListeners("onVideoStateChanged")) {
+			KrollDict result = KandyUtils.getKrollDictFromKandyCall(call);
+			result.put("isSendingVideo", isSendingVideo);
+			result.put("isReceivingVideo", isReceivingVideo);
 
-		fireEvent("onVideoStateChanged", result);
+			fireEvent("onVideoStateChanged", result);
+		}
 	}
 
 	@Override
 	public void onWaitingVoiceMailCall(KandyWaitingVoiceMailMessage call) {
-		KrollDict result = new KrollDict();
+		if (hasListeners("onWaitingVoiceMailCall")) {
+			KrollDict result = new KrollDict();
 
-		result.put("uuid", call.getUUID().toString());
-		result.put("totalMessages", call.getTotalMessages());
-		result.put("numOfUnreadMessages", call.getNumOfUnreadMessages());
-		result.put("timestamp", call.getTimestamp());
-		result.put("eventType", call.getEventType().name());
+			result.put("uuid", call.getUUID().toString());
+			result.put("totalMessages", call.getTotalMessages());
+			result.put("numOfUnreadMessages", call.getNumOfUnreadMessages());
+			result.put("timestamp", call.getTimestamp());
+			result.put("eventType", call.getEventType().name());
 
-		fireEvent("onWaitingVoiceMailCall", result);
+			fireEvent("onWaitingVoiceMailCall", result);
+		}
 	}
 }

@@ -43,7 +43,6 @@ public class ChatServiceProxy extends TiViewProxy implements KandyChatServiceNot
 	private static final String LCAT = ChatServiceProxy.class.getSimpleName();
 
 	private ChatViewProxy viewProxy;
-	private KrollDict callbacks = new KrollDict();
 
 	@Override
 	public TiUIView createView(Activity activity) {
@@ -80,25 +79,6 @@ public class ChatServiceProxy extends TiViewProxy implements KandyChatServiceNot
 	public void unregisterNotificationListener() {
 		if (viewProxy == null)
 			Kandy.getServices().getChatService().unregisterNotificationListener(this);
-	}
-
-	@Override
-	public void handleCreationDict(KrollDict options) {
-		super.handleCreationDict(options);
-		if (options.containsKey("callbacks"))
-			setCallbacks(options.getKrollDict("callbacks"));
-	}
-
-	@Kroll.method
-	@Kroll.setProperty
-	public void setCallbacks(KrollDict callbacks) {
-		this.callbacks = callbacks;
-	}
-
-	@Kroll.method
-	@Kroll.getProperty
-	public KrollDict getCallbacks() {
-		return callbacks;
 	}
 
 	@Kroll.method
@@ -535,58 +515,58 @@ public class ChatServiceProxy extends TiViewProxy implements KandyChatServiceNot
 	@Override
 	public void onChatDelivered(KandyDeliveryAck ack) {
 		Log.d(LCAT, "KandyChatServiceNotificationListener->onChatDelivered() was invoked: " + ack.getUUID());
-		KandyUtils.sendSuccessResult(getKrollObject(), (KrollFunction) callbacks.get("onChatDelivered"),
-				KandyUtils.getKrollDictFromKandyDeliveryAck(ack));
+		if (hasListeners("onChatDelivered"))
+			fireEvent("onChatDelivered", KandyUtils.getKrollDictFromKandyDeliveryAck(ack));
 	}
 
 	@Override
 	public void onChatMediaAutoDownloadFailed(IKandyMessage message, int code, String error) {
 		Log.d(LCAT, "KandyChatServiceNotificationListener->onChatMediaAutoDownloadFailed() was invoked.");
 
-		KrollDict result = new KrollDict();
-		result.put("error", error);
-		result.put("code", code);
-		result.put("message", KandyUtils.getKrollDictFromKandyMessage(message));
-
-		KandyUtils.sendSuccessResult(getKrollObject(), (KrollFunction) callbacks.get("onChatMediaAutoDownloadFailed"),
-				result);
+		if (hasListeners("onChatMediaAutoDownloadFailed")) {
+			KrollDict result = new KrollDict();
+			result.put("error", error);
+			result.put("code", code);
+			result.put("message", KandyUtils.getKrollDictFromKandyMessage(message));
+			fireEvent("onChatMediaAutoDownloadFailed", result);
+		}
 	}
 
 	@Override
 	public void onChatMediaAutoDownloadProgress(IKandyMessage message, IKandyTransferProgress progress) {
 		Log.d(LCAT, "KandyChatServiceNotificationListener->onChatMediaAutoDownloadProgress() was invoked: " + progress);
 
-		KrollDict result = new KrollDict();
-		result.put("process", progress.getProgress());
-		result.put("state", progress.getState());
-		result.put("byteTransfer", progress.getByteTransfer());
-		result.put("byteExpected", progress.getByteExpected());
-		result.put("message", KandyUtils.getKrollDictFromKandyMessage(message));
-
-		KandyUtils.sendSuccessResult(getKrollObject(),
-				(KrollFunction) callbacks.get("onChatMediaAutoDownloadProgress"), result);
+		if (hasListeners("onChatMediaAutoDownloadProgress")) {
+			KrollDict result = new KrollDict();
+			result.put("process", progress.getProgress());
+			result.put("state", progress.getState());
+			result.put("byteTransfer", progress.getByteTransfer());
+			result.put("byteExpected", progress.getByteExpected());
+			result.put("message", KandyUtils.getKrollDictFromKandyMessage(message));
+			fireEvent("onChatMediaAutoDownloadProgress", result);
+		}
 	}
 
 	@Override
 	public void onChatMediaAutoDownloadSucceded(IKandyMessage message, Uri uri) {
 		Log.d(LCAT, "KandyChatServiceNotificationListener->onChatMediaAutoDownloadSucceded() was invoked: " + uri);
 
-		KrollDict result = new KrollDict();
-		result.put("uri", uri);
-		result.put("message", KandyUtils.getKrollDictFromKandyMessage(message));
-
-		KandyUtils.sendSuccessResult(getKrollObject(),
-				(KrollFunction) callbacks.get("onChatMediaAutoDownloadSucceded"), result);
+		if (hasListeners("onChatMediaAutoDownloadSucceded")) {
+			KrollDict result = new KrollDict();
+			result.put("uri", uri);
+			result.put("message", KandyUtils.getKrollDictFromKandyMessage(message));
+			fireEvent("onChatMediaAutoDownloadSucceded", result);
+		}
 	}
 
 	@Override
 	public void onChatReceived(IKandyMessage message, KandyRecordType type) {
 		Log.d(LCAT, "KandyChatServiceNotificationListener->onChatReceived() was invoked: " + type.name());
-
-		KrollDict result = new KrollDict();
-		result.put("type", type.name());
-		result.put("message", KandyUtils.getKrollDictFromKandyMessage(message));
-
-		KandyUtils.sendSuccessResult(getKrollObject(), (KrollFunction) callbacks.get("onChatReceived"), result);
+		if (hasListeners("onChatReceived")) {
+			KrollDict result = new KrollDict();
+			result.put("type", type.name());
+			result.put("message", KandyUtils.getKrollDictFromKandyMessage(message));
+			fireEvent("onChatReceived", result);
+		}
 	}
 }

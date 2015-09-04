@@ -135,17 +135,17 @@ public final class KandyUtils {
 		obj.put("via", call.getVia());
 		obj.put("type", call.getCallType().name());
 		obj.put("state", call.getCallState().name());
-//		obj.put("startTime", call.getStartTime());
-//		obj.put("endTime", call.getEndTime());
-//		obj.put("duration", call.getDurationString());
-//		obj.put("cameraForVideo", call.getCameraForVideo().name());
-//		obj.put("isCallStartedWithVideo", call.isCallStartedWithVideo());
-//		obj.put("isIncomingCall", call.isIncomingCall());
-//		obj.put("isMute", call.isMute());
-//		obj.put("isOnHold", call.isOnHold());
-//		obj.put("isOtherParticipantOnHold", call.isOtherParticipantOnHold());
-//		obj.put("isReceivingVideo", call.isReceivingVideo());
-//		obj.put("isSendingVideo", call.isSendingVideo());
+		obj.put("startTime", call.getStartTime());
+		obj.put("endTime", call.getEndTime());
+		obj.put("duration", call.getDurationString());
+		obj.put("cameraForVideo", call.getCameraForVideo().name());
+		obj.put("isCallStartedWithVideo", call.isCallStartedWithVideo());
+		obj.put("isIncomingCall", call.isIncomingCall());
+		obj.put("isMute", call.isMute());
+		obj.put("isOnHold", call.isOnHold());
+		obj.put("isOtherParticipantOnHold", call.isOtherParticipantOnHold());
+		obj.put("isReceivingVideo", call.isReceivingVideo());
+		obj.put("isSendingVideo", call.isSendingVideo());
 		return obj;
 	}
 

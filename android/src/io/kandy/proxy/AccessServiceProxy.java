@@ -1,7 +1,6 @@
 package io.kandy.proxy;
 
 import android.app.Activity;
-import android.os.Bundle;
 import android.util.Log;
 import com.genband.kandy.api.Kandy;
 import com.genband.kandy.api.access.KandyConnectServiceNotificationListener;
@@ -32,19 +31,7 @@ public class AccessServiceProxy extends TiViewProxy implements KandyConnectServi
 	public static final String ACCESS_TYPE_PASSWORD = "password";
 	public static final String ACCESS_TYPE_TOKEN = "token";
 
-	private KrollDict callbacks = new KrollDict();
-
 	private AccessViewProxy viewProxy;
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void handleCreationDict(KrollDict options) {
-		super.handleCreationDict(options);
-		if (options.containsKey("callbacks"))
-			setCallbacks(options.getKrollDict("callbacks"));
-	}
 
 	/**
 	 * {@inheritDoc}
@@ -53,16 +40,6 @@ public class AccessServiceProxy extends TiViewProxy implements KandyConnectServi
 	public TiUIView createView(Activity activity) {
 		viewProxy = new AccessViewProxy(this);
 		return viewProxy;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void onCreate(Activity activity, Bundle savedInstanceState) {
-		Log.d(LCAT, "onCreate() was invoked.");
-		super.onCreate(activity, savedInstanceState);
-		registerNotificationListener();
 	}
 
 	/**
@@ -87,38 +64,12 @@ public class AccessServiceProxy extends TiViewProxy implements KandyConnectServi
 
 	@Kroll.method
 	public void registerNotificationListener() {
-		if (viewProxy != null) {
-			viewProxy.registerNotificationListener();
-		} else {
-			Kandy.getAccess().registerNotificationListener(this);
-		}
+		Kandy.getAccess().registerNotificationListener(this);
 	}
 
 	@Kroll.method
 	public void unregisterNotificationListener() {
-		if (viewProxy != null) {
-			viewProxy.unregisterNotificationListener();
-		} else {
-			Kandy.getAccess().unregisterNotificationListener(this);
-		}
-	}
-
-	/**
-	 * Set callbacks for access service.
-	 * 
-	 * @param callbacks
-	 *            The access callbacks.
-	 */
-	@Kroll.setProperty
-	@Kroll.method
-	public void setCallbacks(KrollDict callbacks) {
-		this.callbacks = callbacks;
-	}
-
-	@Kroll.getProperty
-	@Kroll.method
-	public KrollDict getCallbacks() {
-		return this.callbacks;
+		Kandy.getAccess().unregisterNotificationListener(this);
 	}
 
 	/**
@@ -226,49 +177,84 @@ public class AccessServiceProxy extends TiViewProxy implements KandyConnectServi
 	@Override
 	public void onConnectionStateChanged(KandyConnectionState state) {
 		Log.d(LCAT, "onConnectionStateChanged() was invoked: " + state.name());
-		KandyUtils.sendSuccessResult(getKrollObject(), (KrollFunction) callbacks.get("onConnectionStateChanged"),
-				state.name());
+		if (hasListeners("onConnectionStateChanged")) {
+			KrollDict props = new KrollDict();
+			props.put("state", state.name());
+			fireEvent("onConnectionStateChanged", props);
+		}
+		if (viewProxy != null)
+			viewProxy.onConnectionStateChanged(state);
 	}
 
 	@Override
 	public void onInvalidUser(String error) {
 		Log.d(LCAT, "onInvalidUser() was invoked: " + error);
-		KandyUtils.sendFailResult(getKrollObject(), (KrollFunction) callbacks.get("onInvalidUser"), error);
+		if (hasListeners("onInvalidUser")) {
+			KrollDict props = new KrollDict();
+			props.put("error", error);
+			fireEvent("onInvalidUser", props);
+		}
+		if (viewProxy != null)
+			viewProxy.onInvalidUser(error);
 	}
 
 	@Override
 	public void onSDKNotSupported(String error) {
 		Log.d(LCAT, "onSDKNotSupported() was invoked: " + error);
-		KandyUtils.sendFailResult(getKrollObject(), (KrollFunction) callbacks.get("onSDKNotSupported"), error);
+		if (hasListeners("onSDKNotSupported")) {
+			KrollDict props = new KrollDict();
+			props.put("error", error);
+			fireEvent("onSDKNotSupported", props);
+		}
+		if (viewProxy != null)
+			viewProxy.onSDKNotSupported(error);
 	}
 
 	@Override
 	public void onSessionExpired(String error) {
 		Log.d(LCAT, "onSessionExpired() was invoked: " + error);
-		KandyUtils.sendFailResult(getKrollObject(), (KrollFunction) callbacks.get("onSessionExpired"), error);
+		if (hasListeners("onSessionExpired")) {
+			KrollDict props = new KrollDict();
+			props.put("error", error);
+			fireEvent("onSessionExpired", props);
+		}
+		if (viewProxy != null)
+			viewProxy.onSessionExpired(error);
 	}
 
 	@Override
 	public void onSocketConnected() {
 		Log.d(LCAT, "onSocketConnected() was invoked.");
-		KandyUtils.sendFailResult(getKrollObject(), (KrollFunction) callbacks.get("onSocketConnected"));
+		fireEvent("onSocketConnected", null);
+		if (viewProxy != null)
+			viewProxy.onSocketConnected();
 	}
 
 	@Override
 	public void onSocketConnecting() {
 		Log.d(LCAT, "onSocketConnecting() was invoked.");
-		KandyUtils.sendFailResult(getKrollObject(), (KrollFunction) callbacks.get("onSocketConnecting"));
+		fireEvent("onSocketConnecting", null);
+		if (viewProxy != null)
+			viewProxy.onSocketConnecting();
 	}
 
 	@Override
 	public void onSocketDisconnected() {
 		Log.d(LCAT, "onSocketDisconnected() was invoked.");
-		KandyUtils.sendFailResult(getKrollObject(), (KrollFunction) callbacks.get("onSocketDisconnected"));
+		fireEvent("onSocketDisconnected", null);
+		if (viewProxy != null)
+			viewProxy.onSocketDisconnected();
 	}
 
 	@Override
 	public void onSocketFailedWithError(String error) {
 		Log.d(LCAT, "onSocketFailedWithError() was invoked: " + error);
-		KandyUtils.sendFailResult(getKrollObject(), (KrollFunction) callbacks.get("onSocketFailedWithError"), error);
+		if (hasListeners("onSocketFailedWithError")) {
+			KrollDict props = new KrollDict();
+			props.put("error", error);
+			fireEvent("onSocketFailedWithError", props);
+		}
+		if (viewProxy != null)
+			viewProxy.onSocketFailedWithError(error);
 	}
 }

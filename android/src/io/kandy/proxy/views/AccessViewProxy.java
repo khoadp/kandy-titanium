@@ -256,41 +256,33 @@ public class AccessViewProxy extends TiUIView implements KandyConnectServiceNoti
 
 	@Override
 	public void onSocketFailedWithError(String error) {
-		((KandyConnectServiceNotificationListener) proxy).onSocketFailedWithError(error);
 	}
 
 	@Override
 	public void onSocketDisconnected() {
-		((KandyConnectServiceNotificationListener) proxy).onSocketDisconnected();
 	}
 
 	@Override
 	public void onSocketConnecting() {
-		((KandyConnectServiceNotificationListener) proxy).onSocketConnecting();
 	}
 
 	@Override
 	public void onSocketConnected() {
-		((KandyConnectServiceNotificationListener) proxy).onSocketConnected();
 	}
 
 	@Override
 	public void onConnectionStateChanged(KandyConnectionState state) {
-		((KandyConnectServiceNotificationListener) proxy).onConnectionStateChanged(state);
 	}
 
 	@Override
 	public void onInvalidUser(String error) {
-		((KandyConnectServiceNotificationListener) proxy).onInvalidUser(error);
 	}
 
 	@Override
 	public void onSessionExpired(String error) {
-		((KandyConnectServiceNotificationListener) proxy).onSessionExpired(error);
 	}
 
 	@Override
 	public void onSDKNotSupported(String error) {
-		((KandyConnectServiceNotificationListener) proxy).onSDKNotSupported(error);
 	}
 }

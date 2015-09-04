@@ -29,6 +29,15 @@ public class ProvisioningServiceProxy extends TiViewProxy {
 
 	public static final String LCAT = ProvisioningServiceProxy.class.getSimpleName();
 
+	@Kroll.constant
+	public static final String PROVISIONING_WIDGET_TYPE = "type";
+	@Kroll.constant
+	public static final String PROVISIONING_REQUEST_WIDGET = "request";
+	@Kroll.constant
+	public static final String PROVISIONING_VALIDATE_WIDGET = "validate";
+	@Kroll.constant
+	public static final String PROVISIONING_DEACTIVATE_WIDGET = "deactivate";
+
 	private String twoLetterISOCountryCode;
 	private ProvisioningViewProxy viewProxy;
 

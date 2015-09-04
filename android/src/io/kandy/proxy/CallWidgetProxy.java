@@ -76,61 +76,70 @@ public class CallWidgetProxy extends TiViewProxy implements KandyCallServiceNoti
 	@Override
 	public void onCallStateChanged(KandyCallState state, IKandyCall call) {
 		Log.i("KandyCallServiceProxyNotificationListener", "onCallStateChanged was invoked.");
-		fireEvent("onCallStateChanged", KandyUtils.getKrollDictFromKandyCall(call));
+		if (hasListeners("onCallStateChanged"))
+			fireEvent("onCallStateChanged", KandyUtils.getKrollDictFromKandyCall(call));
 		if (viewProxy != null)
 			viewProxy.onCallStateChanged(state, call);
 	}
 
 	@Override
 	public void onGSMCallConnected(IKandyCall call) {
-		fireEvent("onGSMCallConnected", KandyUtils.getKrollDictFromKandyCall(call));
+		if (hasListeners("onGSMCallConnected"))
+			fireEvent("onGSMCallConnected", KandyUtils.getKrollDictFromKandyCall(call));
 		if (viewProxy != null)
 			viewProxy.onGSMCallConnected(call);
 	}
 
 	@Override
 	public void onGSMCallDisconnected(IKandyCall call) {
-		fireEvent("onGSMCallDisconnected", KandyUtils.getKrollDictFromKandyCall(call));
+		if (hasListeners("onGSMCallDisconnected"))
+			fireEvent("onGSMCallDisconnected", KandyUtils.getKrollDictFromKandyCall(call));
 		if (viewProxy != null)
 			viewProxy.onGSMCallDisconnected(call);
 	}
 
 	@Override
 	public void onGSMCallIncoming(IKandyCall call) {
-		fireEvent("onGSMCallIncoming", KandyUtils.getKrollDictFromKandyCall(call));
+		if (hasListeners("onGSMCallIncoming"))
+			fireEvent("onGSMCallIncoming", KandyUtils.getKrollDictFromKandyCall(call));
 		if (viewProxy != null)
 			viewProxy.onGSMCallIncoming(call);
 	}
 
 	@Override
 	public void onIncomingCall(IKandyIncomingCall call) {
-		fireEvent("onIncomingCall", KandyUtils.getKrollDictFromKandyCall(call));
+		if (hasListeners("onIncomingCall"))
+			fireEvent("onIncomingCall", KandyUtils.getKrollDictFromKandyCall(call));
 		if (viewProxy != null)
 			viewProxy.onIncomingCall(call);
 	}
 
 	@Override
 	public void onMissedCall(KandyMissedCallMessage call) {
-		KrollDict result = new KrollDict();
+		if (hasListeners("onMissedCall")) {
+			KrollDict result = new KrollDict();
 
-		result.put("uuid", call.getUUID().toString());
-		result.put("timestamp", call.getTimestamp());
-		result.put("via", call.getVia());
-		result.put("source", KandyUtils.getKrollDictFromKandyRecord(call.getSource()));
-		result.put("eventType", call.getEventType().name());
+			result.put("uuid", call.getUUID().toString());
+			result.put("timestamp", call.getTimestamp());
+			result.put("via", call.getVia());
+			result.put("source", KandyUtils.getKrollDictFromKandyRecord(call.getSource()));
+			result.put("eventType", call.getEventType().name());
 
-		fireEvent("onMissedCall", result);
+			fireEvent("onMissedCall", result);
+		}
 		if (viewProxy != null)
 			viewProxy.onMissedCall(call);
 	}
 
 	@Override
 	public void onVideoStateChanged(IKandyCall call, boolean isReceivingVideo, boolean isSendingVideo) {
-		KrollDict result = KandyUtils.getKrollDictFromKandyCall(call);
-		result.put("isSendingVideo", isSendingVideo);
-		result.put("isReceivingVideo", isReceivingVideo);
+		if (hasListeners("onVideoStateChanged")) {
+			KrollDict result = KandyUtils.getKrollDictFromKandyCall(call);
+			result.put("isSendingVideo", isSendingVideo);
+			result.put("isReceivingVideo", isReceivingVideo);
 
-		fireEvent("onVideoStateChanged", result);
+			fireEvent("onVideoStateChanged", result);
+		}
 
 		if (viewProxy != null)
 			viewProxy.onVideoStateChanged(call, isReceivingVideo, isSendingVideo);
@@ -138,15 +147,17 @@ public class CallWidgetProxy extends TiViewProxy implements KandyCallServiceNoti
 
 	@Override
 	public void onWaitingVoiceMailCall(KandyWaitingVoiceMailMessage call) {
-		KrollDict result = new KrollDict();
+		if (hasListeners("onWaitingVoiceMailCall")) {
+			KrollDict result = new KrollDict();
 
-		result.put("uuid", call.getUUID().toString());
-		result.put("totalMessages", call.getTotalMessages());
-		result.put("numOfUnreadMessages", call.getNumOfUnreadMessages());
-		result.put("timestamp", call.getTimestamp());
-		result.put("eventType", call.getEventType().name());
+			result.put("uuid", call.getUUID().toString());
+			result.put("totalMessages", call.getTotalMessages());
+			result.put("numOfUnreadMessages", call.getNumOfUnreadMessages());
+			result.put("timestamp", call.getTimestamp());
+			result.put("eventType", call.getEventType().name());
 
-		fireEvent("onWaitingVoiceMailCall", result);
+			fireEvent("onWaitingVoiceMailCall", result);
+		}
 
 		if (viewProxy != null)
 			viewProxy.onWaitingVoiceMailCall(call);

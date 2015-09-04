@@ -1,6 +1,7 @@
 package io.kandy.proxy.views;
 
 import android.app.Activity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +13,7 @@ import com.genband.kandy.api.provisioning.IKandyValidationResponse;
 import com.genband.kandy.api.provisioning.KandyValidationResponseListener;
 import com.genband.kandy.api.services.common.KandyResponseListener;
 import io.kandy.KandyConstant;
+import io.kandy.proxy.ProvisioningServiceProxy;
 import io.kandy.utils.KandyUtils;
 import io.kandy.utils.UIUtils;
 import org.appcelerator.kroll.KrollDict;
@@ -30,6 +32,8 @@ public class ProvisioningViewProxy extends TiUIView {
 
 	private Activity activity;
 
+	private View requestView, validateView, deactivateView;
+
 	private TextView signedPhoneNumber;
 	private Button requestBtn, validateBtn, deactivateBtn;
 	private EditText phoneNumber, otpCode;
@@ -44,11 +48,12 @@ public class ProvisioningViewProxy extends TiUIView {
 
 		View layoutWraper;
 
-		// Get view
 		LayoutInflater layoutInflater = LayoutInflater.from(proxy.getActivity());
 		layoutWraper = layoutInflater.inflate(KandyUtils.getLayout("kandy_provisioning_widget"), null);
 
-		// Get widgets
+		requestView = layoutWraper.findViewById(KandyUtils.getId("kandy_request_view_container"));
+		validateView = layoutWraper.findViewById(KandyUtils.getId("kandy_validate_view_container"));
+		deactivateView = layoutWraper.findViewById(KandyUtils.getId("kandy_deactivate_view_container"));
 
 		phoneNumber = (EditText) layoutWraper.findViewById(KandyUtils.getId("kandy_phone_number_edit"));
 		otpCode = (EditText) layoutWraper.findViewById(KandyUtils.getId("kandy_otp_code_edit"));
@@ -57,8 +62,6 @@ public class ProvisioningViewProxy extends TiUIView {
 		requestBtn = (Button) layoutWraper.findViewById(KandyUtils.getId("kandy_request_button"));
 		validateBtn = (Button) layoutWraper.findViewById(KandyUtils.getId("kandy_validate_button"));
 		deactivateBtn = (Button) layoutWraper.findViewById(KandyUtils.getId("kandy_deactivate_button"));
-
-		// Set click events
 
 		requestBtn.setOnClickListener(new View.OnClickListener() {
 
@@ -89,6 +92,20 @@ public class ProvisioningViewProxy extends TiUIView {
 		super.processProperties(options);
 		if (options.containsKey("twoLetterISOCountryCode"))
 			setTwoLetterISOCountryCode(options.getString("twoLetterISOCountryCode"));
+		if (options.containsKey(ProvisioningServiceProxy.PROVISIONING_WIDGET_TYPE)) {
+			String type = options.getString(ProvisioningServiceProxy.PROVISIONING_WIDGET_TYPE).toLowerCase();
+			if (TextUtils.equals(type, ProvisioningServiceProxy.PROVISIONING_REQUEST_WIDGET)) {
+				validateView.setVisibility(View.GONE);
+				deactivateView.setVisibility(View.GONE);
+			} else if (TextUtils.equals(type, ProvisioningServiceProxy.PROVISIONING_VALIDATE_WIDGET)) {
+				requestView.setVisibility(View.GONE);
+				deactivateView.setVisibility(View.GONE);
+			} else if (TextUtils.equals(type, ProvisioningServiceProxy.PROVISIONING_DEACTIVATE_WIDGET)) {
+				signedPhoneNumber.setVisibility(View.GONE);
+				requestView.setVisibility(View.GONE);
+				validateView.setVisibility(View.GONE);
+			}
+		}
 	}
 
 	public void setTwoLetterISOCountryCode(String code) {

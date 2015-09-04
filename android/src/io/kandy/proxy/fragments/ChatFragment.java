@@ -1,8 +1,6 @@
 package io.kandy.proxy.fragments;
 
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Fragment;
+import android.app.*;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
@@ -70,6 +68,13 @@ public class ChatFragment extends Fragment implements OnItemClickListener, OnAct
 	private TiUIView viewProxy;
 	private Activity activity;
 
+	private Fragment backFragment;
+
+	public ChatFragment(TiUIView viewProxy, String id, boolean isGroupChatMode, Fragment back) {
+		this(viewProxy, id, isGroupChatMode);
+		backFragment = back;
+	}
+
 	public ChatFragment(TiUIView viewProxy, String id, boolean isGroupChatMode) {
 		this.viewProxy = viewProxy;
 		this.isGroupChatMode = isGroupChatMode;
@@ -108,7 +113,7 @@ public class ChatFragment extends Fragment implements OnItemClickListener, OnAct
 		mAdapter = new MessagesAdapter(activity, KandyUtils.getLayout("message_listview_item"),
 				new ArrayList<Message>());
 		uiMessagesListView.setAdapter(mAdapter);
-		
+
 		ImageButton uiSendButton = (ImageButton) layoutWraper.findViewById(KandyUtils
 				.getId("kandy_chat_send_msg_button"));
 		uiSendButton.setOnClickListener(new OnClickListener() {
@@ -200,6 +205,22 @@ public class ChatFragment extends Fragment implements OnItemClickListener, OnAct
 				sendSMS();
 			}
 		});
+
+		if (backFragment != null) {
+			Button uiBackButton = (Button) layoutWraper.findViewById(KandyUtils.getId("kandy_chat_back_button"));
+			uiBackButton.setVisibility(View.VISIBLE);
+			uiBackButton.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+					FragmentManager fragmentManager = getFragmentManager();
+					FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+					fragmentTransaction.remove(ChatFragment.this);
+					fragmentTransaction.show(backFragment);
+					fragmentTransaction.commit();
+				}
+			});
+		}
 
 		((TiBaseActivity) activity).addOnActivityResultListener(this);
 
