@@ -27,4 +27,9 @@
 	<string name="addressBook">Address book</string>
 	<string name="getDeviceContacts">Get device contacts</string>
 	<string name="getDomainDirectoryContacts">Get domain contacts</string>
+	
+	<string name="apiKeyLabel">Api key: </string>
+	<string name="secretKeyLabel">Secret key: </string>
+	<string name="hostLabel">Host url: </string>
+	<string name="update">Update</string>
 </resources>

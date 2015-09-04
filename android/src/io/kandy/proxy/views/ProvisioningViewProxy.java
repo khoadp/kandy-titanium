@@ -32,7 +32,7 @@ public class ProvisioningViewProxy extends TiUIView {
 
 	private Activity activity;
 
-	private View requestView, validateView, deactivateView;
+	private View requestView, validateView, deactivateView, deactiveLabel;
 
 	private TextView signedPhoneNumber;
 	private Button requestBtn, validateBtn, deactivateBtn;
@@ -54,6 +54,7 @@ public class ProvisioningViewProxy extends TiUIView {
 		requestView = layoutWraper.findViewById(KandyUtils.getId("kandy_request_view_container"));
 		validateView = layoutWraper.findViewById(KandyUtils.getId("kandy_validate_view_container"));
 		deactivateView = layoutWraper.findViewById(KandyUtils.getId("kandy_deactivate_view_container"));
+		deactiveLabel = layoutWraper.findViewById(KandyUtils.getId("kandy_deactivate_label"));
 
 		phoneNumber = (EditText) layoutWraper.findViewById(KandyUtils.getId("kandy_phone_number_edit"));
 		otpCode = (EditText) layoutWraper.findViewById(KandyUtils.getId("kandy_otp_code_edit"));
@@ -101,7 +102,7 @@ public class ProvisioningViewProxy extends TiUIView {
 				requestView.setVisibility(View.GONE);
 				deactivateView.setVisibility(View.GONE);
 			} else if (TextUtils.equals(type, ProvisioningServiceProxy.PROVISIONING_DEACTIVATE_WIDGET)) {
-				signedPhoneNumber.setVisibility(View.GONE);
+				deactiveLabel.setVisibility(View.GONE);
 				requestView.setVisibility(View.GONE);
 				validateView.setVisibility(View.GONE);
 			}

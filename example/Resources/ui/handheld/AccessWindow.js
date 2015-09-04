@@ -5,21 +5,21 @@ function AccessWindow(Kandy) {
 	});
 
 	var container = Titanium.UI.createScrollView({
-    	contentHeight:'auto',
-    	scrollType: 'vertical'
+		contentHeight : 'auto',
+		scrollType : 'vertical'
 	});
 	self.add(container);
 
 	var access = Kandy.createAccessService({
 		width : 350,
 		height : 500,
-		callbacks : {
-			onConnectionStateChanged : function(state) {
-				if (state == Kandy.CONNECTION_STATE_CONNECTED) {
-					var LoggedInApplicationTabGroup = require('ui/common/LoggedInApplicationTabGroup');
-					new LoggedInApplicationTabGroup(Kandy).open();	
-				}
-			}
+	});
+
+	access.addEventListener("onConnectionStateChanged", function(e) {
+		Ti.API.info(e.state);
+		if (e.state == Kandy.CONNECTION_STATE_CONNECTED) {
+			var LoggedInApplicationTabGroup = require('ui/common/LoggedInApplicationTabGroup');
+			new LoggedInApplicationTabGroup(Kandy).open();
 		}
 	});
 

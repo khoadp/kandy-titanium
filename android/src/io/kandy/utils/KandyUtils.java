@@ -21,7 +21,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -67,7 +66,7 @@ public final class KandyUtils {
 		return getResource(name, "drawable");
 	}
 
-	public static void checkAndSendResult(KrollObject krollObject, KrollFunction krollFunction, HashMap result) {
+	public static void checkAndSendResult(KrollObject krollObject, KrollFunction krollFunction, KrollDict result) {
 		if (krollObject != null && krollFunction != null) {
 			krollFunction.call(krollObject, result);
 		}
@@ -293,7 +292,7 @@ public final class KandyUtils {
 		obj.put("uuid", ack.getUUID().toString());
 		obj.put("eventType", ack.getEventType().name());
 		obj.put("timestamp", ack.getTimestamp());
-		
+
 		return obj;
 	}
 }

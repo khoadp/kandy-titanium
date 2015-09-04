@@ -3,11 +3,13 @@ function NotLoggedInApplicationTabGroup(Kandy) {
 	var self = Ti.UI.createTabGroup();
 
 	var AccessWindow = require('ui/handheld/AccessWindow'),
-	    ProvisioningWindow = require('ui/handheld/ProvisioningWindow');
+	    ProvisioningWindow = require('ui/handheld/ProvisioningWindow'),
+	    SettingsWindow = require('ui/handheld/SettingsWindow');
 
 	//create app tabs
 	var win1 = new AccessWindow(Kandy),
-	    win2 = new ProvisioningWindow(Kandy);
+	    win2 = new ProvisioningWindow(Kandy),
+	    win3 = new SettingsWindow(Kandy);
 
 	var tab1 = Ti.UI.createTab({
 		title : L('access'),
@@ -35,7 +37,7 @@ function NotLoggedInApplicationTabGroup(Kandy) {
 			title : L('settings')
 		});
 		menuItem.addEventListener('click', function(e) {
-			//webView.goBack();
+			win3.open();
 		});
 	};
 

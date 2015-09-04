@@ -199,10 +199,15 @@ public class KandyModule extends KrollModule {
 	@Kroll.method
 	public void setKandyChatSettings(KrollDict options) {
 		SharedPreferences.Editor edit = prefs.edit();
-		edit.putString(KandyConstant.PREF_KEY_POLICY, options.getString(KandyConstant.PREF_KEY_POLICY)).apply();
-		edit.putString(KandyConstant.PREF_KEY_MAX_SIZE, options.getString(KandyConstant.PREF_KEY_MAX_SIZE)).apply();
-		edit.putString(KandyConstant.PREF_KEY_PATH, options.getString(KandyConstant.PREF_KEY_PATH)).apply();
-		edit.putString(KandyConstant.PREF_KEY_THUMB_SIZE, options.getString(KandyConstant.PREF_KEY_THUMB_SIZE)).apply();
+		if (options.containsKey(KandyConstant.PREF_KEY_POLICY))
+			edit.putString(KandyConstant.PREF_KEY_POLICY, options.getString(KandyConstant.PREF_KEY_POLICY)).apply();
+		if (options.containsKey(KandyConstant.PREF_KEY_MAX_SIZE))
+			edit.putString(KandyConstant.PREF_KEY_MAX_SIZE, options.getString(KandyConstant.PREF_KEY_MAX_SIZE)).apply();
+		if (options.containsKey(KandyConstant.PREF_KEY_PATH))
+			edit.putString(KandyConstant.PREF_KEY_PATH, options.getString(KandyConstant.PREF_KEY_PATH)).apply();
+		if (options.containsKey(KandyConstant.PREF_KEY_THUMB_SIZE))
+			edit.putString(KandyConstant.PREF_KEY_THUMB_SIZE, options.getString(KandyConstant.PREF_KEY_THUMB_SIZE))
+					.apply();
 	}
 
 	/**
