@@ -149,7 +149,7 @@ public class CallServiceProxy extends KrollProxy implements KandyCallServiceNoti
 	public void accept(KrollDict args) {
 		KrollFunction success = (KrollFunction) args.get("success");
 		KrollFunction error = (KrollFunction) args.get("error");
-		String id = args.getString("id");
+		String id = args.getString("callee");
 		boolean startWithVideo = args.getBoolean("startWithVideo");
 
 		if (!checkActiveCall(id, error))
@@ -165,7 +165,7 @@ public class CallServiceProxy extends KrollProxy implements KandyCallServiceNoti
 	public void ignore(KrollDict args) {
 		KrollFunction success = (KrollFunction) args.get("success");
 		KrollFunction error = (KrollFunction) args.get("error");
-		String id = args.getString("id");
+		String id = args.getString("callee");
 
 		if (!checkActiveCall(id, error))
 			return;
@@ -177,7 +177,7 @@ public class CallServiceProxy extends KrollProxy implements KandyCallServiceNoti
 	public void reject(KrollDict args) {
 		KrollFunction success = (KrollFunction) args.get("success");
 		KrollFunction error = (KrollFunction) args.get("error");
-		String id = args.getString("id");
+		String id = args.getString("callee");
 
 		if (!checkActiveCall(id, error))
 			return;
@@ -190,7 +190,7 @@ public class CallServiceProxy extends KrollProxy implements KandyCallServiceNoti
 	public void hangup(KrollDict args) {
 		KrollFunction success = (KrollFunction) args.get("success");
 		KrollFunction error = (KrollFunction) args.get("error");
-		String id = args.getString("id");
+		String id = args.getString("callee");
 
 		if (!checkActiveCall(id, error))
 			return;
@@ -204,7 +204,7 @@ public class CallServiceProxy extends KrollProxy implements KandyCallServiceNoti
 	public void mute(KrollDict args) {
 		KrollFunction success = (KrollFunction) args.get("success");
 		KrollFunction error = (KrollFunction) args.get("error");
-		String id = args.getString("id");
+		String id = args.getString("callee");
 
 		if (!checkActiveCall(id, error))
 			return;
@@ -217,7 +217,7 @@ public class CallServiceProxy extends KrollProxy implements KandyCallServiceNoti
 	public void unmute(KrollDict args) {
 		KrollFunction success = (KrollFunction) args.get("success");
 		KrollFunction error = (KrollFunction) args.get("error");
-		String id = args.getString("id");
+		String id = args.getString("callee");
 
 		if (!checkActiveCall(id, error))
 			return;
@@ -230,7 +230,7 @@ public class CallServiceProxy extends KrollProxy implements KandyCallServiceNoti
 	public void hold(KrollDict args) {
 		KrollFunction success = (KrollFunction) args.get("success");
 		KrollFunction error = (KrollFunction) args.get("error");
-		String id = args.getString("id");
+		String id = args.getString("callee");
 
 		if (!checkActiveCall(id, error))
 			return;
@@ -243,7 +243,7 @@ public class CallServiceProxy extends KrollProxy implements KandyCallServiceNoti
 	public void unhold(KrollDict args) {
 		KrollFunction success = (KrollFunction) args.get("success");
 		KrollFunction error = (KrollFunction) args.get("error");
-		String id = args.getString("id");
+		String id = args.getString("callee");
 
 		if (!checkActiveCall(id, error))
 			return;
@@ -256,7 +256,7 @@ public class CallServiceProxy extends KrollProxy implements KandyCallServiceNoti
 	public void switchVideoOn(KrollDict args) {
 		KrollFunction success = (KrollFunction) args.get("success");
 		KrollFunction error = (KrollFunction) args.get("error");
-		String id = args.getString("id");
+		String id = args.getString("callee");
 
 		if (!checkActiveCall(id, error))
 			return;
@@ -269,7 +269,7 @@ public class CallServiceProxy extends KrollProxy implements KandyCallServiceNoti
 	public void switchVideoOff(KrollDict args) {
 		KrollFunction success = (KrollFunction) args.get("success");
 		KrollFunction error = (KrollFunction) args.get("error");
-		String id = args.getString("id");
+		String id = args.getString("callee");
 
 		if (!checkActiveCall(id, error))
 			return;
@@ -294,7 +294,7 @@ public class CallServiceProxy extends KrollProxy implements KandyCallServiceNoti
 	public void switchCamera(KrollDict args) {
 		KrollFunction success = (KrollFunction) args.get("success");
 		KrollFunction error = (KrollFunction) args.get("error");
-		String id = args.getString("id");
+		String id = args.getString("callee");
 
 		KandyCameraInfo cameraInfo;
 		try {

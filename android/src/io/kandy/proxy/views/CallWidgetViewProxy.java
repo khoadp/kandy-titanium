@@ -2,6 +2,8 @@ package io.kandy.proxy.views;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.text.TextUtils;
 import android.util.Log;
@@ -12,6 +14,7 @@ import android.widget.*;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import com.genband.kandy.api.Kandy;
 import com.genband.kandy.api.services.calls.*;
+import com.genband.kandy.api.services.common.KandyCameraInfo;
 import com.genband.kandy.api.services.common.KandyMissedCallMessage;
 import com.genband.kandy.api.services.common.KandyWaitingVoiceMailMessage;
 import com.genband.kandy.api.utils.KandyIllegalArgumentException;
@@ -27,8 +30,6 @@ public class CallWidgetViewProxy extends TiUIView implements KandyCallServiceNot
 
 	private static final String TAG = CallWidgetViewProxy.class.getSimpleName();
 
-	private LinearLayout uiCallEditLayout;
-
 	private EditText uiPhoneNumber;
 	private Button callButton;
 	private CheckBox uiVideoCheckbox, uiPSTNCheckbox, uiSIPCheckbox;
@@ -43,7 +44,7 @@ public class CallWidgetViewProxy extends TiUIView implements KandyCallServiceNot
 	private Activity activity;
 	private IKandyCall call;
 
-	private KandyInCallDialog inCallDialog;
+	private KandyIncallDialog inCallDialog;
 	private AlertDialog mIncomingCallDialog;
 
 	public CallWidgetViewProxy(TiViewProxy proxy) {
@@ -55,8 +56,6 @@ public class CallWidgetViewProxy extends TiUIView implements KandyCallServiceNot
 
 		LayoutInflater layoutInflater = LayoutInflater.from(proxy.getActivity());
 		layoutWraper = layoutInflater.inflate(KandyUtils.getLayout("kandy_call_widget"), null);
-
-		uiCallEditLayout = (LinearLayout) layoutWraper.findViewById(KandyUtils.getId("kandy_calls_with_edit"));
 
 		uiPhoneNumber = (EditText) layoutWraper.findViewById(KandyUtils.getId("kandy_calls_phone_number_edit"));
 
@@ -97,6 +96,8 @@ public class CallWidgetViewProxy extends TiUIView implements KandyCallServiceNot
 		});
 
 		setNativeView(layoutWraper);
+
+		inCallDialog = new KandyIncallDialog(activity);
 	}
 
 	@Override
@@ -141,11 +142,18 @@ public class CallWidgetViewProxy extends TiUIView implements KandyCallServiceNot
 				else if (TextUtils.equals(type, CallWidgetProxy.CALL_INCOMING_WIDGET))
 					hasIncomingDialog = true;
 			}
+			if (!hasOutgoingDialog) {
+				uiPhoneNumber.setVisibility(View.GONE);
+				uiVideoCheckbox.setVisibility(View.GONE);
+				uiPSTNCheckbox.setVisibility(View.GONE);
+				uiSIPCheckbox.setVisibility(View.GONE);
+				callButton.setVisibility(View.GONE);
+			}
 		}
 	}
 
 	private void doCall() {
-		//IKandyCall call;
+		// IKandyCall call;
 		String number = uiPhoneNumber.getText().toString();
 		if (isPSTNCall) {
 			call = Kandy.getServices().getCallService().createPSTNCall(null, number, null);
@@ -187,9 +195,6 @@ public class CallWidgetViewProxy extends TiUIView implements KandyCallServiceNot
 
 		CallServiceProxy.addKandyCall(call);
 
-		inCallDialog = new KandyInCallDialog(proxy);
-		inCallDialog.setKandyCall(call);
-
 		((IKandyOutgoingCall) call).establish(new KandyCallResponseListener() {
 
 			@Override
@@ -214,13 +219,15 @@ public class CallWidgetViewProxy extends TiUIView implements KandyCallServiceNot
 
 	public void answerIncomingCall(final IKandyIncomingCall call) {
 		CallServiceProxy.addKandyCall(call);
-		activity.runOnUiThread(new Runnable() {
+		if (hasIncomingDialog) {
+			activity.runOnUiThread(new Runnable() {
 
-			@Override
-			public void run() {
-				createIncomingCallPopup(call);
-			}
-		});
+				@Override
+				public void run() {
+					createIncomingCallPopup(call);
+				}
+			});
+		}
 	}
 
 	private void createIncomingCallPopup(final IKandyIncomingCall pInCall) {
@@ -271,8 +278,6 @@ public class CallWidgetViewProxy extends TiUIView implements KandyCallServiceNot
 
 				@Override
 				public void onRequestSucceeded(IKandyCall call) {
-					inCallDialog = new KandyInCallDialog(proxy);
-					inCallDialog.setKandyCall(call);
 					inCallDialog.show();
 				}
 
@@ -286,8 +291,6 @@ public class CallWidgetViewProxy extends TiUIView implements KandyCallServiceNot
 
 				@Override
 				public void onRequestSucceeded(IKandyCall call) {
-					inCallDialog = new KandyInCallDialog(proxy);
-					inCallDialog.setKandyCall(call);
 					inCallDialog.show();
 				}
 
@@ -336,10 +339,9 @@ public class CallWidgetViewProxy extends TiUIView implements KandyCallServiceNot
 	@Override
 	public void onCallStateChanged(KandyCallState state, IKandyCall call) {
 		Log.i(TAG, "onCallStateChanged() was invoked: " + call.getCallee().getUri() + " " + state.name());
-		if (state == KandyCallState.TERMINATED && inCallDialog.isShowing()
-				&& inCallDialog.isKandyCall(call.getCallee().getUri())) {
+		if (state == KandyCallState.TERMINATED && inCallDialog.isShowing()) {
 			CallServiceProxy.removeKandyCall(call.getCallee().getUri());
-			inCallDialog.dismiss();
+			inCallDialog.hide();
 		}
 	}
 
@@ -375,5 +377,264 @@ public class CallWidgetViewProxy extends TiUIView implements KandyCallServiceNot
 
 	@Override
 	public void onWaitingVoiceMailCall(KandyWaitingVoiceMailMessage message) {
+	}
+
+	public class KandyIncallDialog extends Dialog {
+
+		private ImageView uiUnknownAvatar;
+		private View videoCallLayout;
+		private KandyView localView, remoteView;
+
+		private ToggleButton holdTbutton, muteTbutton, videoTbutton, cameraTbutton;
+		private ImageButton hangupButton;
+
+		public KandyIncallDialog(Context context) {
+			super(context, android.R.style.Theme_Light_NoTitleBar);
+
+			setContentView(KandyUtils.getLayout("kandy_incall_dialog"));
+			setCancelable(false);
+			setCanceledOnTouchOutside(false);
+
+			uiUnknownAvatar = (ImageView) findViewById(KandyUtils.getId("kandy_calls_unknown_avatar"));
+			videoCallLayout = findViewById(KandyUtils.getId("kandy_calls_video_layout"));
+
+			localView = (KandyView) findViewById(KandyUtils.getId("kandy_calls_local_video_view"));
+			localView.setZOrderOnTop(true);
+			remoteView = (KandyView) findViewById(KandyUtils.getId("kandy_calls_video_view"));
+			remoteView.setZOrderMediaOverlay(true);
+
+			holdTbutton = (ToggleButton) findViewById(KandyUtils.getId("kandy_calls_hold_tbutton"));
+			holdTbutton.setOnClickListener(new View.OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+					boolean isChecked = ((ToggleButton) v).isChecked();
+					switchHold(isChecked);
+				}
+			});
+
+			muteTbutton = (ToggleButton) findViewById(KandyUtils.getId("kandy_calls_mute_tbutton"));
+			muteTbutton.setOnClickListener(new View.OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+					boolean isChecked = ((ToggleButton) v).isChecked();
+					switchMute(isChecked);
+				}
+			});
+
+			videoTbutton = (ToggleButton) findViewById(KandyUtils.getId("kandy_calls_video_tbutton"));
+			videoTbutton.setOnClickListener(new View.OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+					boolean isChecked = ((ToggleButton) v).isChecked();
+					switchVideo(isChecked);
+				}
+			});
+
+			cameraTbutton = (ToggleButton) findViewById(KandyUtils.getId("kandy_calls_switch_camera_tbutton"));
+			cameraTbutton.setOnClickListener(new View.OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+					boolean isChecked = ((ToggleButton) v).isChecked();
+					switchCamera(isChecked);
+				}
+			});
+
+			hangupButton = (ImageButton) findViewById(KandyUtils.getId("kandy_calls_hangup_button"));
+			hangupButton.setOnClickListener(new View.OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+					hangup();
+				}
+			});
+		}
+
+		@Override
+		public void show() {
+			call.setLocalVideoView(localView);
+			call.setRemoteVideoView(remoteView);
+			activity.runOnUiThread(new Runnable() {
+
+				@Override
+				public void run() {
+					switchVideoView(call.isCallStartedWithVideo());
+				}
+			});
+			super.show();
+		}
+
+		public void switchVideoView(final boolean isVideoView) {
+			activity.runOnUiThread(new Runnable() {
+
+				@Override
+				public void run() {
+					if (isVideoView) {
+						videoTbutton.setChecked(true);
+						videoCallLayout.setVisibility(View.VISIBLE);
+						localView.setVisibility(View.VISIBLE);
+						call.setRemoteVideoView(remoteView);
+						uiUnknownAvatar.setVisibility(View.GONE);
+					} else {
+						videoTbutton.setChecked(false);
+						localView.setVisibility(View.GONE);
+						videoCallLayout.setVisibility(View.GONE);
+						uiUnknownAvatar.setVisibility(View.VISIBLE);
+					}
+				}
+			});
+		}
+
+		public void switchHold(boolean isChecked) {
+			if (call == null)
+				return;
+			if (isChecked)
+				call.hold(new KandyCallResponseListener() {
+
+					@Override
+					public void onRequestSucceeded(IKandyCall call) {
+					}
+
+					@Override
+					public void onRequestFailed(IKandyCall call, int code, String error) {
+						// UIUtils.showToastWithMessage(activity, error);
+						activity.runOnUiThread(new Runnable() {
+
+							@Override
+							public void run() {
+								holdTbutton.setChecked(false);
+							}
+						});
+					}
+				});
+			else
+				call.unhold(new KandyCallResponseListener() {
+
+					@Override
+					public void onRequestSucceeded(IKandyCall call) {
+					}
+
+					@Override
+					public void onRequestFailed(IKandyCall call, int code, String error) {
+						// UIUtils.showToastWithMessage(activity, error);
+						activity.runOnUiThread(new Runnable() {
+
+							@Override
+							public void run() {
+								holdTbutton.setChecked(true);
+							}
+						});
+					}
+				});
+		}
+
+		public void switchMute(boolean isChecked) {
+			if (call == null)
+				return;
+			Log.i("KandyInCallDialog", "switchMute() was invoked: " + String.valueOf(isChecked));
+			if (isChecked)
+				call.mute(new KandyCallResponseListener() {
+
+					@Override
+					public void onRequestSucceeded(IKandyCall call) {
+					}
+
+					@Override
+					public void onRequestFailed(IKandyCall call, int code, String error) {
+						// UIUtils.showToastWithMessage(activity, error);
+						activity.runOnUiThread(new Runnable() {
+
+							@Override
+							public void run() {
+								muteTbutton.setChecked(false);
+							}
+						});
+					}
+				});
+			else
+				call.unmute(new KandyCallResponseListener() {
+
+					@Override
+					public void onRequestSucceeded(IKandyCall call) {
+					}
+
+					@Override
+					public void onRequestFailed(IKandyCall call, int code, String error) {
+						// UIUtils.showToastWithMessage(activity, error);
+						activity.runOnUiThread(new Runnable() {
+
+							@Override
+							public void run() {
+								muteTbutton.setChecked(true);
+							}
+						});
+					}
+				});
+		}
+
+		public void switchVideo(boolean isChecked) {
+			if (call == null)
+				return;
+			if (isChecked)
+				call.startVideoSharing(new KandyCallResponseListener() {
+
+					@Override
+					public void onRequestSucceeded(IKandyCall call) {
+						switchVideoView(true);
+					}
+
+					@Override
+					public void onRequestFailed(IKandyCall call, int code, String error) {
+						// UIUtils.showToastWithMessage(activity, error);
+						switchVideoView(false);
+					}
+				});
+			else
+				call.stopVideoSharing(new KandyCallResponseListener() {
+
+					@Override
+					public void onRequestSucceeded(IKandyCall call) {
+						switchVideoView(false);
+					}
+
+					@Override
+					public void onRequestFailed(IKandyCall call, int code, String error) {
+						// UIUtils.showToastWithMessage(activity, error);
+						switchVideoView(true);
+					}
+				});
+		}
+
+		public void switchCamera(boolean isChecked) {
+			if (call == null)
+				return;
+			KandyCameraInfo cameraInfo = isChecked ? KandyCameraInfo.FACING_FRONT : KandyCameraInfo.FACING_BACK;
+			call.switchCamera(cameraInfo);
+		}
+
+		public void hangup() {
+			call.hangup(new KandyCallResponseListener() {
+
+				@Override
+				public void onRequestSucceeded(IKandyCall callee) {
+					// FIXME: this listener is not called
+					Log.i("KandyIncallDialog", "onRequestSucceeded()");
+					call = null;
+					CallServiceProxy.removeKandyCall(call.getCallee().getUri());
+					inCallDialog.hide();
+				}
+
+				@Override
+				public void onRequestFailed(IKandyCall callee, int code, String error) {
+					call = null;
+					CallServiceProxy.removeKandyCall(call.getCallee().getUri());
+					inCallDialog.hide();
+					UIUtils.showDialogWithErrorMessage(activity, error);
+				}
+			});
+		}
 	}
 }

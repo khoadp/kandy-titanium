@@ -89,6 +89,5 @@ local.properties
 # TeXlipse plugin
 .texlipse
 
-android/build
-android/example/build
-example/build
+*build
+*.settings
