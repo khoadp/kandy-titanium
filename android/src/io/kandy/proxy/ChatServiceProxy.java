@@ -18,13 +18,13 @@ import com.genband.kandy.api.services.common.KandyResponseListener;
 import com.genband.kandy.api.services.common.KandyResponseProgressListener;
 import com.genband.kandy.api.services.location.KandyCurrentLocationListener;
 import com.genband.kandy.api.utils.KandyIllegalArgumentException;
-import io.kandy.KandyConstant;
 import io.kandy.KandyModule;
 import io.kandy.proxy.views.ChatViewProxy;
 import io.kandy.utils.KandyUtils;
 import org.appcelerator.kroll.KrollDict;
 import org.appcelerator.kroll.KrollFunction;
 import org.appcelerator.kroll.annotations.Kroll;
+import org.appcelerator.titanium.TiLifecycle.OnActivityResultEvent;
 import org.appcelerator.titanium.proxy.TiViewProxy;
 import org.appcelerator.titanium.view.TiUIView;
 import org.json.JSONObject;
@@ -38,9 +38,21 @@ import java.util.UUID;
  * 
  */
 @Kroll.proxy(creatableInModule = KandyModule.class)
-public class ChatServiceProxy extends TiViewProxy implements KandyChatServiceNotificationListener {
+public class ChatServiceProxy extends TiViewProxy implements OnActivityResultEvent,
+		KandyChatServiceNotificationListener {
 
 	private static final String LCAT = ChatServiceProxy.class.getSimpleName();
+
+	@Kroll.constant
+	public static final int CONTACT_PICKER_RESULT = 1001;
+	@Kroll.constant
+	public static final int IMAGE_PICKER_RESULT = 1002;
+	@Kroll.constant
+	public static final int VIDEO_PICKER_RESULT = 1003;
+	@Kroll.constant
+	public static final int AUDIO_PICKER_RESULT = 1004;
+	@Kroll.constant
+	public static final int FILE_PICKER_RESULT = 1005;
 
 	private ChatViewProxy viewProxy;
 
@@ -151,7 +163,7 @@ public class ChatServiceProxy extends TiViewProxy implements KandyChatServiceNot
 		Intent intent = new Intent(Intent.ACTION_PICK);
 		intent.setType("audio/*");
 		intent.setAction(Intent.ACTION_GET_CONTENT);
-		getActivity().startActivityForResult(intent, KandyConstant.AUDIO_PICKER_RESULT);
+		getActivity().startActivityForResult(intent, AUDIO_PICKER_RESULT);
 	}
 
 	@Kroll.method
@@ -179,7 +191,7 @@ public class ChatServiceProxy extends TiViewProxy implements KandyChatServiceNot
 		Intent intent = new Intent();
 		intent.setType("video/*");
 		intent.setAction(Intent.ACTION_GET_CONTENT);
-		getActivity().startActivityForResult(intent, KandyConstant.VIDEO_PICKER_RESULT);
+		getActivity().startActivityForResult(intent, VIDEO_PICKER_RESULT);
 	}
 
 	@Kroll.method
@@ -206,7 +218,7 @@ public class ChatServiceProxy extends TiViewProxy implements KandyChatServiceNot
 	public void pickImage() {
 		Intent intent = new Intent(Intent.ACTION_PICK);
 		intent.setType("image/*");
-		getActivity().startActivityForResult(intent, KandyConstant.IMAGE_PICKER_RESULT);
+		getActivity().startActivityForResult(intent, IMAGE_PICKER_RESULT);
 	}
 
 	@Kroll.method
@@ -232,7 +244,7 @@ public class ChatServiceProxy extends TiViewProxy implements KandyChatServiceNot
 	@Kroll.method
 	public void pickContact() {
 		Intent contactPickerIntent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
-		getActivity().startActivityForResult(contactPickerIntent, KandyConstant.CONTACT_PICKER_RESULT);
+		getActivity().startActivityForResult(contactPickerIntent, CONTACT_PICKER_RESULT);
 	}
 
 	@Kroll.method
@@ -262,7 +274,7 @@ public class ChatServiceProxy extends TiViewProxy implements KandyChatServiceNot
 		intent.addCategory(Intent.CATEGORY_OPENABLE);
 		try {
 			getActivity().startActivityForResult(Intent.createChooser(intent, "Select a File to Upload"),
-					KandyConstant.FILE_PICKER_RESULT);
+					FILE_PICKER_RESULT);
 		} catch (android.content.ActivityNotFoundException ex) {
 			// Potentially direct the user to the Market with a Dialog
 			// Toast.makeText(this, "Please install a File Manager.",
@@ -567,6 +579,19 @@ public class ChatServiceProxy extends TiViewProxy implements KandyChatServiceNot
 			result.put("type", type.name());
 			result.put("message", KandyUtils.getKrollDictFromKandyMessage(message));
 			fireEvent("onChatReceived", result);
+		}
+	}
+
+	@Override
+	public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
+		if (resultCode == Activity.RESULT_OK) {
+			if (hasListeners("onActivityResult")) {
+				KrollDict obj = new KrollDict();
+				obj.put("requestCode", requestCode);
+				obj.put("resultCode", resultCode);
+				obj.put("data", data.getData());
+				fireEvent("onActivityResult", obj);
+			}
 		}
 	}
 }

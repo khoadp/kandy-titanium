@@ -21,11 +21,5 @@ public abstract class KandyConstant {
 
 	public final static String LOCAL_STORAGE = "Kandy//Local storage";
 
-	public static final int CONTACT_PICKER_RESULT = 1001;
-	public static final int IMAGE_PICKER_RESULT = 1002;
-	public static final int VIDEO_PICKER_RESULT = 1003;
-	public static final int AUDIO_PICKER_RESULT = 1004;
-	public static final int FILE_PICKER_RESULT = 1005;
-
 	public static final String DEFAULT_TWO_LETTER_ISO_COUNTRY_CODE = "US";
 }

@@ -73,7 +73,7 @@ public class CloudStorageServiceProxy extends KrollProxy {
 	}
 
 	@Kroll.method
-	public void downloadMediaFromCloudStorage(KrollDict args) {
+	public void downloadMedia(KrollDict args) {
 		final KrollFunction success = (KrollFunction) args.get("success");
 		final KrollFunction error = (KrollFunction) args.get("error");
 
@@ -123,7 +123,7 @@ public class CloudStorageServiceProxy extends KrollProxy {
 	}
 
 	@Kroll.method
-	public void downloadMediaThumbnailFromCloudStorage(KrollDict args) {
+	public void downloadMediaThumbnail(KrollDict args) {
 		final KrollFunction success = (KrollFunction) args.get("success");
 		final KrollFunction error = (KrollFunction) args.get("error");
 
@@ -182,7 +182,7 @@ public class CloudStorageServiceProxy extends KrollProxy {
 	}
 
 	@Kroll.method
-	public void cancelMediaTransferFromCloudStorage(KrollDict args) {
+	public void cancelMediaTransfer(KrollDict args) {
 		final KrollFunction success = (KrollFunction) args.get("success");
 		final KrollFunction error = (KrollFunction) args.get("error");
 

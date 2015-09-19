@@ -27,6 +27,7 @@ import com.genband.kandy.api.services.common.KandyResponseProgressListener;
 import com.genband.kandy.api.services.common.KandyUploadProgressListener;
 import com.genband.kandy.api.services.location.KandyCurrentLocationListener;
 import com.genband.kandy.api.utils.KandyIllegalArgumentException;
+import io.kandy.proxy.ChatServiceProxy;
 import io.kandy.proxy.adapters.MessagesAdapter;
 import io.kandy.proxy.views.ChatViewProxy;
 import io.kandy.utils.KandyUtils;
@@ -45,12 +46,6 @@ public class ChatFragment extends Fragment implements OnItemClickListener, OnAct
 		KandyChatServiceNotificationListener {
 
 	private static final String TAG = ChatViewProxy.class.getSimpleName();
-
-	private static final int CONTACT_PICKER_RESULT = 1001;
-	private static final int IMAGE_PICKER_RESULT = 1002;
-	private static final int VIDEO_PICKER_RESULT = 1003;
-	private static final int AUDIO_PICKER_RESULT = 1004;
-	private static final int FILE_PICKER_RESULT = 1005;
 
 	private MessagesAdapter mAdapter;
 	private Queue<IKandyMessage> mMessagesUUIDQueue;
@@ -404,26 +399,26 @@ public class ChatFragment extends Fragment implements OnItemClickListener, OnAct
 	private void pickImage() {
 		Intent intent = new Intent(Intent.ACTION_PICK);
 		intent.setType("image/*");
-		activity.startActivityForResult(intent, IMAGE_PICKER_RESULT);
+		activity.startActivityForResult(intent, ChatServiceProxy.IMAGE_PICKER_RESULT);
 	}
 
 	public void pickContact() {
 		Intent contactPickerIntent = new Intent(Intent.ACTION_PICK, Contacts.CONTENT_URI);
-		activity.startActivityForResult(contactPickerIntent, CONTACT_PICKER_RESULT);
+		activity.startActivityForResult(contactPickerIntent, ChatServiceProxy.CONTACT_PICKER_RESULT);
 	}
 
 	private void pickAudio() {
 		Intent intent = new Intent(Intent.ACTION_PICK);
 		intent.setType("audio/*");
 		intent.setAction(Intent.ACTION_GET_CONTENT);
-		activity.startActivityForResult(intent, AUDIO_PICKER_RESULT);
+		activity.startActivityForResult(intent, ChatServiceProxy.AUDIO_PICKER_RESULT);
 	}
 
 	private void pickVideo() {
 		Intent intent = new Intent();
 		intent.setType("video/*");
 		intent.setAction(Intent.ACTION_GET_CONTENT);
-		activity.startActivityForResult(intent, VIDEO_PICKER_RESULT);
+		activity.startActivityForResult(intent, ChatServiceProxy.VIDEO_PICKER_RESULT);
 	}
 
 	private void pickFile() {
@@ -431,7 +426,8 @@ public class ChatFragment extends Fragment implements OnItemClickListener, OnAct
 		intent.setType("*/*");
 		intent.addCategory(Intent.CATEGORY_OPENABLE);
 		try {
-			activity.startActivityForResult(Intent.createChooser(intent, "Select a File to Upload"), FILE_PICKER_RESULT);
+			activity.startActivityForResult(Intent.createChooser(intent, "Select a File to Upload"),
+					ChatServiceProxy.FILE_PICKER_RESULT);
 		} catch (android.content.ActivityNotFoundException ex) {
 			// Potentially direct the user to the Market with a Dialog
 			// Toast.makeText(this, "Please install a File Manager.",
@@ -499,23 +495,23 @@ public class ChatFragment extends Fragment implements OnItemClickListener, OnAct
 		if (resultCode == Activity.RESULT_OK) {
 
 			switch (requestCode) {
-			case CONTACT_PICKER_RESULT:
+			case ChatServiceProxy.CONTACT_PICKER_RESULT:
 				sendContact(data.getData());
 				break;
 
-			case IMAGE_PICKER_RESULT:
+			case ChatServiceProxy.IMAGE_PICKER_RESULT:
 				sendImage(data.getData());
 				break;
 
-			case VIDEO_PICKER_RESULT:
+			case ChatServiceProxy.VIDEO_PICKER_RESULT:
 				sendVideo(data.getData());
 				break;
 
-			case AUDIO_PICKER_RESULT:
+			case ChatServiceProxy.AUDIO_PICKER_RESULT:
 				sendAudio(data.getData());
 				break;
 
-			case FILE_PICKER_RESULT:
+			case ChatServiceProxy.FILE_PICKER_RESULT:
 				sendFile(data.getData());
 				break;
 

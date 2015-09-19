@@ -84,7 +84,7 @@ public class AccessServiceProxy extends TiViewProxy implements KandyConnectServi
 		final KrollFunction success = (KrollFunction) args.get("success");
 		final KrollFunction error = (KrollFunction) args.get("error");
 		final String username = args.getString("username");
-		final String password = args.getString("username");
+		final String password = args.getString("password");
 		final String token = args.getString("token");
 
 		if (token != null && token != "") {
