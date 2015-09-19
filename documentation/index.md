@@ -222,6 +222,10 @@ Switch to back camera for a video sharing.
 
 #### switchCamera(KrollDict args)
 Switch to front or back camera for video sharing.
+- `callee`: The callee who is accepted.
+- `camera`: The camera info.
+- `success`: The success callback function.
+- `error`: The error callback function.
 
 ##### switchSpeakerOn(KrollDict args)
 Switch speaker on for current active calls.
@@ -464,11 +468,59 @@ Get local contacts from user device.
 Get domain contacts.
 - `success`: The success callback function.
 - `error`: The error callback function.
+
+##### getFilteredDomainDirectoryContacts(KrollDict args)
+Get filtered domain contacts.
+- `filters`: The contacts filters.
+- `search`: The search query.
+- `success`: The success callback function.
+- `error`: The error callback function.
+
+##### getPersonalAddressBook(KrollDict args)
+Get personal address book.
+- `success`: The success callback function.
+- `error`: The error callback function.
+
+##### addContactToPersonalAddressBook(KrollDict args) 
+Add a contact to personal address book.
+- `contact`: The contact info.
+- `success`: The success callback function.
+- `error`: The error callback function.
+
+##### removePersonalAddressBookContact(KrollDict args)
+Remove a contact from personal address book.
+- `contact`: The contact info.
+- `success`: The success callback function.
+- `error`: The error callback function.
+
 #### Cloud storage
+
+#####  uploadMedia(KrollDict args)
+Upload a file to cloud storage.
+- `uri`: The uri of the file.
+- `success`: The success callback function.
+- `error`: The error callback function.
+
+##### downloadMedia(KrollDict args)
+##### downloadMediaThumbnail(KrollDict args)
+##### cancelMediaTransfer(KrollDict args) 
+Download media from cloud storage.
+- `uuid`: The UUID of the file.
+- `filename`: The file saved name.
+- `success`: The success callback function.
+- `error`: The error callback function.
 
 #### Push
 
-## Usage
+##### enablePushNotification(KrollDict args)
+Enable push notification.
+- `success`: The success callback function.
+- `error`: The error callback function.
+
+##### disablePushNotification(KrollDict args)
+Diable push notification.
+- `success`: The success callback function.
+- `error`: The error callback function.
 
 ## Author
 
