@@ -17,6 +17,7 @@ Edit the modules section of your tiapp.xml file to include this module:
     <module platform="android">io.kandy</module>
   </modules>
 ```
+Then, change `$PACKAGE_NAME` variable in [`timodule.xml`](android/timodule.xml) to your package name.
 
 ## Getting Started
 To access this module from JavaScript, you would do the following (recommended):
