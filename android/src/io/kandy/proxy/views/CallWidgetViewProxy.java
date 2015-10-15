@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.support.v4.widget.DrawerLayout;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -46,6 +47,9 @@ public class CallWidgetViewProxy extends TiUIView implements KandyCallServiceNot
 
 	private KandyIncallDialog inCallDialog;
 	private AlertDialog mIncomingCallDialog;
+
+	// private CalleeAdapter calleeAdapter;
+	// private ArrayList<String> calleeList;
 
 	public CallWidgetViewProxy(TiViewProxy proxy) {
 		super(proxy);
@@ -271,8 +275,6 @@ public class CallWidgetViewProxy extends TiUIView implements KandyCallServiceNot
 	}
 
 	public void accept() {
-		if (inCallDialog != null)
-			inCallDialog.hangup();
 		if (call.canReceiveVideo()) {
 			((IKandyIncomingCall) call).accept(isVideoCall, new KandyCallResponseListener() {
 
@@ -388,6 +390,8 @@ public class CallWidgetViewProxy extends TiUIView implements KandyCallServiceNot
 		private ToggleButton holdTbutton, muteTbutton, videoTbutton, cameraTbutton;
 		private ImageButton hangupButton;
 
+		// private ListView uiLeftDrawer;
+
 		public KandyIncallDialog(Context context) {
 			super(context, android.R.style.Theme_Light_NoTitleBar);
 
@@ -398,6 +402,22 @@ public class CallWidgetViewProxy extends TiUIView implements KandyCallServiceNot
 			uiUnknownAvatar = (ImageView) findViewById(KandyUtils.getId("kandy_calls_unknown_avatar"));
 			videoCallLayout = findViewById(KandyUtils.getId("kandy_calls_video_layout"));
 
+//			calleeList = new ArrayList<String>();
+//			calleeAdapter = new CalleeAdapter(context, KandyUtils.getLayout("call_listview_item"), calleeList);
+//			uiLeftDrawer = (ListView) findViewById(KandyUtils.getId("kandy_calls_left_drawer"));
+//			uiLeftDrawer.setAdapter(calleeAdapter);
+//			uiLeftDrawer.setOnItemClickListener(new OnItemClickListener() {
+//
+//				@Override
+//				public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+//
+//				}
+//			});
+
+			// TODO: support multi-call
+			DrawerLayout drawerLayout = (DrawerLayout)findViewById(KandyUtils.getId("drawer_layout"));
+			drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+			
 			localView = (KandyView) findViewById(KandyUtils.getId("kandy_calls_local_video_view"));
 			localView.setZOrderOnTop(true);
 			remoteView = (KandyView) findViewById(KandyUtils.getId("kandy_calls_video_view"));
@@ -622,19 +642,23 @@ public class CallWidgetViewProxy extends TiUIView implements KandyCallServiceNot
 				public void onRequestSucceeded(IKandyCall callee) {
 					// FIXME: this listener is not called
 					Log.i("KandyIncallDialog", "onRequestSucceeded()");
-					call = null;
-					CallServiceProxy.removeKandyCall(call.getCallee().getUri());
-					inCallDialog.hide();
+					// CallServiceProxy.removeKandyCall(call.getCallee().getUri());
+					// inCallDialog.hide();
+					// call = null;
 				}
 
 				@Override
 				public void onRequestFailed(IKandyCall callee, int code, String error) {
-					call = null;
-					CallServiceProxy.removeKandyCall(call.getCallee().getUri());
-					inCallDialog.hide();
+					// call = null;
+					// CallServiceProxy.removeKandyCall(call.getCallee().getUri());
+					// inCallDialog.hide();
 					UIUtils.showDialogWithErrorMessage(activity, error);
 				}
 			});
+
+			CallServiceProxy.removeKandyCall(call.getCallee().getUri());
+			inCallDialog.hide();
+			call = null;
 		}
 	}
 }

@@ -53,7 +53,8 @@ public class CallServiceProxy extends KrollProxy implements KandyCallServiceNoti
 	}
 
 	public static void addKandyCall(IKandyCall callee) {
-		calls.put(callee.getCallee().getUri(), callee);
+		if (!calls.containsKey(callee.getCallee().getUri()))
+			calls.put(callee.getCallee().getUri(), callee);
 	}
 
 	public static void removeKandyCall(String id) {

@@ -2,4 +2,8 @@
 <resources>
     <color name="kandy_registration_state_background">#cc0000ff</color>
     <color name="kandy_call_camera_view_lable_background">#20000000</color>
+    
+    <color name="line_one">#ff000000</color>
+    <color name="line_two">#80000000</color>
+    <color name="line_three">#ffcccccc</color>
 </resources>
