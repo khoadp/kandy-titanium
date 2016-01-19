@@ -1,5 +1,14 @@
 package io.kandy.proxy.views;
 
+import io.kandy.KandyConstant;
+import io.kandy.proxy.ProvisioningServiceProxy;
+import io.kandy.utils.KandyUtils;
+import io.kandy.utils.UIUtils;
+
+import org.appcelerator.kroll.KrollDict;
+import org.appcelerator.titanium.proxy.TiViewProxy;
+import org.appcelerator.titanium.view.TiUIView;
+
 import android.app.Activity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -8,17 +17,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+
 import com.genband.kandy.api.Kandy;
 import com.genband.kandy.api.provisioning.IKandyValidationResponse;
+import com.genband.kandy.api.provisioning.KandyValidationMethoud;
 import com.genband.kandy.api.provisioning.KandyValidationResponseListener;
 import com.genband.kandy.api.services.common.KandyResponseListener;
-import io.kandy.KandyConstant;
-import io.kandy.proxy.ProvisioningServiceProxy;
-import io.kandy.utils.KandyUtils;
-import io.kandy.utils.UIUtils;
-import org.appcelerator.kroll.KrollDict;
-import org.appcelerator.titanium.proxy.TiViewProxy;
-import org.appcelerator.titanium.view.TiUIView;
 
 /**
  * Provisioning view proxy.
@@ -127,7 +131,7 @@ public class ProvisioningViewProxy extends TiUIView {
 	}
 
 	public void requestCode(String phoneNumber) {
-		Kandy.getProvisioning().requestCode(phoneNumber, twoLetterISOCountryCode, new KandyResponseListener() {
+		Kandy.getProvisioning().requestCode(KandyValidationMethoud.SMS, phoneNumber, twoLetterISOCountryCode, null, new KandyResponseListener() {
 
 			@Override
 			public void onRequestFailed(int responseCode, String err) {
@@ -203,7 +207,6 @@ public class ProvisioningViewProxy extends TiUIView {
 	public void setSignedUser(final String user) {
 		activity.runOnUiThread(new Runnable() {
 
-			@Override
 			public void run() {
 				signedPhoneNumber.setText(user);
 			}

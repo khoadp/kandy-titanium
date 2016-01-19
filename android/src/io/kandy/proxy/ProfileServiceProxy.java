@@ -1,20 +1,23 @@
 package io.kandy.proxy;
 
-import android.util.Log;
-import com.genband.kandy.api.Kandy;
-import com.genband.kandy.api.services.common.KandyResponseListener;
-import com.genband.kandy.api.services.profile.IKandyDeviceProfile;
-import com.genband.kandy.api.services.profile.KandyDeviceProfileParams;
-import com.genband.kandy.api.services.profile.KandyDeviceProfileResponseListener;
 import io.kandy.KandyModule;
 import io.kandy.utils.KandyUtils;
+
+import java.util.ArrayList;
+
 import org.appcelerator.kroll.KrollDict;
 import org.appcelerator.kroll.KrollFunction;
 import org.appcelerator.kroll.KrollProxy;
 import org.appcelerator.kroll.annotations.Kroll;
 import org.json.JSONArray;
 
-import java.util.ArrayList;
+import android.util.Log;
+
+import com.genband.kandy.api.Kandy;
+import com.genband.kandy.api.services.common.KandyResponseListener;
+import com.genband.kandy.api.services.profile.IKandyDeviceProfile;
+import com.genband.kandy.api.services.profile.KandyDeviceProfileParams;
+import com.genband.kandy.api.services.profile.KandyDeviceProfileResponseListener;
 
 /**
  * Profile service proxy.

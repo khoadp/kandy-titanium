@@ -1,12 +1,15 @@
 package io.kandy.proxy.views;
 
-import android.view.LayoutInflater;
-import android.view.View;
-import com.genband.kandy.api.services.calls.IKandyCall;
-import com.genband.kandy.api.services.calls.KandyView;
 import io.kandy.utils.KandyUtils;
+
 import org.appcelerator.titanium.proxy.TiViewProxy;
 import org.appcelerator.titanium.view.TiUIView;
+
+import android.view.LayoutInflater;
+import android.view.View;
+
+import com.genband.kandy.api.services.calls.IKandyCall;
+import com.genband.kandy.api.services.calls.KandyView;
 
 public class KandyVideoView extends TiUIView {
 

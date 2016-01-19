@@ -1,17 +1,19 @@
 package io.kandy.proxy.adapters;
 
+import io.kandy.utils.KandyUtils;
+
+import java.util.List;
+
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
+
 import com.genband.kandy.api.Kandy;
 import com.genband.kandy.api.services.groups.KandyGroup;
 import com.genband.kandy.api.services.groups.KandyGroupParticipant;
-import io.kandy.utils.KandyUtils;
-
-import java.util.List;
 
 public class GroupAdapter extends ArrayAdapter<KandyGroup> {
 

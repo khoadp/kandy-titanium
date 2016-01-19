@@ -1,5 +1,13 @@
 package io.kandy.proxy.views;
 
+import io.kandy.proxy.AccessServiceProxy;
+import io.kandy.utils.KandyUtils;
+import io.kandy.utils.UIUtils;
+
+import org.appcelerator.titanium.proxy.TiViewProxy;
+import org.appcelerator.titanium.view.TiUIView;
+import org.json.JSONObject;
+
 import android.app.Activity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -8,6 +16,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+
 import com.genband.kandy.api.Kandy;
 import com.genband.kandy.api.access.KandyConnectServiceNotificationListener;
 import com.genband.kandy.api.access.KandyConnectionState;
@@ -15,11 +24,6 @@ import com.genband.kandy.api.access.KandyLoginResponseListener;
 import com.genband.kandy.api.access.KandyLogoutResponseListener;
 import com.genband.kandy.api.services.calls.KandyRecord;
 import com.genband.kandy.api.utils.KandyIllegalArgumentException;
-import io.kandy.proxy.AccessServiceProxy;
-import io.kandy.utils.KandyUtils;
-import io.kandy.utils.UIUtils;
-import org.appcelerator.titanium.proxy.TiViewProxy;
-import org.appcelerator.titanium.view.TiUIView;
 
 /**
  * The view for access proxy.
@@ -117,7 +121,7 @@ public class AccessViewProxy extends TiUIView implements KandyConnectServiceNoti
 	private void loginEnabled(final boolean enabled) {
 		activity.runOnUiThread(new Runnable() {
 
-			@Override
+			
 			public void run() {
 				username.setEnabled(enabled);
 				password.setEnabled(enabled);
@@ -130,7 +134,7 @@ public class AccessViewProxy extends TiUIView implements KandyConnectServiceNoti
 	private void logoutEnabled(final boolean enabled) {
 		activity.runOnUiThread(new Runnable() {
 
-			@Override
+			
 			public void run() {
 				logoutBtn.setClickable(enabled);
 			}
@@ -177,7 +181,7 @@ public class AccessViewProxy extends TiUIView implements KandyConnectServiceNoti
 
 		Kandy.getAccess().login(kandyUser, password, new KandyLoginResponseListener() {
 
-			@Override
+			
 			public void onRequestFailed(int responseCode, String err) {
 				Log.i(LCAT, "Kandy.getAccess().login:onRequestFailed error: " + err + ". Response code: "
 						+ responseCode);
@@ -185,7 +189,7 @@ public class AccessViewProxy extends TiUIView implements KandyConnectServiceNoti
 				loginEnabled(true);
 			}
 
-			@Override
+			
 			public void onLoginSucceeded() {
 				Log.i(LCAT, "Kandy.getAccess().login:onLoginSucceeded");
 				UIUtils.handleResultOnUiThread(activity, false, KandyUtils.getString("kandy_login_login_success"));
@@ -198,7 +202,7 @@ public class AccessViewProxy extends TiUIView implements KandyConnectServiceNoti
 	private void login(String userAccessToken) {
 		Kandy.getAccess().login(userAccessToken, new KandyLoginResponseListener() {
 
-			@Override
+			
 			public void onRequestFailed(int responseCode, String err) {
 				Log.i(LCAT, "Kandy.getAccess().login:onRequestFailed error: " + err + ". Response code: "
 						+ responseCode);
@@ -206,7 +210,7 @@ public class AccessViewProxy extends TiUIView implements KandyConnectServiceNoti
 				loginEnabled(true);
 			}
 
-			@Override
+			
 			public void onLoginSucceeded() {
 				Log.i(LCAT, "Kandy.getAccess().login:onLoginSucceeded");
 				UIUtils.handleResultOnUiThread(activity, false, KandyUtils.getString("kandy_login_login_success"));
@@ -226,7 +230,7 @@ public class AccessViewProxy extends TiUIView implements KandyConnectServiceNoti
 	private void logout() {
 		Kandy.getAccess().logout(new KandyLogoutResponseListener() {
 
-			@Override
+			
 			public void onRequestFailed(int responseCode, String err) {
 				Log.i(LCAT, "Kandy.getAccess().logout:onRequestFailed error: " + err + ". Response code: "
 						+ responseCode);
@@ -234,7 +238,7 @@ public class AccessViewProxy extends TiUIView implements KandyConnectServiceNoti
 				logoutEnabled(true);
 			}
 
-			@Override
+			
 			public void onLogoutSucceeded() {
 				UIUtils.handleResultOnUiThread(getProxy().getActivity(), false,
 						KandyUtils.getString("kandy_login_logout_success"));
@@ -254,35 +258,45 @@ public class AccessViewProxy extends TiUIView implements KandyConnectServiceNoti
 		Kandy.getAccess().unregisterNotificationListener(this);
 	}
 
-	@Override
+	
 	public void onSocketFailedWithError(String error) {
 	}
 
-	@Override
+	
 	public void onSocketDisconnected() {
 	}
 
-	@Override
+	
 	public void onSocketConnecting() {
 	}
 
-	@Override
+	
 	public void onSocketConnected() {
 	}
 
-	@Override
+	
 	public void onConnectionStateChanged(KandyConnectionState state) {
 	}
 
-	@Override
+	
 	public void onInvalidUser(String error) {
 	}
 
-	@Override
+	
 	public void onSessionExpired(String error) {
 	}
 
-	@Override
+	
 	public void onSDKNotSupported(String error) {
+	}
+
+	public void onCertificateError(String arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void onServerConfigurationReceived(JSONObject arg0) {
+		// TODO Auto-generated method stub
+		
 	}
 }

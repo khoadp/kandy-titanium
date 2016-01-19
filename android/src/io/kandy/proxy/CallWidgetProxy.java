@@ -1,7 +1,17 @@
 package io.kandy.proxy;
 
+import io.kandy.KandyModule;
+import io.kandy.proxy.views.CallWidgetViewProxy;
+import io.kandy.utils.KandyUtils;
+
+import org.appcelerator.kroll.KrollDict;
+import org.appcelerator.kroll.annotations.Kroll;
+import org.appcelerator.titanium.proxy.TiViewProxy;
+import org.appcelerator.titanium.view.TiUIView;
+
 import android.app.Activity;
 import android.util.Log;
+
 import com.genband.kandy.api.Kandy;
 import com.genband.kandy.api.services.calls.IKandyCall;
 import com.genband.kandy.api.services.calls.IKandyIncomingCall;
@@ -9,13 +19,6 @@ import com.genband.kandy.api.services.calls.KandyCallServiceNotificationListener
 import com.genband.kandy.api.services.calls.KandyCallState;
 import com.genband.kandy.api.services.common.KandyMissedCallMessage;
 import com.genband.kandy.api.services.common.KandyWaitingVoiceMailMessage;
-import io.kandy.KandyModule;
-import io.kandy.proxy.views.CallWidgetViewProxy;
-import io.kandy.utils.KandyUtils;
-import org.appcelerator.kroll.KrollDict;
-import org.appcelerator.kroll.annotations.Kroll;
-import org.appcelerator.titanium.proxy.TiViewProxy;
-import org.appcelerator.titanium.view.TiUIView;
 
 @Kroll.proxy(creatableInModule = KandyModule.class)
 public class CallWidgetProxy extends TiViewProxy implements KandyCallServiceNotificationListener {
@@ -73,7 +76,6 @@ public class CallWidgetProxy extends TiViewProxy implements KandyCallServiceNoti
 		Kandy.getServices().getCallService().unregisterNotificationListener(this);
 	}
 
-	@Override
 	public void onCallStateChanged(KandyCallState state, IKandyCall call) {
 		Log.i("KandyCallServiceProxyNotificationListener", "onCallStateChanged was invoked.");
 		if (hasListeners("onCallStateChanged"))
@@ -82,31 +84,33 @@ public class CallWidgetProxy extends TiViewProxy implements KandyCallServiceNoti
 			viewProxy.onCallStateChanged(state, call);
 	}
 
-	@Override
-	public void onGSMCallConnected(IKandyCall call) {
+	public void onGSMCallConnected(IKandyCall call, String incomingNumber) {
 		if (hasListeners("onGSMCallConnected"))
 			fireEvent("onGSMCallConnected", KandyUtils.getKrollDictFromKandyCall(call));
 		if (viewProxy != null)
 			viewProxy.onGSMCallConnected(call);
 	}
 
-	@Override
-	public void onGSMCallDisconnected(IKandyCall call) {
-		if (hasListeners("onGSMCallDisconnected"))
-			fireEvent("onGSMCallDisconnected", KandyUtils.getKrollDictFromKandyCall(call));
+	public void onGSMCallDisconnected(IKandyCall call, String incomingNumber) {
+		if (hasListeners("onGSMCallDisconnected")){
+			KrollDict result = KandyUtils.getKrollDictFromKandyCall(call);
+			result.put("incomingNumber", incomingNumber);
+			fireEvent("onGSMCallDisconnected", result);
+		}
 		if (viewProxy != null)
 			viewProxy.onGSMCallDisconnected(call);
 	}
 
-	@Override
-	public void onGSMCallIncoming(IKandyCall call) {
-		if (hasListeners("onGSMCallIncoming"))
-			fireEvent("onGSMCallIncoming", KandyUtils.getKrollDictFromKandyCall(call));
+	public void onGSMCallIncoming(IKandyCall call, String incomingNumber) {
+		if (hasListeners("onGSMCallIncoming")){
+			KrollDict result = KandyUtils.getKrollDictFromKandyCall(call);
+			result.put("incomingNumber", incomingNumber);
+			fireEvent("onGSMCallIncoming", result);
+		}
 		if (viewProxy != null)
 			viewProxy.onGSMCallIncoming(call);
 	}
 
-	@Override
 	public void onIncomingCall(IKandyIncomingCall call) {
 		if (hasListeners("onIncomingCall"))
 			fireEvent("onIncomingCall", KandyUtils.getKrollDictFromKandyCall(call));
@@ -114,7 +118,6 @@ public class CallWidgetProxy extends TiViewProxy implements KandyCallServiceNoti
 			viewProxy.onIncomingCall(call);
 	}
 
-	@Override
 	public void onMissedCall(KandyMissedCallMessage call) {
 		if (hasListeners("onMissedCall")) {
 			KrollDict result = new KrollDict();
@@ -131,7 +134,6 @@ public class CallWidgetProxy extends TiViewProxy implements KandyCallServiceNoti
 			viewProxy.onMissedCall(call);
 	}
 
-	@Override
 	public void onVideoStateChanged(IKandyCall call, boolean isReceivingVideo, boolean isSendingVideo) {
 		if (hasListeners("onVideoStateChanged")) {
 			KrollDict result = KandyUtils.getKrollDictFromKandyCall(call);
@@ -145,7 +147,6 @@ public class CallWidgetProxy extends TiViewProxy implements KandyCallServiceNoti
 			viewProxy.onVideoStateChanged(call, isReceivingVideo, isSendingVideo);
 	}
 
-	@Override
 	public void onWaitingVoiceMailCall(KandyWaitingVoiceMailMessage call) {
 		if (hasListeners("onWaitingVoiceMailCall")) {
 			KrollDict result = new KrollDict();

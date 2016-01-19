@@ -1,27 +1,5 @@
 package io.kandy.proxy.fragments;
 
-import android.app.*;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.net.Uri;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.*;
-import android.view.View.OnClickListener;
-import android.view.inputmethod.EditorInfo;
-import android.widget.*;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.TextView.OnEditorActionListener;
-import com.genband.kandy.api.Kandy;
-import com.genband.kandy.api.services.calls.KandyRecord;
-import com.genband.kandy.api.services.chats.IKandyImageItem;
-import com.genband.kandy.api.services.chats.IKandyTransferProgress;
-import com.genband.kandy.api.services.chats.KandyThumbnailSize;
-import com.genband.kandy.api.services.common.KandyGroupUploadProgressListener;
-import com.genband.kandy.api.services.common.KandyResponseListener;
-import com.genband.kandy.api.services.common.KandyResponseProgressListener;
-import com.genband.kandy.api.services.groups.*;
-import com.genband.kandy.api.utils.KandyIllegalArgumentException;
 import io.kandy.proxy.adapters.GroupParticipantAdapter;
 import io.kandy.proxy.views.GroupViewProxy;
 import io.kandy.utils.KandyUtils;
@@ -30,6 +8,54 @@ import io.kandy.utils.UIUtils;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.KeyEvent;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.TextView.OnEditorActionListener;
+
+import com.genband.kandy.api.Kandy;
+import com.genband.kandy.api.services.calls.KandyRecord;
+import com.genband.kandy.api.services.chats.IKandyImageItem;
+import com.genband.kandy.api.services.chats.IKandyTransferProgress;
+import com.genband.kandy.api.services.chats.KandyThumbnailSize;
+import com.genband.kandy.api.services.common.KandyGroupUploadProgressListener;
+import com.genband.kandy.api.services.common.KandyResponseListener;
+import com.genband.kandy.api.services.common.KandyResponseProgressListener;
+import com.genband.kandy.api.services.groups.IKandyGroupDestroyed;
+import com.genband.kandy.api.services.groups.IKandyGroupParticipantJoined;
+import com.genband.kandy.api.services.groups.IKandyGroupParticipantKicked;
+import com.genband.kandy.api.services.groups.IKandyGroupParticipantLeft;
+import com.genband.kandy.api.services.groups.IKandyGroupUpdated;
+import com.genband.kandy.api.services.groups.KandyGroup;
+import com.genband.kandy.api.services.groups.KandyGroupParams;
+import com.genband.kandy.api.services.groups.KandyGroupParticipant;
+import com.genband.kandy.api.services.groups.KandyGroupResponseListener;
+import com.genband.kandy.api.services.groups.KandyGroupServiceNotificationListener;
+import com.genband.kandy.api.utils.KandyIllegalArgumentException;
 
 public class DetailGroupFragment extends Fragment implements KandyGroupServiceNotificationListener {
 
@@ -56,7 +82,7 @@ public class DetailGroupFragment extends Fragment implements KandyGroupServiceNo
 		this.mGroupId = groupId;
 	}
 
-	@Override
+	
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		if (mGroupId != null) {
@@ -66,19 +92,19 @@ public class DetailGroupFragment extends Fragment implements KandyGroupServiceNo
 		mDateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 	}
 
-	@Override
+	
 	public void onResume() {
 		super.onResume();
 		Kandy.getServices().getGroupService().registerNotificationListener(this);
 	}
 
-	@Override
+	
 	public void onPause() {
 		super.onPause();
 		Kandy.getServices().getGroupService().unregisterNotificationListener(this);
 	}
 
-	@Override
+	
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		switch (requestCode) {
 
@@ -94,13 +120,13 @@ public class DetailGroupFragment extends Fragment implements KandyGroupServiceNo
 		}
 	}
 
-	@Override
+	
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		getActivity().getMenuInflater().inflate(KandyUtils.getResource("group_settings", "menu"), menu);
 		super.onCreateOptionsMenu(menu, inflater);
 	}
 
-	@Override
+	
 	public boolean onOptionsItemSelected(MenuItem item) {
 		int id = item.getItemId();
 		if (id == KandyUtils.getId("action_settings_leave")) {
@@ -116,7 +142,7 @@ public class DetailGroupFragment extends Fragment implements KandyGroupServiceNo
 		return super.onOptionsItemSelected(item);
 	}
 
-	@Override
+	
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view = inflater.inflate(KandyUtils.getLayout("kandy_group_detail_fragment"), container, false);
 
@@ -130,7 +156,7 @@ public class DetailGroupFragment extends Fragment implements KandyGroupServiceNo
 
 		uiGroupNameEdit.setOnEditorActionListener(new OnEditorActionListener() {
 
-			@Override
+			
 			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
 				boolean handled = false;
 				if (actionId == EditorInfo.IME_ACTION_SEND) {
@@ -143,7 +169,7 @@ public class DetailGroupFragment extends Fragment implements KandyGroupServiceNo
 
 		uiThumbnailImage.setOnClickListener(new OnClickListener() {
 
-			@Override
+			
 			public void onClick(View v) {
 				createImageActionsDialog().show();
 			}
@@ -158,7 +184,7 @@ public class DetailGroupFragment extends Fragment implements KandyGroupServiceNo
 		((Button) view.findViewById(KandyUtils.getId("ui_activity_group_settings_chat_button")))
 				.setOnClickListener(new OnClickListener() {
 
-					@Override
+					
 					public void onClick(View v) {
 						FragmentManager fragmentManager = getFragmentManager();
 						FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -174,7 +200,7 @@ public class DetailGroupFragment extends Fragment implements KandyGroupServiceNo
 		((Button) view.findViewById(KandyUtils.getId("ui_activity_group_settings_add_participant_button")))
 				.setOnClickListener(new OnClickListener() {
 
-					@Override
+					
 					public void onClick(View v) {
 						String participant = uiGroupParticipantEdit.getText().toString();
 						addParticipant(participant);
@@ -184,7 +210,7 @@ public class DetailGroupFragment extends Fragment implements KandyGroupServiceNo
 		((Button) view.findViewById(KandyUtils.getId("ui_activity_groups_back_button")))
 				.setOnClickListener(new OnClickListener() {
 
-					@Override
+					
 					public void onClick(View v) {
 						FragmentManager fragmentManager = getFragmentManager();
 						FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -199,7 +225,7 @@ public class DetailGroupFragment extends Fragment implements KandyGroupServiceNo
 		list.setAdapter(mAdapter);
 		list.setOnItemClickListener(new OnItemClickListener() {
 
-			@Override
+			
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				final KandyGroupParticipant participant = mAdapter.getItem(position);
 				createParticipantActionsDialog(participant).show();
@@ -224,12 +250,12 @@ public class DetailGroupFragment extends Fragment implements KandyGroupServiceNo
 		Kandy.getServices().getGroupService()
 				.updateGroupName(getKandyGroupInstance().getGroupId(), string, new KandyGroupResponseListener() {
 
-					@Override
+					
 					public void onRequestFailed(int responseCode, String err) {
 						UIUtils.handleResultOnUiThread(getActivity(), true, err);
 					}
 
-					@Override
+					
 					public void onRequestSucceded(KandyGroup kandyGroup) {
 						setKandyGroupInstance(kandyGroup);
 						updateUI();
@@ -245,19 +271,19 @@ public class DetailGroupFragment extends Fragment implements KandyGroupServiceNo
 		Kandy.getServices().getGroupService()
 				.updateGroupImage(getKandyGroupInstance().getGroupId(), uri, new KandyGroupUploadProgressListener() {
 
-					@Override
+					
 					public void onRequestFailed(int responseCode, String err) {
 						UIUtils.handleResultOnUiThread(getActivity(), true, err);
 
 					}
 
-					@Override
+					
 					public void onRequestSucceded(KandyGroup kandyGroup) {
 						setKandyGroupInstance(kandyGroup);
 						updateImageUI();
 					}
 
-					@Override
+					
 					public void onProgressUpdate(IKandyTransferProgress progress) {
 						Log.d("UPLOAD_IMAGE", "uploading image, progress: " + progress.getProgress());
 					}
@@ -272,7 +298,7 @@ public class DetailGroupFragment extends Fragment implements KandyGroupServiceNo
 		builder.setItems(new String[] { "Remove Image", "Update Image" },
 				new android.content.DialogInterface.OnClickListener() {
 
-					@Override
+					
 					public void onClick(DialogInterface dialog, int which) {
 
 						switch (which) {
@@ -304,7 +330,7 @@ public class DetailGroupFragment extends Fragment implements KandyGroupServiceNo
 		builder.setItems(new String[] { "Remove participant", muteState },
 				new android.content.DialogInterface.OnClickListener() {
 
-					@Override
+					
 					public void onClick(DialogInterface dialog, int which) {
 
 						switch (which) {
@@ -330,12 +356,12 @@ public class DetailGroupFragment extends Fragment implements KandyGroupServiceNo
 		Kandy.getServices().getGroupService()
 				.removeGroupImage(getKandyGroupInstance().getGroupId(), new KandyGroupResponseListener() {
 
-					@Override
+					
 					public void onRequestFailed(int responseCode, String err) {
 						UIUtils.handleResultOnUiThread(getActivity(), true, err);
 					}
 
-					@Override
+					
 					public void onRequestSucceded(KandyGroup kandyGroup) {
 						setKandyGroupInstance(kandyGroup);
 						UIUtils.handleResultOnUiThread(getActivity(), false,
@@ -351,16 +377,16 @@ public class DetailGroupFragment extends Fragment implements KandyGroupServiceNo
 				.downloadGroupImageThumbnail(getKandyGroupInstance().getGroupId(), KandyThumbnailSize.MEDIUM,
 						new KandyResponseProgressListener() {
 
-							@Override
+							
 							public void onRequestFailed(int responseCode, String err) {
 								UIUtils.handleResultOnUiThread(getActivity(), true, err);
 							}
 
-							@Override
+							
 							public void onRequestSucceded(final Uri fileUri) {
 								getActivity().runOnUiThread(new Runnable() {
 
-									@Override
+									
 									public void run() {
 										uiThumbnailImage.setImageURI(fileUri);
 										UIUtils.handleResultOnUiThread(getActivity(), false, KandyUtils
@@ -369,7 +395,7 @@ public class DetailGroupFragment extends Fragment implements KandyGroupServiceNo
 								});
 							}
 
-							@Override
+							
 							public void onProgressUpdate(IKandyTransferProgress progress) {
 								Log.d("DOWNLOAD_IMAGE", "download Image thumbnail, progress: " + progress.getProgress());
 							}
@@ -383,12 +409,12 @@ public class DetailGroupFragment extends Fragment implements KandyGroupServiceNo
 			Kandy.getServices().getGroupService()
 					.unmuteGroup(getKandyGroupInstance().getGroupId(), new KandyGroupResponseListener() {
 
-						@Override
+						
 						public void onRequestFailed(int responseCode, String err) {
 							UIUtils.handleResultOnUiThread(getActivity(), true, err);
 						}
 
-						@Override
+						
 						public void onRequestSucceded(KandyGroup kandyGroup) {
 							setKandyGroupInstance(kandyGroup);
 							updateUI();
@@ -400,12 +426,12 @@ public class DetailGroupFragment extends Fragment implements KandyGroupServiceNo
 			Kandy.getServices().getGroupService()
 					.muteGroup(getKandyGroupInstance().getGroupId(), new KandyGroupResponseListener() {
 
-						@Override
+						
 						public void onRequestFailed(int responseCode, String err) {
 							UIUtils.handleResultOnUiThread(getActivity(), true, err);
 						}
 
-						@Override
+						
 						public void onRequestSucceded(KandyGroup kandyGroup) {
 							setKandyGroupInstance(kandyGroup);
 							updateUI();
@@ -422,12 +448,12 @@ public class DetailGroupFragment extends Fragment implements KandyGroupServiceNo
 		Kandy.getServices().getGroupService()
 				.destroyGroup(getKandyGroupInstance().getGroupId(), new KandyResponseListener() {
 
-					@Override
+					
 					public void onRequestFailed(int responseCode, String err) {
 						UIUtils.handleResultOnUiThread(getActivity(), true, err);
 					}
 
-					@Override
+					
 					public void onRequestSucceded() {
 						UIUtils.handleResultOnUiThread(getActivity(), false,
 								KandyUtils.getString("groups_settings_activity_action_group_destroyed"));
@@ -442,12 +468,12 @@ public class DetailGroupFragment extends Fragment implements KandyGroupServiceNo
 		Kandy.getServices().getGroupService()
 				.leaveGroup(getKandyGroupInstance().getGroupId(), new KandyResponseListener() {
 
-					@Override
+					
 					public void onRequestFailed(int responseCode, String err) {
 						UIUtils.handleResultOnUiThread(getActivity(), true, err);
 					}
 
-					@Override
+					
 					public void onRequestSucceded() {
 						UIUtils.handleResultOnUiThread(getActivity(), false,
 								KandyUtils.getString("groups_settings_activity_action_group_left"));
@@ -461,12 +487,12 @@ public class DetailGroupFragment extends Fragment implements KandyGroupServiceNo
 				.removeParticipants(getKandyGroupInstance().getGroupId(), participants,
 						new KandyGroupResponseListener() {
 
-							@Override
+							
 							public void onRequestFailed(int responseCode, String err) {
 								UIUtils.handleResultOnUiThread(getActivity(), true, err);
 							}
 
-							@Override
+							
 							public void onRequestSucceded(KandyGroup kandyGroup) {
 								setKandyGroupInstance(kandyGroup);
 								updateUI();
@@ -484,12 +510,12 @@ public class DetailGroupFragment extends Fragment implements KandyGroupServiceNo
 					.unmuteParticipants(getKandyGroupInstance().getGroupId(), participants,
 							new KandyGroupResponseListener() {
 
-								@Override
+								
 								public void onRequestFailed(int responseCode, String err) {
 									UIUtils.handleResultOnUiThread(getActivity(), true, err);
 								}
 
-								@Override
+								
 								public void onRequestSucceded(KandyGroup kandyGroup) {
 									setKandyGroupInstance(kandyGroup);
 									updateUI();
@@ -504,12 +530,12 @@ public class DetailGroupFragment extends Fragment implements KandyGroupServiceNo
 					.muteParticipants(getKandyGroupInstance().getGroupId(), participants,
 							new KandyGroupResponseListener() {
 
-								@Override
+								
 								public void onRequestFailed(int responseCode, String err) {
 									UIUtils.handleResultOnUiThread(getActivity(), true, err);
 								}
 
-								@Override
+								
 								public void onRequestSucceded(KandyGroup kandyGroup) {
 									setKandyGroupInstance(kandyGroup);
 									updateUI();
@@ -537,12 +563,12 @@ public class DetailGroupFragment extends Fragment implements KandyGroupServiceNo
 				.addParticipants(getKandyGroupInstance().getGroupId(), newParticipants,
 						new KandyGroupResponseListener() {
 
-							@Override
+							
 							public void onRequestFailed(int responseCode, String err) {
 								UIUtils.handleResultOnUiThread(getActivity(), true, err);
 							}
 
-							@Override
+							
 							public void onRequestSucceded(KandyGroup kandyGroup) {
 								setKandyGroupInstance(kandyGroup);
 								updateUI();
@@ -564,7 +590,7 @@ public class DetailGroupFragment extends Fragment implements KandyGroupServiceNo
 	private void getSelectedGroup() {
 		getActivity().runOnUiThread(new Runnable() {
 
-			@Override
+			
 			public void run() {
 				UIUtils.showProgressDialogWithMessage(getActivity(),
 						KandyUtils.getString("groups_settings_activity_action_getting_group_data"));
@@ -572,12 +598,12 @@ public class DetailGroupFragment extends Fragment implements KandyGroupServiceNo
 					Kandy.getServices().getGroupService()
 							.getGroupById(new KandyRecord(mGroupId), new KandyGroupResponseListener() {
 
-								@Override
+								
 								public void onRequestFailed(int responseCode, String error) {
 									UIUtils.handleResultOnUiThread(getActivity(), true, error);
 								}
 
-								@Override
+								
 								public void onRequestSucceded(KandyGroup kandyGroup) {
 									setKandyGroupInstance(kandyGroup);
 									updateUI();
@@ -595,7 +621,7 @@ public class DetailGroupFragment extends Fragment implements KandyGroupServiceNo
 	private void updateUI() {
 		getActivity().runOnUiThread(new Runnable() {
 
-			@Override
+			
 			public void run() {
 				String dateString = mDateFormat.format(getKandyGroupInstance().getCreationDate());
 				uiGroupCreatedAt.setText("created at: " + dateString);
@@ -613,7 +639,7 @@ public class DetailGroupFragment extends Fragment implements KandyGroupServiceNo
 	private void updateImageUI() {
 		getActivity().runOnUiThread(new Runnable() {
 
-			@Override
+			
 			public void run() {
 				UIUtils.dismissProgressDialog();
 				IKandyImageItem image = getKandyGroupInstance().getImage();
@@ -630,7 +656,7 @@ public class DetailGroupFragment extends Fragment implements KandyGroupServiceNo
 		});
 	}
 
-	@Override
+	
 	public void onGroupDestroyed(IKandyGroupDestroyed message) {
 		((KandyGroupServiceNotificationListener) groupViewProxy).onGroupDestroyed(message);
 		if (message.getGroupId().getUri().equals(getKandyGroupInstance().getGroupId().getUri())) {
@@ -640,7 +666,7 @@ public class DetailGroupFragment extends Fragment implements KandyGroupServiceNo
 		}
 	}
 
-	@Override
+	
 	public void onGroupUpdated(IKandyGroupUpdated message) {
 		((KandyGroupServiceNotificationListener) groupViewProxy).onGroupUpdated(message);
 		if (message.getGroupId().getUri().equals(getKandyGroupInstance().getGroupId().getUri())) {
@@ -664,7 +690,7 @@ public class DetailGroupFragment extends Fragment implements KandyGroupServiceNo
 				if (isImageRemoved) {
 					getActivity().runOnUiThread(new Runnable() {
 
-						@Override
+						
 						public void run() {
 							uiThumbnailImage.setImageResource(KandyUtils.getDrawable("icon_photo"));
 						}
@@ -674,7 +700,7 @@ public class DetailGroupFragment extends Fragment implements KandyGroupServiceNo
 		}
 	}
 
-	@Override
+	
 	public void onParticipantJoined(IKandyGroupParticipantJoined message) {
 		((KandyGroupServiceNotificationListener) groupViewProxy).onParticipantJoined(message);
 		if (message.getGroupId().getUri().equals(getKandyGroupInstance().getGroupId().getUri())) {
@@ -682,7 +708,7 @@ public class DetailGroupFragment extends Fragment implements KandyGroupServiceNo
 		}
 	}
 
-	@Override
+	
 	public void onParticipantKicked(IKandyGroupParticipantKicked message) {
 		((KandyGroupServiceNotificationListener) groupViewProxy).onParticipantKicked(message);
 		if (message.getGroupId().getUri().equals(getKandyGroupInstance().getGroupId().getUri())) {
@@ -705,7 +731,7 @@ public class DetailGroupFragment extends Fragment implements KandyGroupServiceNo
 
 	}
 
-	@Override
+	
 	public void onParticipantLeft(IKandyGroupParticipantLeft message) {
 		((KandyGroupServiceNotificationListener) groupViewProxy).onParticipantLeft(message);
 		if (message.getGroupId().getUri().equals(getKandyGroupInstance().getGroupId().getUri())) {

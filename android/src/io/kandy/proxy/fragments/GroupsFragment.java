@@ -1,5 +1,13 @@
 package io.kandy.proxy.fragments;
 
+import io.kandy.proxy.adapters.GroupAdapter;
+import io.kandy.proxy.views.GroupViewProxy;
+import io.kandy.utils.KandyUtils;
+import io.kandy.utils.UIUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
@@ -14,15 +22,18 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-import com.genband.kandy.api.Kandy;
-import com.genband.kandy.api.services.groups.*;
-import io.kandy.proxy.adapters.GroupAdapter;
-import io.kandy.proxy.views.GroupViewProxy;
-import io.kandy.utils.KandyUtils;
-import io.kandy.utils.UIUtils;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.genband.kandy.api.Kandy;
+import com.genband.kandy.api.services.groups.IKandyGroupDestroyed;
+import com.genband.kandy.api.services.groups.IKandyGroupParticipantJoined;
+import com.genband.kandy.api.services.groups.IKandyGroupParticipantKicked;
+import com.genband.kandy.api.services.groups.IKandyGroupParticipantLeft;
+import com.genband.kandy.api.services.groups.IKandyGroupUpdated;
+import com.genband.kandy.api.services.groups.KandyGroup;
+import com.genband.kandy.api.services.groups.KandyGroupParams;
+import com.genband.kandy.api.services.groups.KandyGroupResponseListener;
+import com.genband.kandy.api.services.groups.KandyGroupServiceNotificationListener;
+import com.genband.kandy.api.services.groups.KandyGroupsResponseListener;
 
 public class GroupsFragment extends Fragment implements OnItemClickListener, KandyGroupServiceNotificationListener {
 
@@ -38,25 +49,25 @@ public class GroupsFragment extends Fragment implements OnItemClickListener, Kan
 		this.groupViewProxy = groupViewProxy;
 	}
 
-	@Override
+	
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		getListOfGroupsOnUiThread();
 	}
 
-	@Override
+	
 	public void onResume() {
 		super.onResume();
 		Kandy.getServices().getGroupService().registerNotificationListener(this);
 	}
 
-	@Override
+	
 	public void onPause() {
 		super.onPause();
 		Kandy.getServices().getGroupService().unregisterNotificationListener(this);
 	}
 
-	@Override
+	
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view = inflater.inflate(KandyUtils.getLayout("kandy_groups_fragment"), container, false);
 
@@ -70,7 +81,7 @@ public class GroupsFragment extends Fragment implements OnItemClickListener, Kan
 		((Button) view.findViewById(KandyUtils.getId("ui_activity_groups_list_group_create_btn")))
 				.setOnClickListener(new OnClickListener() {
 
-					@Override
+					
 					public void onClick(View v) {
 						createGroup();
 					}
@@ -89,12 +100,12 @@ public class GroupsFragment extends Fragment implements OnItemClickListener, Kan
 
 		Kandy.getServices().getGroupService().createGroup(params, new KandyGroupResponseListener() {
 
-			@Override
+			
 			public void onRequestFailed(int responseCode, String error) {
 				UIUtils.handleResultOnUiThread(getActivity(), true, error);
 			}
 
-			@Override
+			
 			public void onRequestSucceded(KandyGroup kandyGroup) {
 				mGroups.add(kandyGroup);
 				updateUI();
@@ -107,7 +118,7 @@ public class GroupsFragment extends Fragment implements OnItemClickListener, Kan
 	private void getListOfGroupsOnUiThread() {
 		getActivity().runOnUiThread(new Runnable() {
 
-			@Override
+			
 			public void run() {
 				getListOfGroups();
 			}
@@ -120,12 +131,12 @@ public class GroupsFragment extends Fragment implements OnItemClickListener, Kan
 		Log.i(LCAT, "getListOfGroups() was invoked.");
 		Kandy.getServices().getGroupService().getMyGroups(new KandyGroupsResponseListener() {
 
-			@Override
+			
 			public void onRequestFailed(int responseCode, String error) {
 				UIUtils.handleResultOnUiThread(getActivity(), true, error);
 			}
 
-			@Override
+			
 			public void onRequestSucceded(List<KandyGroup> groupList) {
 				mGroups.clear();
 				mGroups.addAll(groupList);
@@ -138,14 +149,14 @@ public class GroupsFragment extends Fragment implements OnItemClickListener, Kan
 	private void updateUI() {
 		getActivity().runOnUiThread(new Runnable() {
 
-			@Override
+			
 			public void run() {
 				mGroupAdapter.notifyDataSetChanged();
 			}
 		});
 	}
 
-	@Override
+	
 	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 		KandyGroup group = (KandyGroup) mGroupAdapter.getItem(position);
 		String groupId = group.getGroupId().getUri();
@@ -159,31 +170,31 @@ public class GroupsFragment extends Fragment implements OnItemClickListener, Kan
 
 	}
 
-	@Override
+	
 	public void onGroupDestroyed(IKandyGroupDestroyed group) {
 		((KandyGroupServiceNotificationListener) groupViewProxy).onGroupDestroyed(group);
 		getListOfGroupsOnUiThread();
 	}
 
-	@Override
+	
 	public void onGroupUpdated(IKandyGroupUpdated group) {
 		((KandyGroupServiceNotificationListener) groupViewProxy).onGroupUpdated(group);
 		getListOfGroupsOnUiThread();
 	}
 
-	@Override
+	
 	public void onParticipantJoined(IKandyGroupParticipantJoined participant) {
 		((KandyGroupServiceNotificationListener) groupViewProxy).onParticipantJoined(participant);
 		getListOfGroupsOnUiThread();
 	}
 
-	@Override
+	
 	public void onParticipantKicked(IKandyGroupParticipantKicked participant) {
 		((KandyGroupServiceNotificationListener) groupViewProxy).onParticipantKicked(participant);
 		getListOfGroupsOnUiThread();
 	}
 
-	@Override
+	
 	public void onParticipantLeft(IKandyGroupParticipantLeft participant) {
 		((KandyGroupServiceNotificationListener) groupViewProxy).onParticipantLeft(participant);
 		getListOfGroupsOnUiThread();

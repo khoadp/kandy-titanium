@@ -1,13 +1,16 @@
 package io.kandy.proxy;
 
-import android.app.Activity;
-import com.genband.kandy.api.services.calls.IKandyCall;
 import io.kandy.KandyModule;
 import io.kandy.proxy.views.KandyVideoView;
+
 import org.appcelerator.kroll.KrollDict;
 import org.appcelerator.kroll.annotations.Kroll;
 import org.appcelerator.titanium.proxy.TiViewProxy;
 import org.appcelerator.titanium.view.TiUIView;
+
+import android.app.Activity;
+
+import com.genband.kandy.api.services.calls.IKandyCall;
 
 @Kroll.proxy(creatableInModule = KandyModule.class)
 public class CallViewProxy extends TiViewProxy {

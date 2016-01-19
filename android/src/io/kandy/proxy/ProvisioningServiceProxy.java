@@ -1,22 +1,26 @@
 package io.kandy.proxy;
 
-import android.app.Activity;
-import android.util.Log;
-import com.genband.kandy.api.Kandy;
-import com.genband.kandy.api.provisioning.IKandyValidationResponse;
-import com.genband.kandy.api.provisioning.KandyValidationResponseListener;
-import com.genband.kandy.api.services.common.KandyResponseListener;
-import com.genband.kandy.api.services.location.IKandyAreaCode;
-import com.genband.kandy.api.services.location.KandyCountryInfoResponseListener;
 import io.kandy.KandyConstant;
 import io.kandy.KandyModule;
 import io.kandy.proxy.views.ProvisioningViewProxy;
 import io.kandy.utils.KandyUtils;
+
 import org.appcelerator.kroll.KrollDict;
 import org.appcelerator.kroll.KrollFunction;
 import org.appcelerator.kroll.annotations.Kroll;
 import org.appcelerator.titanium.proxy.TiViewProxy;
 import org.appcelerator.titanium.view.TiUIView;
+
+import android.app.Activity;
+import android.util.Log;
+
+import com.genband.kandy.api.Kandy;
+import com.genband.kandy.api.provisioning.IKandyValidationResponse;
+import com.genband.kandy.api.provisioning.KandyValidationMethoud;
+import com.genband.kandy.api.provisioning.KandyValidationResponseListener;
+import com.genband.kandy.api.services.common.KandyResponseListener;
+import com.genband.kandy.api.services.location.IKandyAreaCode;
+import com.genband.kandy.api.services.location.KandyCountryInfoResponseListener;
 
 /**
  * Provisioning service
@@ -100,7 +104,7 @@ public class ProvisioningServiceProxy extends TiViewProxy {
 			twoLetterISOCountryCode = this.twoLetterISOCountryCode;
 		}
 
-		Kandy.getProvisioning().requestCode(phoneNumber, twoLetterISOCountryCode, new KandyResponseListener() {
+		Kandy.getProvisioning().requestCode(KandyValidationMethoud.SMS, phoneNumber, twoLetterISOCountryCode, null, new KandyResponseListener() {
 
 			@Override
 			public void onRequestFailed(int code, String err) {

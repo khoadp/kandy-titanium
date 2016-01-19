@@ -1,23 +1,34 @@
 package io.kandy.proxy;
 
-import android.app.Activity;
-import android.content.Context;
-import android.media.AudioManager;
-import android.util.Log;
-import com.genband.kandy.api.Kandy;
-import com.genband.kandy.api.services.calls.*;
-import com.genband.kandy.api.services.common.KandyCameraInfo;
-import com.genband.kandy.api.services.common.KandyMissedCallMessage;
-import com.genband.kandy.api.services.common.KandyWaitingVoiceMailMessage;
-import com.genband.kandy.api.utils.KandyIllegalArgumentException;
 import io.kandy.KandyModule;
 import io.kandy.utils.KandyUtils;
+
+import java.util.HashMap;
+
 import org.appcelerator.kroll.KrollDict;
 import org.appcelerator.kroll.KrollFunction;
 import org.appcelerator.kroll.KrollProxy;
 import org.appcelerator.kroll.annotations.Kroll;
 
-import java.util.HashMap;
+import android.app.Activity;
+import android.content.Context;
+import android.media.AudioManager;
+import android.util.Log;
+
+import com.genband.kandy.api.Kandy;
+import com.genband.kandy.api.services.calls.IKandyCall;
+import com.genband.kandy.api.services.calls.IKandyIncomingCall;
+import com.genband.kandy.api.services.calls.IKandyOutgoingCall;
+import com.genband.kandy.api.services.calls.KandyCallResponseListener;
+import com.genband.kandy.api.services.calls.KandyCallServiceNotificationListener;
+import com.genband.kandy.api.services.calls.KandyCallState;
+import com.genband.kandy.api.services.calls.KandyOutgingVoipCallOptions;
+import com.genband.kandy.api.services.calls.KandyRecord;
+import com.genband.kandy.api.services.calls.KandyView;
+import com.genband.kandy.api.services.common.KandyCameraInfo;
+import com.genband.kandy.api.services.common.KandyMissedCallMessage;
+import com.genband.kandy.api.services.common.KandyWaitingVoiceMailMessage;
+import com.genband.kandy.api.utils.KandyIllegalArgumentException;
 
 @Kroll.proxy(creatableInModule = KandyModule.class)
 public class CallServiceProxy extends KrollProxy implements KandyCallServiceNotificationListener {
@@ -345,7 +356,6 @@ public class CallServiceProxy extends KrollProxy implements KandyCallServiceNoti
 			this.error = error;
 		}
 
-		@Override
 		public void onRequestFailed(IKandyCall call, int code, String err) {
 			Log.d(LCAT, "KandyCallResponseListenerCallBack->onRequestFailed() was invoked: "
 					+ call.getCallee().getUri() + " - " + String.valueOf(code) + " - " + err);
@@ -353,7 +363,6 @@ public class CallServiceProxy extends KrollProxy implements KandyCallServiceNoti
 			KandyUtils.sendFailResult(getKrollObject(), error, code, err);
 		}
 
-		@Override
 		public void onRequestSucceeded(IKandyCall call) {
 			Log.d(LCAT, "KandyCallResponseListenerCallBack->onRequestSucceeded() was invoked: "
 					+ call.getCallee().getUri());
@@ -362,38 +371,41 @@ public class CallServiceProxy extends KrollProxy implements KandyCallServiceNoti
 
 	}
 
-	@Override
 	public void onCallStateChanged(KandyCallState state, IKandyCall call) {
 		Log.i("KandyCallServiceProxyNotificationListener", "onCallStateChanged was invoked.");
 		if (hasListeners("onCallStateChanged"))
 			fireEvent("onCallStateChanged", KandyUtils.getKrollDictFromKandyCall(call));
 	}
 
-	@Override
-	public void onGSMCallConnected(IKandyCall call) {
-		if (hasListeners("onGSMCallConnected"))
-			fireEvent("onGSMCallConnected", KandyUtils.getKrollDictFromKandyCall(call));
+	public void onGSMCallConnected(IKandyCall call, String incomingNumber) {
+		if (hasListeners("onGSMCallConnected")){
+			KrollDict result = KandyUtils.getKrollDictFromKandyCall(call);
+			result.put("incomingNumber", incomingNumber);
+			fireEvent("onGSMCallConnected", result);
+		}
 	}
 
-	@Override
-	public void onGSMCallDisconnected(IKandyCall call) {
-		if (hasListeners("onGSMCallDisconnected"))
-			fireEvent("onGSMCallDisconnected", KandyUtils.getKrollDictFromKandyCall(call));
+	public void onGSMCallDisconnected(IKandyCall call, String incomingNumber) {
+		if (hasListeners("onGSMCallDisconnected")){
+			KrollDict result = KandyUtils.getKrollDictFromKandyCall(call);
+			result.put("incomingNumber", incomingNumber);
+			fireEvent("onGSMCallDisconnected", result);
+		}
 	}
 
-	@Override
-	public void onGSMCallIncoming(IKandyCall call) {
-		if (hasListeners("onGSMCallIncoming"))
-			fireEvent("onGSMCallIncoming", KandyUtils.getKrollDictFromKandyCall(call));
+	public void onGSMCallIncoming(IKandyCall call, String incomingNumber) {
+		if (hasListeners("onGSMCallIncoming")){
+			KrollDict result = KandyUtils.getKrollDictFromKandyCall(call);
+			result.put("incomingNumber", incomingNumber);
+			fireEvent("onGSMCallIncoming", result);
+		}
 	}
 
-	@Override
 	public void onIncomingCall(IKandyIncomingCall call) {
 		if (hasListeners("onIncomingCall"))
 			fireEvent("onIncomingCall", KandyUtils.getKrollDictFromKandyCall(call));
 	}
 
-	@Override
 	public void onMissedCall(KandyMissedCallMessage call) {
 		if (hasListeners("onMissedCall")) {
 			KrollDict result = new KrollDict();
@@ -408,7 +420,6 @@ public class CallServiceProxy extends KrollProxy implements KandyCallServiceNoti
 		}
 	}
 
-	@Override
 	public void onVideoStateChanged(IKandyCall call, boolean isReceivingVideo, boolean isSendingVideo) {
 		if (hasListeners("onVideoStateChanged")) {
 			KrollDict result = KandyUtils.getKrollDictFromKandyCall(call);
@@ -419,7 +430,6 @@ public class CallServiceProxy extends KrollProxy implements KandyCallServiceNoti
 		}
 	}
 
-	@Override
 	public void onWaitingVoiceMailCall(KandyWaitingVoiceMailMessage call) {
 		if (hasListeners("onWaitingVoiceMailCall")) {
 			KrollDict result = new KrollDict();

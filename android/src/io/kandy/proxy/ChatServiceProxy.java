@@ -1,5 +1,19 @@
 package io.kandy.proxy;
 
+import io.kandy.KandyModule;
+import io.kandy.proxy.views.ChatViewProxy;
+import io.kandy.utils.KandyUtils;
+
+import java.util.UUID;
+
+import org.appcelerator.kroll.KrollDict;
+import org.appcelerator.kroll.KrollFunction;
+import org.appcelerator.kroll.annotations.Kroll;
+import org.appcelerator.titanium.TiLifecycle.OnActivityResultEvent;
+import org.appcelerator.titanium.proxy.TiViewProxy;
+import org.appcelerator.titanium.view.TiUIView;
+import org.json.JSONObject;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.location.Location;
@@ -9,27 +23,31 @@ import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.Window;
 import android.widget.Toast;
+
 import com.genband.kandy.api.Kandy;
 import com.genband.kandy.api.services.calls.KandyRecord;
 import com.genband.kandy.api.services.calls.KandyRecordType;
-import com.genband.kandy.api.services.chats.*;
+import com.genband.kandy.api.services.chats.IKandyAudioItem;
+import com.genband.kandy.api.services.chats.IKandyContactItem;
+import com.genband.kandy.api.services.chats.IKandyFileItem;
+import com.genband.kandy.api.services.chats.IKandyImageItem;
+import com.genband.kandy.api.services.chats.IKandyLocationItem;
+import com.genband.kandy.api.services.chats.IKandyMediaItem;
+import com.genband.kandy.api.services.chats.IKandyMessage;
+import com.genband.kandy.api.services.chats.IKandyTextItem;
+import com.genband.kandy.api.services.chats.IKandyTransferProgress;
+import com.genband.kandy.api.services.chats.IKandyVideoItem;
+import com.genband.kandy.api.services.chats.KandyChatMessage;
+import com.genband.kandy.api.services.chats.KandyChatServiceNotificationListener;
+import com.genband.kandy.api.services.chats.KandyDeliveryAck;
+import com.genband.kandy.api.services.chats.KandyMessageBuilder;
+import com.genband.kandy.api.services.chats.KandySMSMessage;
+import com.genband.kandy.api.services.chats.KandyThumbnailSize;
 import com.genband.kandy.api.services.common.KandyResponseCancelListener;
 import com.genband.kandy.api.services.common.KandyResponseListener;
 import com.genband.kandy.api.services.common.KandyResponseProgressListener;
 import com.genband.kandy.api.services.location.KandyCurrentLocationListener;
 import com.genband.kandy.api.utils.KandyIllegalArgumentException;
-import io.kandy.KandyModule;
-import io.kandy.proxy.views.ChatViewProxy;
-import io.kandy.utils.KandyUtils;
-import org.appcelerator.kroll.KrollDict;
-import org.appcelerator.kroll.KrollFunction;
-import org.appcelerator.kroll.annotations.Kroll;
-import org.appcelerator.titanium.TiLifecycle.OnActivityResultEvent;
-import org.appcelerator.titanium.proxy.TiViewProxy;
-import org.appcelerator.titanium.view.TiUIView;
-import org.json.JSONObject;
-
-import java.util.UUID;
 
 /**
  * Chat service
@@ -315,7 +333,6 @@ public class ChatServiceProxy extends TiViewProxy implements OnActivityResultEve
 		try {
 			Kandy.getServices().getLocationService().getCurrentLocation(new KandyCurrentLocationListener() {
 
-				@Override
 				public void onCurrentLocationReceived(Location location) {
 					Log.d(LCAT,
 							"KandyCurrentLocationListener->onCurrentLocationReceived() was invoked: "
@@ -324,7 +341,6 @@ public class ChatServiceProxy extends TiViewProxy implements OnActivityResultEve
 					sendChatMessage(success, error, destination, kandyLocation, type);
 				}
 
-				@Override
 				public void onCurrentLocationFailed(int code, String err) {
 					Log.d(LCAT, "KandyCurrentLocationListener->onRequestFailed() was invoked: " + String.valueOf(code)
 							+ " - " + error);
@@ -524,14 +540,12 @@ public class ChatServiceProxy extends TiViewProxy implements OnActivityResultEve
 
 	}
 
-	@Override
 	public void onChatDelivered(KandyDeliveryAck ack) {
 		Log.d(LCAT, "KandyChatServiceNotificationListener->onChatDelivered() was invoked: " + ack.getUUID());
 		if (hasListeners("onChatDelivered"))
 			fireEvent("onChatDelivered", KandyUtils.getKrollDictFromKandyDeliveryAck(ack));
 	}
 
-	@Override
 	public void onChatMediaAutoDownloadFailed(IKandyMessage message, int code, String error) {
 		Log.d(LCAT, "KandyChatServiceNotificationListener->onChatMediaAutoDownloadFailed() was invoked.");
 
@@ -544,7 +558,6 @@ public class ChatServiceProxy extends TiViewProxy implements OnActivityResultEve
 		}
 	}
 
-	@Override
 	public void onChatMediaAutoDownloadProgress(IKandyMessage message, IKandyTransferProgress progress) {
 		Log.d(LCAT, "KandyChatServiceNotificationListener->onChatMediaAutoDownloadProgress() was invoked: " + progress);
 
@@ -559,7 +572,6 @@ public class ChatServiceProxy extends TiViewProxy implements OnActivityResultEve
 		}
 	}
 
-	@Override
 	public void onChatMediaAutoDownloadSucceded(IKandyMessage message, Uri uri) {
 		Log.d(LCAT, "KandyChatServiceNotificationListener->onChatMediaAutoDownloadSucceded() was invoked: " + uri);
 
@@ -571,7 +583,6 @@ public class ChatServiceProxy extends TiViewProxy implements OnActivityResultEve
 		}
 	}
 
-	@Override
 	public void onChatReceived(IKandyMessage message, KandyRecordType type) {
 		Log.d(LCAT, "KandyChatServiceNotificationListener->onChatReceived() was invoked: " + type.name());
 		if (hasListeners("onChatReceived")) {
@@ -582,7 +593,6 @@ public class ChatServiceProxy extends TiViewProxy implements OnActivityResultEve
 		}
 	}
 
-	@Override
 	public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
 		if (resultCode == Activity.RESULT_OK) {
 			if (hasListeners("onActivityResult")) {

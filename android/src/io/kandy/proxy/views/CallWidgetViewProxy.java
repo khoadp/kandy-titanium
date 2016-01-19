@@ -1,5 +1,14 @@
 package io.kandy.proxy.views;
 
+import io.kandy.proxy.CallServiceProxy;
+import io.kandy.proxy.CallWidgetProxy;
+import io.kandy.utils.KandyUtils;
+import io.kandy.utils.UIUtils;
+
+import org.appcelerator.kroll.KrollDict;
+import org.appcelerator.titanium.proxy.TiViewProxy;
+import org.appcelerator.titanium.view.TiUIView;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -11,21 +20,29 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.*;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.ToggleButton;
+
 import com.genband.kandy.api.Kandy;
-import com.genband.kandy.api.services.calls.*;
+import com.genband.kandy.api.services.calls.IKandyCall;
+import com.genband.kandy.api.services.calls.IKandyIncomingCall;
+import com.genband.kandy.api.services.calls.IKandyOutgoingCall;
+import com.genband.kandy.api.services.calls.KandyCallResponseListener;
+import com.genband.kandy.api.services.calls.KandyCallServiceNotificationListener;
+import com.genband.kandy.api.services.calls.KandyCallState;
+import com.genband.kandy.api.services.calls.KandyOutgingVoipCallOptions;
+import com.genband.kandy.api.services.calls.KandyRecord;
+import com.genband.kandy.api.services.calls.KandyView;
 import com.genband.kandy.api.services.common.KandyCameraInfo;
 import com.genband.kandy.api.services.common.KandyMissedCallMessage;
 import com.genband.kandy.api.services.common.KandyWaitingVoiceMailMessage;
 import com.genband.kandy.api.utils.KandyIllegalArgumentException;
-import io.kandy.proxy.CallServiceProxy;
-import io.kandy.proxy.CallWidgetProxy;
-import io.kandy.utils.KandyUtils;
-import io.kandy.utils.UIUtils;
-import org.appcelerator.kroll.KrollDict;
-import org.appcelerator.titanium.proxy.TiViewProxy;
-import org.appcelerator.titanium.view.TiUIView;
 
 public class CallWidgetViewProxy extends TiUIView implements KandyCallServiceNotificationListener {
 
@@ -66,7 +83,7 @@ public class CallWidgetViewProxy extends TiUIView implements KandyCallServiceNot
 		uiVideoCheckbox = (CheckBox) layoutWraper.findViewById(KandyUtils.getId("kandy_calls_video_checkbox"));
 		uiVideoCheckbox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
-			@Override
+			
 			public void onCheckedChanged(CompoundButton cb, boolean isChecked) {
 				isVideoCall = isChecked;
 			}
@@ -75,7 +92,7 @@ public class CallWidgetViewProxy extends TiUIView implements KandyCallServiceNot
 		uiPSTNCheckbox = (CheckBox) layoutWraper.findViewById(KandyUtils.getId("kandy_calls_video_pstn_checkbox"));
 		uiPSTNCheckbox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
-			@Override
+			
 			public void onCheckedChanged(CompoundButton cb, boolean isChecked) {
 				isPSTNCall = isChecked;
 			}
@@ -84,7 +101,7 @@ public class CallWidgetViewProxy extends TiUIView implements KandyCallServiceNot
 		uiSIPCheckbox = (CheckBox) layoutWraper.findViewById(KandyUtils.getId("kandy_calls_video_sip_trunk_checkbox"));
 		uiSIPCheckbox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
-			@Override
+			
 			public void onCheckedChanged(CompoundButton cb, boolean isChecked) {
 				isSIPCall = isChecked;
 			}
@@ -93,7 +110,7 @@ public class CallWidgetViewProxy extends TiUIView implements KandyCallServiceNot
 		callButton = (Button) layoutWraper.findViewById(KandyUtils.getId("kandy_calls_call_button"));
 		callButton.setOnClickListener(new OnClickListener() {
 
-			@Override
+			
 			public void onClick(View v) {
 				doCall();
 			}
@@ -104,7 +121,7 @@ public class CallWidgetViewProxy extends TiUIView implements KandyCallServiceNot
 		inCallDialog = new KandyIncallDialog(activity);
 	}
 
-	@Override
+	
 	public void processProperties(KrollDict properties) {
 		super.processProperties(properties);
 		if (properties.containsKey(CallWidgetProxy.CALLEE)) {
@@ -201,13 +218,13 @@ public class CallWidgetViewProxy extends TiUIView implements KandyCallServiceNot
 
 		((IKandyOutgoingCall) call).establish(new KandyCallResponseListener() {
 
-			@Override
+			
 			public void onRequestSucceeded(IKandyCall call) {
 				Log.i(TAG, "KandyCallResponseListener.onRequestSucceeded() was invoked: " + call.getCallee().getUri());
 				inCallDialog.show();
 			}
 
-			@Override
+			
 			public void onRequestFailed(IKandyCall call, int code, String error) {
 				CallServiceProxy.removeKandyCall(call.getCallee().getUri());
 				UIUtils.showDialogWithErrorMessage(proxy.getActivity(), error);
@@ -226,7 +243,7 @@ public class CallWidgetViewProxy extends TiUIView implements KandyCallServiceNot
 		if (hasIncomingDialog) {
 			activity.runOnUiThread(new Runnable() {
 
-				@Override
+				
 				public void run() {
 					createIncomingCallPopup(call);
 				}
@@ -239,7 +256,7 @@ public class CallWidgetViewProxy extends TiUIView implements KandyCallServiceNot
 		builder.setPositiveButton(KandyUtils.getString("kandy_calls_answer_button_label"),
 				new DialogInterface.OnClickListener() {
 
-					@Override
+					
 					public void onClick(DialogInterface dialog, int which) {
 						call = pInCall;
 						accept();
@@ -250,7 +267,7 @@ public class CallWidgetViewProxy extends TiUIView implements KandyCallServiceNot
 		builder.setNeutralButton(KandyUtils.getString("kandy_calls_ignore_incoming_call_button_label"),
 				new DialogInterface.OnClickListener() {
 
-					@Override
+					
 					public void onClick(DialogInterface dialog, int which) {
 						ignoreIncomingCall((IKandyIncomingCall) pInCall);
 						dialog.dismiss();
@@ -260,7 +277,7 @@ public class CallWidgetViewProxy extends TiUIView implements KandyCallServiceNot
 		builder.setNegativeButton(KandyUtils.getString("kandy_calls_reject_incoming_call_button_label"),
 				new DialogInterface.OnClickListener() {
 
-					@Override
+					
 					public void onClick(DialogInterface dialog, int which) {
 						rejectIncomingCall((IKandyIncomingCall) pInCall);
 						dialog.dismiss();
@@ -278,12 +295,12 @@ public class CallWidgetViewProxy extends TiUIView implements KandyCallServiceNot
 		if (call.canReceiveVideo()) {
 			((IKandyIncomingCall) call).accept(isVideoCall, new KandyCallResponseListener() {
 
-				@Override
+				
 				public void onRequestSucceeded(IKandyCall call) {
 					inCallDialog.show();
 				}
 
-				@Override
+				
 				public void onRequestFailed(IKandyCall call, int code, String error) {
 					UIUtils.showToastWithMessage(activity, error);
 				}
@@ -291,12 +308,12 @@ public class CallWidgetViewProxy extends TiUIView implements KandyCallServiceNot
 		} else {
 			((IKandyIncomingCall) call).accept(false, new KandyCallResponseListener() {
 
-				@Override
+				
 				public void onRequestSucceeded(IKandyCall call) {
 					inCallDialog.show();
 				}
 
-				@Override
+				
 				public void onRequestFailed(IKandyCall call, int code, String error) {
 					UIUtils.showToastWithMessage(activity, error);
 				}
@@ -309,12 +326,12 @@ public class CallWidgetViewProxy extends TiUIView implements KandyCallServiceNot
 			return;
 		pIncall.reject(new KandyCallResponseListener() {
 
-			@Override
+			
 			public void onRequestSucceeded(IKandyCall call) {
 				CallServiceProxy.removeKandyCall(call.getCallee().getUri());
 			}
 
-			@Override
+			
 			public void onRequestFailed(IKandyCall call, int code, String error) {
 				UIUtils.showToastWithMessage(activity, error);
 			}
@@ -326,19 +343,19 @@ public class CallWidgetViewProxy extends TiUIView implements KandyCallServiceNot
 			return;
 		pIncall.ignore(new KandyCallResponseListener() {
 
-			@Override
+			
 			public void onRequestSucceeded(IKandyCall call) {
 				CallServiceProxy.removeKandyCall(call.getCallee().getUri());
 			}
 
-			@Override
+			
 			public void onRequestFailed(IKandyCall call, int code, String error) {
 				UIUtils.showToastWithMessage(activity, error);
 			}
 		});
 	}
 
-	@Override
+	
 	public void onCallStateChanged(KandyCallState state, IKandyCall call) {
 		Log.i(TAG, "onCallStateChanged() was invoked: " + call.getCallee().getUri() + " " + state.name());
 		if (state == KandyCallState.TERMINATED && inCallDialog.isShowing()) {
@@ -347,37 +364,37 @@ public class CallWidgetViewProxy extends TiUIView implements KandyCallServiceNot
 		}
 	}
 
-	@Override
+	
 	public void onGSMCallConnected(IKandyCall call) {
 		if (inCallDialog != null)
 			inCallDialog.switchHold(true);
 	}
 
-	@Override
+	
 	public void onGSMCallDisconnected(IKandyCall call) {
 		if (inCallDialog != null)
 			inCallDialog.switchHold(false);
 	}
 
-	@Override
+	
 	public void onGSMCallIncoming(IKandyCall call) {
 	}
 
-	@Override
+	
 	public void onIncomingCall(final IKandyIncomingCall call) {
 		Log.i(TAG, "onIncomingCall() was invoked: " + call.getCallee().getUri());
 		answerIncomingCall(call);
 	}
 
-	@Override
+	
 	public void onMissedCall(KandyMissedCallMessage message) {
 	}
 
-	@Override
+	
 	public void onVideoStateChanged(IKandyCall call, boolean isReceivingVideo, boolean isSendingVideo) {
 	}
 
-	@Override
+	
 	public void onWaitingVoiceMailCall(KandyWaitingVoiceMailMessage message) {
 	}
 
@@ -408,7 +425,7 @@ public class CallWidgetViewProxy extends TiUIView implements KandyCallServiceNot
 //			uiLeftDrawer.setAdapter(calleeAdapter);
 //			uiLeftDrawer.setOnItemClickListener(new OnItemClickListener() {
 //
-//				@Override
+//				
 //				public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
 //
 //				}
@@ -426,7 +443,7 @@ public class CallWidgetViewProxy extends TiUIView implements KandyCallServiceNot
 			holdTbutton = (ToggleButton) findViewById(KandyUtils.getId("kandy_calls_hold_tbutton"));
 			holdTbutton.setOnClickListener(new View.OnClickListener() {
 
-				@Override
+				
 				public void onClick(View v) {
 					boolean isChecked = ((ToggleButton) v).isChecked();
 					switchHold(isChecked);
@@ -436,7 +453,7 @@ public class CallWidgetViewProxy extends TiUIView implements KandyCallServiceNot
 			muteTbutton = (ToggleButton) findViewById(KandyUtils.getId("kandy_calls_mute_tbutton"));
 			muteTbutton.setOnClickListener(new View.OnClickListener() {
 
-				@Override
+				
 				public void onClick(View v) {
 					boolean isChecked = ((ToggleButton) v).isChecked();
 					switchMute(isChecked);
@@ -446,7 +463,7 @@ public class CallWidgetViewProxy extends TiUIView implements KandyCallServiceNot
 			videoTbutton = (ToggleButton) findViewById(KandyUtils.getId("kandy_calls_video_tbutton"));
 			videoTbutton.setOnClickListener(new View.OnClickListener() {
 
-				@Override
+				
 				public void onClick(View v) {
 					boolean isChecked = ((ToggleButton) v).isChecked();
 					switchVideo(isChecked);
@@ -456,7 +473,7 @@ public class CallWidgetViewProxy extends TiUIView implements KandyCallServiceNot
 			cameraTbutton = (ToggleButton) findViewById(KandyUtils.getId("kandy_calls_switch_camera_tbutton"));
 			cameraTbutton.setOnClickListener(new View.OnClickListener() {
 
-				@Override
+				
 				public void onClick(View v) {
 					boolean isChecked = ((ToggleButton) v).isChecked();
 					switchCamera(isChecked);
@@ -466,20 +483,20 @@ public class CallWidgetViewProxy extends TiUIView implements KandyCallServiceNot
 			hangupButton = (ImageButton) findViewById(KandyUtils.getId("kandy_calls_hangup_button"));
 			hangupButton.setOnClickListener(new View.OnClickListener() {
 
-				@Override
+				
 				public void onClick(View v) {
 					hangup();
 				}
 			});
 		}
 
-		@Override
+		
 		public void show() {
 			call.setLocalVideoView(localView);
 			call.setRemoteVideoView(remoteView);
 			activity.runOnUiThread(new Runnable() {
 
-				@Override
+				
 				public void run() {
 					switchVideoView(call.isCallStartedWithVideo());
 				}
@@ -490,7 +507,7 @@ public class CallWidgetViewProxy extends TiUIView implements KandyCallServiceNot
 		public void switchVideoView(final boolean isVideoView) {
 			activity.runOnUiThread(new Runnable() {
 
-				@Override
+				
 				public void run() {
 					if (isVideoView) {
 						videoTbutton.setChecked(true);
@@ -514,16 +531,16 @@ public class CallWidgetViewProxy extends TiUIView implements KandyCallServiceNot
 			if (isChecked)
 				call.hold(new KandyCallResponseListener() {
 
-					@Override
+					
 					public void onRequestSucceeded(IKandyCall call) {
 					}
 
-					@Override
+					
 					public void onRequestFailed(IKandyCall call, int code, String error) {
 						// UIUtils.showToastWithMessage(activity, error);
 						activity.runOnUiThread(new Runnable() {
 
-							@Override
+							
 							public void run() {
 								holdTbutton.setChecked(false);
 							}
@@ -533,16 +550,16 @@ public class CallWidgetViewProxy extends TiUIView implements KandyCallServiceNot
 			else
 				call.unhold(new KandyCallResponseListener() {
 
-					@Override
+					
 					public void onRequestSucceeded(IKandyCall call) {
 					}
 
-					@Override
+					
 					public void onRequestFailed(IKandyCall call, int code, String error) {
 						// UIUtils.showToastWithMessage(activity, error);
 						activity.runOnUiThread(new Runnable() {
 
-							@Override
+							
 							public void run() {
 								holdTbutton.setChecked(true);
 							}
@@ -558,16 +575,16 @@ public class CallWidgetViewProxy extends TiUIView implements KandyCallServiceNot
 			if (isChecked)
 				call.mute(new KandyCallResponseListener() {
 
-					@Override
+					
 					public void onRequestSucceeded(IKandyCall call) {
 					}
 
-					@Override
+					
 					public void onRequestFailed(IKandyCall call, int code, String error) {
 						// UIUtils.showToastWithMessage(activity, error);
 						activity.runOnUiThread(new Runnable() {
 
-							@Override
+							
 							public void run() {
 								muteTbutton.setChecked(false);
 							}
@@ -577,16 +594,16 @@ public class CallWidgetViewProxy extends TiUIView implements KandyCallServiceNot
 			else
 				call.unmute(new KandyCallResponseListener() {
 
-					@Override
+					
 					public void onRequestSucceeded(IKandyCall call) {
 					}
 
-					@Override
+					
 					public void onRequestFailed(IKandyCall call, int code, String error) {
 						// UIUtils.showToastWithMessage(activity, error);
 						activity.runOnUiThread(new Runnable() {
 
-							@Override
+							
 							public void run() {
 								muteTbutton.setChecked(true);
 							}
@@ -601,12 +618,12 @@ public class CallWidgetViewProxy extends TiUIView implements KandyCallServiceNot
 			if (isChecked)
 				call.startVideoSharing(new KandyCallResponseListener() {
 
-					@Override
+					
 					public void onRequestSucceeded(IKandyCall call) {
 						switchVideoView(true);
 					}
 
-					@Override
+					
 					public void onRequestFailed(IKandyCall call, int code, String error) {
 						// UIUtils.showToastWithMessage(activity, error);
 						switchVideoView(false);
@@ -615,12 +632,12 @@ public class CallWidgetViewProxy extends TiUIView implements KandyCallServiceNot
 			else
 				call.stopVideoSharing(new KandyCallResponseListener() {
 
-					@Override
+					
 					public void onRequestSucceeded(IKandyCall call) {
 						switchVideoView(false);
 					}
 
-					@Override
+					
 					public void onRequestFailed(IKandyCall call, int code, String error) {
 						// UIUtils.showToastWithMessage(activity, error);
 						switchVideoView(true);
@@ -638,7 +655,7 @@ public class CallWidgetViewProxy extends TiUIView implements KandyCallServiceNot
 		public void hangup() {
 			call.hangup(new KandyCallResponseListener() {
 
-				@Override
+				
 				public void onRequestSucceeded(IKandyCall callee) {
 					// FIXME: this listener is not called
 					Log.i("KandyIncallDialog", "onRequestSucceeded()");
@@ -647,7 +664,7 @@ public class CallWidgetViewProxy extends TiUIView implements KandyCallServiceNot
 					// call = null;
 				}
 
-				@Override
+				
 				public void onRequestFailed(IKandyCall callee, int code, String error) {
 					// call = null;
 					// CallServiceProxy.removeKandyCall(call.getCallee().getUri());
@@ -660,5 +677,20 @@ public class CallWidgetViewProxy extends TiUIView implements KandyCallServiceNot
 			inCallDialog.hide();
 			call = null;
 		}
+	}
+
+	public void onGSMCallConnected(IKandyCall arg0, String arg1) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void onGSMCallDisconnected(IKandyCall arg0, String arg1) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void onGSMCallIncoming(IKandyCall arg0, String arg1) {
+		// TODO Auto-generated method stub
+		
 	}
 }
