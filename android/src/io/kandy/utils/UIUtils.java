@@ -18,7 +18,7 @@ public class UIUtils {
 	public static void showProgressDialogOnUiThread(final Activity activity, final String message) {
 		activity.runOnUiThread(new Runnable() {
 
-			@Override
+			
 			public void run() {
 				dismissProgressDialog();
 				mProgressDialog = ProgressDialog.show(activity, null, message);
@@ -29,7 +29,7 @@ public class UIUtils {
 	public static ProgressDialog showProgressDialogOnUiThreadWithProgress(final Activity activity, final String message) {
 		activity.runOnUiThread(new Runnable() {
 
-			@Override
+			
 			public void run() {
 				dismissProgressDialog();
 				mProgressDialog = new ProgressDialog(activity);
@@ -46,7 +46,7 @@ public class UIUtils {
 			final String message, final OnCancelListener listener) {
 		activity.runOnUiThread(new Runnable() {
 
-			@Override
+			
 			public void run() {
 				dismissProgressDialog();
 				mProgressDialog = new ProgressDialog(activity);
@@ -65,7 +65,7 @@ public class UIUtils {
 			final String message, final OnCancelListener listener, final DialogInterface.OnClickListener clickListener) {
 		activity.runOnUiThread(new Runnable() {
 
-			@Override
+			
 			public void run() {
 				dismissProgressDialog();
 				mProgressDialog = new ProgressDialog(activity);
@@ -127,7 +127,7 @@ public class UIUtils {
 		builder.setMessage(pErrorMessage);
 		builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 
-			@Override
+			
 			public void onClick(DialogInterface dialog, int which) {
 				dialog.dismiss();
 			}
@@ -153,7 +153,7 @@ public class UIUtils {
 		builder.setMessage(pMessage);
 		builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 
-			@Override
+			
 			public void onClick(DialogInterface dialog, int which) {
 				dialog.dismiss();
 			}
@@ -175,7 +175,7 @@ public class UIUtils {
 	public static void handleResultOnUiThread(final Activity pActivity, final boolean isFail, final String pMessage) {
 		pActivity.runOnUiThread(new Runnable() {
 
-			@Override
+			
 			public void run() {
 				dismissProgressDialog();
 
@@ -191,7 +191,7 @@ public class UIUtils {
 	public static void showDialogOnUiThread(final Activity pActivity, final String pTitle, final String pMessage) {
 		pActivity.runOnUiThread(new Runnable() {
 
-			@Override
+			
 			public void run() {
 				dismissProgressDialog();
 				showDialogWithTitledMessage(pActivity, pTitle, pMessage);

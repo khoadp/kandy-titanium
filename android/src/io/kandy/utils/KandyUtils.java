@@ -1,8 +1,22 @@
 package io.kandy.utils;
 
+import io.kandy.KandyModule;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import org.appcelerator.kroll.KrollDict;
+import org.appcelerator.kroll.KrollFunction;
+import org.appcelerator.kroll.KrollObject;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.content.Context;
 import android.location.Location;
 import android.util.Log;
+
 import com.genband.kandy.api.services.billing.IKandyBillingPackage;
 import com.genband.kandy.api.services.billing.IKandyBillingPackageProperty;
 import com.genband.kandy.api.services.calls.IKandyCall;
@@ -12,17 +26,6 @@ import com.genband.kandy.api.services.chats.IKandyMessage;
 import com.genband.kandy.api.services.chats.KandyDeliveryAck;
 import com.genband.kandy.api.services.groups.KandyGroup;
 import com.genband.kandy.api.services.groups.KandyGroupParticipant;
-import io.kandy.KandyModule;
-import org.appcelerator.kroll.KrollDict;
-import org.appcelerator.kroll.KrollFunction;
-import org.appcelerator.kroll.KrollObject;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * Common utils for Kandy module.
@@ -134,9 +137,9 @@ public final class KandyUtils {
 		obj.put("via", call.getVia());
 		obj.put("type", call.getCallType().name());
 		obj.put("state", call.getCallState().name());
-		obj.put("startTime", call.getStartTime());
-		obj.put("endTime", call.getEndTime());
-		obj.put("duration", call.getDurationString());
+//		obj.put("startTime", call.getStartTime());
+//		obj.put("endTime", call.getEndTime());
+//		obj.put("duration", call.getDurationString());
 		obj.put("cameraForVideo", call.getCameraForVideo().name());
 		obj.put("isCallStartedWithVideo", call.isCallStartedWithVideo());
 		obj.put("isIncomingCall", call.isIncomingCall());
@@ -157,7 +160,6 @@ public final class KandyUtils {
 		return obj;
 	}
 
-	@SuppressWarnings("unchecked")
 	public static KrollDict JSONObjectToKrollDict(JSONObject object) throws JSONException {
 		KrollDict map = new KrollDict();
 

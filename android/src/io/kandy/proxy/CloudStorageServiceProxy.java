@@ -1,7 +1,21 @@
 package io.kandy.proxy;
 
+import io.kandy.KandyConstant;
+import io.kandy.KandyModule;
+import io.kandy.utils.FileUtils;
+import io.kandy.utils.KandyUtils;
+
+import java.util.Calendar;
+import java.util.UUID;
+
+import org.appcelerator.kroll.KrollDict;
+import org.appcelerator.kroll.KrollFunction;
+import org.appcelerator.kroll.KrollProxy;
+import org.appcelerator.kroll.annotations.Kroll;
+
 import android.net.Uri;
 import android.util.Log;
+
 import com.genband.kandy.api.Kandy;
 import com.genband.kandy.api.services.chats.IKandyFileItem;
 import com.genband.kandy.api.services.chats.IKandyTransferProgress;
@@ -11,17 +25,6 @@ import com.genband.kandy.api.services.common.KandyResponseCancelListener;
 import com.genband.kandy.api.services.common.KandyResponseProgressListener;
 import com.genband.kandy.api.services.common.KandyUploadProgressListener;
 import com.genband.kandy.api.utils.KandyIllegalArgumentException;
-import io.kandy.KandyConstant;
-import io.kandy.KandyModule;
-import io.kandy.utils.FileUtils;
-import io.kandy.utils.KandyUtils;
-import org.appcelerator.kroll.KrollDict;
-import org.appcelerator.kroll.KrollFunction;
-import org.appcelerator.kroll.KrollProxy;
-import org.appcelerator.kroll.annotations.Kroll;
-
-import java.util.Calendar;
-import java.util.UUID;
 
 @Kroll.proxy(creatableInModule = KandyModule.class)
 public class CloudStorageServiceProxy extends KrollProxy {

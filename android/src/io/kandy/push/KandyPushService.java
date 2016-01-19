@@ -1,12 +1,13 @@
 package io.kandy.push;
 
+import io.kandy.KandyConstant;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+
 import com.genband.kandy.api.Kandy;
 import com.genband.kandy.api.services.common.KandyResponseListener;
 import com.google.android.gcm.GCMBaseIntentService;
-import io.kandy.KandyConstant;
 
 public class KandyPushService extends GCMBaseIntentService {
 	private static final String TAG = KandyPushService.class.getSimpleName();

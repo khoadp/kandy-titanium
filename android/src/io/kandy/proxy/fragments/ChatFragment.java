@@ -1,6 +1,26 @@
 package io.kandy.proxy.fragments;
 
-import android.app.*;
+import io.kandy.proxy.ChatServiceProxy;
+import io.kandy.proxy.adapters.MessagesAdapter;
+import io.kandy.proxy.views.ChatViewProxy;
+import io.kandy.utils.KandyUtils;
+import io.kandy.utils.UIUtils;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Locale;
+import java.util.Queue;
+import java.util.concurrent.LinkedBlockingQueue;
+
+import org.appcelerator.titanium.TiBaseActivity;
+import org.appcelerator.titanium.TiLifecycle.OnActivityResultEvent;
+import org.appcelerator.titanium.view.TiUIView;
+
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
@@ -15,32 +35,39 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.*;
+import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ListView;
+import android.widget.Toast;
+
 import com.genband.kandy.api.Kandy;
 import com.genband.kandy.api.services.calls.KandyRecord;
 import com.genband.kandy.api.services.calls.KandyRecordType;
-import com.genband.kandy.api.services.chats.*;
+import com.genband.kandy.api.services.chats.IKandyAudioItem;
+import com.genband.kandy.api.services.chats.IKandyContactItem;
+import com.genband.kandy.api.services.chats.IKandyFileItem;
+import com.genband.kandy.api.services.chats.IKandyImageItem;
+import com.genband.kandy.api.services.chats.IKandyLocationItem;
+import com.genband.kandy.api.services.chats.IKandyMediaItem;
+import com.genband.kandy.api.services.chats.IKandyMessage;
+import com.genband.kandy.api.services.chats.IKandyTransferProgress;
+import com.genband.kandy.api.services.chats.IKandyVideoItem;
+import com.genband.kandy.api.services.chats.KandyChatMessage;
+import com.genband.kandy.api.services.chats.KandyChatServiceNotificationListener;
+import com.genband.kandy.api.services.chats.KandyDeliveryAck;
+import com.genband.kandy.api.services.chats.KandyMessageBuilder;
+import com.genband.kandy.api.services.chats.KandyMessageMediaItemType;
+import com.genband.kandy.api.services.chats.KandySMSMessage;
+import com.genband.kandy.api.services.chats.KandyTransferState;
 import com.genband.kandy.api.services.common.KandyResponseCancelListener;
 import com.genband.kandy.api.services.common.KandyResponseListener;
 import com.genband.kandy.api.services.common.KandyResponseProgressListener;
 import com.genband.kandy.api.services.common.KandyUploadProgressListener;
 import com.genband.kandy.api.services.location.KandyCurrentLocationListener;
 import com.genband.kandy.api.utils.KandyIllegalArgumentException;
-import io.kandy.proxy.ChatServiceProxy;
-import io.kandy.proxy.adapters.MessagesAdapter;
-import io.kandy.proxy.views.ChatViewProxy;
-import io.kandy.utils.KandyUtils;
-import io.kandy.utils.UIUtils;
-import org.appcelerator.titanium.TiBaseActivity;
-import org.appcelerator.titanium.TiLifecycle.OnActivityResultEvent;
-import org.appcelerator.titanium.view.TiUIView;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Locale;
-import java.util.Queue;
-import java.util.concurrent.LinkedBlockingQueue;
 
 public class ChatFragment extends Fragment implements OnItemClickListener, OnActivityResultEvent,
 		KandyChatServiceNotificationListener {
@@ -76,25 +103,24 @@ public class ChatFragment extends Fragment implements OnItemClickListener, OnAct
 		this.id = id;
 	}
 
-	@Override
+	
 	public void onAttach(Activity activity) {
-		super.onAttach(activity);
 		this.activity = activity;
 	}
 
-	@Override
+	
 	public void onResume() {
 		super.onResume();
 		Kandy.getServices().getChatService().registerNotificationListener(this);
 	}
 
-	@Override
+	
 	public void onPause() {
 		super.onPause();
 		Kandy.getServices().getChatService().unregisterNotificationListener(this);
 	}
 
-	@Override
+	
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View layoutWraper = inflater.inflate(KandyUtils.getLayout("kandy_chat_fragment"), container, false);
 
@@ -113,7 +139,7 @@ public class ChatFragment extends Fragment implements OnItemClickListener, OnAct
 				.getId("kandy_chat_send_msg_button"));
 		uiSendButton.setOnClickListener(new OnClickListener() {
 
-			@Override
+			
 			public void onClick(View v) {
 				sendText();
 			}
@@ -123,7 +149,7 @@ public class ChatFragment extends Fragment implements OnItemClickListener, OnAct
 				.getId("kandy_chat_get_incoming_msgs_button"));
 		uiIncomingMsgsPullerButton.setOnClickListener(new OnClickListener() {
 
-			@Override
+			
 			public void onClick(View v) {
 				pullPendingEvents();
 			}
@@ -132,7 +158,7 @@ public class ChatFragment extends Fragment implements OnItemClickListener, OnAct
 		Button uiSendImgButton = (Button) layoutWraper.findViewById(KandyUtils.getId("kandy_chat_img_button"));
 		uiSendImgButton.setOnClickListener(new OnClickListener() {
 
-			@Override
+			
 			public void onClick(View v) {
 				pickImage();
 			}
@@ -149,7 +175,7 @@ public class ChatFragment extends Fragment implements OnItemClickListener, OnAct
 		Button uiSendContactButton = (Button) layoutWraper.findViewById(KandyUtils.getId("kandy_chat_contact_button"));
 		uiSendContactButton.setOnClickListener(new OnClickListener() {
 
-			@Override
+			
 			public void onClick(View v) {
 				pickContact();
 			}
@@ -158,7 +184,7 @@ public class ChatFragment extends Fragment implements OnItemClickListener, OnAct
 		Button uiSendAudioButton = (Button) layoutWraper.findViewById(KandyUtils.getId("kandy_chat_audio_button"));
 		uiSendAudioButton.setOnClickListener(new OnClickListener() {
 
-			@Override
+			
 			public void onClick(View v) {
 				pickAudio();
 			}
@@ -167,7 +193,7 @@ public class ChatFragment extends Fragment implements OnItemClickListener, OnAct
 		Button uiSendVideoButton = (Button) layoutWraper.findViewById(KandyUtils.getId("kandy_chat_video_button"));
 		uiSendVideoButton.setOnClickListener(new OnClickListener() {
 
-			@Override
+			
 			public void onClick(View v) {
 				pickVideo();
 			}
@@ -176,7 +202,7 @@ public class ChatFragment extends Fragment implements OnItemClickListener, OnAct
 		Button uiSendFileButton = (Button) layoutWraper.findViewById(KandyUtils.getId("kandy_chat_file_button"));
 		uiSendFileButton.setOnClickListener(new OnClickListener() {
 
-			@Override
+			
 			public void onClick(View v) {
 				pickFile();
 			}
@@ -186,7 +212,7 @@ public class ChatFragment extends Fragment implements OnItemClickListener, OnAct
 				.findViewById(KandyUtils.getId("kandy_chat_location_button"));
 		uiSendLocationButton.setOnClickListener(new OnClickListener() {
 
-			@Override
+			
 			public void onClick(View v) {
 				sendCurrentLocation();
 			}
@@ -195,7 +221,7 @@ public class ChatFragment extends Fragment implements OnItemClickListener, OnAct
 		Button uiSendSMSButton = (Button) layoutWraper.findViewById(KandyUtils.getId("kandy_chat_send_sms_button"));
 		uiSendSMSButton.setOnClickListener(new OnClickListener() {
 
-			@Override
+			
 			public void onClick(View v) {
 				sendSMS();
 			}
@@ -206,7 +232,7 @@ public class ChatFragment extends Fragment implements OnItemClickListener, OnAct
 			uiBackButton.setVisibility(View.VISIBLE);
 			uiBackButton.setOnClickListener(new OnClickListener() {
 
-				@Override
+				
 				public void onClick(View v) {
 					FragmentManager fragmentManager = getFragmentManager();
 					FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -247,14 +273,14 @@ public class ChatFragment extends Fragment implements OnItemClickListener, OnAct
 		// Sending message
 		Kandy.getServices().getChatService().sendChat(message, new KandyResponseListener() {
 
-			@Override
+			
 			public void onRequestFailed(int responseCode, String err) {
 				Log.e(TAG, "Kandy.getChatService().sendMessage:onRequestFailed - Error: " + err + "\nResponse code: "
 						+ responseCode);
 				UIUtils.handleResultOnUiThread(activity, true, err);
 			}
 
-			@Override
+			
 			public void onRequestSucceded() {
 				Log.i(TAG, "Kandy.getChatService().sendMessage:onRequestSucceded - Message sent");
 				UIUtils.handleResultOnUiThread(activity, false, KandyUtils.getString("kandy_chat_message_sent_label"));
@@ -286,14 +312,14 @@ public class ChatFragment extends Fragment implements OnItemClickListener, OnAct
 		// Sending message
 		Kandy.getServices().getChatService().sendSMS(message, new KandyResponseListener() {
 
-			@Override
+			
 			public void onRequestFailed(int responseCode, String err) {
 				Log.e(TAG, "Kandy.getChatService().sendSMS:onRequestFailed - Error: " + err + "\nResponse code: "
 						+ responseCode);
 				UIUtils.handleResultOnUiThread(activity, true, err);
 			}
 
-			@Override
+			
 			public void onRequestSucceded() {
 				Log.i(TAG, "Kandy.getChatService().sendSMS:onRequestSucceded - Message sent");
 				UIUtils.handleResultOnUiThread(activity, false, KandyUtils.getString("kandy_chat_message_sent_label"));
@@ -308,7 +334,7 @@ public class ChatFragment extends Fragment implements OnItemClickListener, OnAct
 
 			Kandy.getServices().getLocationService().getCurrentLocation(new KandyCurrentLocationListener() {
 
-				@Override
+				
 				public void onCurrentLocationReceived(Location location) {
 					Log.d(TAG,
 							"onCurrentLocationReceived: lat: " + location.getLatitude() + " lon: "
@@ -316,7 +342,7 @@ public class ChatFragment extends Fragment implements OnItemClickListener, OnAct
 					sendLocation(location);
 				}
 
-				@Override
+				
 				public void onCurrentLocationFailed(int errorCode, String error) {
 					Log.d(TAG, "onCurrentLocationFailed: errorCode: " + errorCode + " error: " + error);
 					UIUtils.handleResultOnUiThread(activity, true, error);
@@ -343,18 +369,18 @@ public class ChatFragment extends Fragment implements OnItemClickListener, OnAct
 
 		Kandy.getServices().getChatService().sendChat(message, new KandyUploadProgressListener() {
 
-			@Override
+			
 			public void onRequestFailed(int responseCode, String err) {
 				Log.e(TAG, "uploadKandyLocationFile():onRequestFailed " + err + " error code: " + responseCode);
 				UIUtils.handleResultOnUiThread(activity, true, err);
 			}
 
-			@Override
+			
 			public void onProgressUpdate(IKandyTransferProgress progress) {
 				Log.i(TAG, "uploadKandyLocationFile():onProgressUpdate(): " + progress + "%");
 			}
 
-			@Override
+			
 			public void onRequestSucceded() {
 				Log.i(TAG, "uploadKandyLocationFile():onRequestSucceded()");
 				UIUtils.handleResultOnUiThread(activity, false, KandyUtils.getString("msg_upload_succeed"));
@@ -366,7 +392,7 @@ public class ChatFragment extends Fragment implements OnItemClickListener, OnAct
 	private void addMessageOnUI(final IKandyMessage message) {
 		activity.runOnUiThread(new Runnable() {
 
-			@Override
+			
 			public void run() {
 				uiMessageEdit.setText("");
 				closeKeyboard();
@@ -381,14 +407,14 @@ public class ChatFragment extends Fragment implements OnItemClickListener, OnAct
 		UIUtils.showProgressDialogOnUiThread(activity, KandyUtils.getString("msg_pull_events"));
 		Kandy.getServices().getChatService().pullEvents(new KandyResponseListener() {
 
-			@Override
+			
 			public void onRequestFailed(int responseCode, String err) {
 				UIUtils.handleResultOnUiThread(activity, true, err);
 				Log.e(TAG, "Kandy.getServices().getChatService().pullEvents:onRequestFailed: " + err
 						+ " response code: " + responseCode);
 			}
 
-			@Override
+			
 			public void onRequestSucceded() {
 				Log.i(TAG, "Kandy.getServices().getChatService().pullEvents:onRequestSucceded");
 				UIUtils.handleResultOnUiThread(activity, false, KandyUtils.getString("msg_pull_events_succeed"));
@@ -470,16 +496,16 @@ public class ChatFragment extends Fragment implements OnItemClickListener, OnAct
 
 		UIUtils.showCancelableProgressDialogOnUiThreadWithProgress(activity, textMEssage, new OnCancelListener() {
 
-			@Override
+			
 			public void onCancel(DialogInterface dialog) {
 				Kandy.getServices().getChatService().cancelMediaTransfer(message, new KandyResponseCancelListener() {
 
-					@Override
+					
 					public void onRequestFailed(int responseCode, String err) {
 						Log.d(TAG, "onRequestFailed: " + " responseCode: " + responseCode + " error: " + err);
 					}
 
-					@Override
+					
 					public void onCancelSucceded() {
 						Log.d(TAG, "onCancelSucceded: " + "upload canceled");
 					}
@@ -490,7 +516,7 @@ public class ChatFragment extends Fragment implements OnItemClickListener, OnAct
 		});
 	}
 
-	@Override
+	
 	public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
 		if (resultCode == Activity.RESULT_OK) {
 
@@ -542,19 +568,19 @@ public class ChatFragment extends Fragment implements OnItemClickListener, OnAct
 
 		Kandy.getServices().getChatService().sendChat(message, new KandyUploadProgressListener() {
 
-			@Override
+			
 			public void onRequestFailed(int responseCode, String err) {
 				Log.e(TAG, "uploadKandyContactFile():onRequestFailed " + err + " error code: " + responseCode);
 				UIUtils.handleResultOnUiThread(activity, true, err);
 			}
 
-			@Override
+			
 			public void onProgressUpdate(IKandyTransferProgress progress) {
 				Log.i(TAG, "uploadKandyContactFile():onProgressUpdate(): " + progress + "%");
 				UIUtils.showProgressInDialogOnUiThread(progress.getProgress());
 			}
 
-			@Override
+			
 			public void onRequestSucceded() {
 				Log.i(TAG, "uploadKandyContactFile():onRequestSucceded()");
 				UIUtils.handleResultOnUiThread(activity, false, KandyUtils.getString("msg_upload_succeed"));
@@ -585,19 +611,19 @@ public class ChatFragment extends Fragment implements OnItemClickListener, OnAct
 
 		Kandy.getServices().getChatService().sendChat(message, new KandyUploadProgressListener() {
 
-			@Override
+			
 			public void onRequestFailed(int responseCode, String err) {
 				Log.e(TAG, "uploadKandyFile():onRequestFailed " + err + " error code: " + responseCode);
 				UIUtils.handleResultOnUiThread(activity, true, err);
 			}
 
-			@Override
+			
 			public void onProgressUpdate(IKandyTransferProgress progress) {
 				Log.i(TAG, "uploadKandyFile():onProgressUpdate(): " + progress + "%");
 				UIUtils.showProgressInDialogOnUiThread(progress.getProgress());
 			}
 
-			@Override
+			
 			public void onRequestSucceded() {
 				Log.i(TAG, "uploadKandyFile():onRequestSucceded()");
 				UIUtils.handleResultOnUiThread(activity, false, KandyUtils.getString("msg_upload_succeed"));
@@ -627,19 +653,19 @@ public class ChatFragment extends Fragment implements OnItemClickListener, OnAct
 
 		Kandy.getServices().getChatService().sendChat(message, new KandyUploadProgressListener() {
 
-			@Override
+			
 			public void onRequestFailed(int responseCode, String err) {
 				Log.e(TAG, "uploadKandyAudioFile():onRequestFailed " + err + " error code: " + responseCode);
 				UIUtils.handleResultOnUiThread(activity, true, err);
 			}
 
-			@Override
+			
 			public void onProgressUpdate(IKandyTransferProgress progress) {
 				Log.i(TAG, "uploadKandyAudioFile():onProgressUpdate(): " + progress + "%");
 				UIUtils.showProgressInDialogOnUiThread(progress.getProgress());
 			}
 
-			@Override
+			
 			public void onRequestSucceded() {
 				Log.i(TAG, "uploadKandyAudioFile():onRequestSucceded()");
 				UIUtils.handleResultOnUiThread(activity, false, KandyUtils.getString("msg_upload_succeed"));
@@ -670,19 +696,19 @@ public class ChatFragment extends Fragment implements OnItemClickListener, OnAct
 
 		Kandy.getServices().getChatService().sendChat(message, new KandyUploadProgressListener() {
 
-			@Override
+			
 			public void onRequestFailed(int responseCode, String err) {
 				Log.e(TAG, "uploadKandyVideoFile():onRequestFailed " + err + " error code: " + responseCode);
 				UIUtils.handleResultOnUiThread(activity, true, err);
 			}
 
-			@Override
+			
 			public void onProgressUpdate(IKandyTransferProgress progress) {
 				Log.d(TAG, "uploadKandyVideoFile():onProgressUpdate(): " + progress + "%");
 				UIUtils.showProgressInDialogOnUiThread(progress.getProgress());
 			}
 
-			@Override
+			
 			public void onRequestSucceded() {
 				Log.d(TAG, "uploadKandyVideoFile():onRequestSucceded()");
 				UIUtils.handleResultOnUiThread(activity, false, KandyUtils.getString("msg_upload_succeed"));
@@ -713,19 +739,19 @@ public class ChatFragment extends Fragment implements OnItemClickListener, OnAct
 
 		Kandy.getServices().getChatService().sendChat(message, new KandyUploadProgressListener() {
 
-			@Override
+			
 			public void onRequestFailed(int responseCode, String err) {
 				Log.e(TAG, "uploadKandyFile():onRequestFailed " + err + " error code: " + responseCode);
 				UIUtils.handleResultOnUiThread(activity, true, err);
 			}
 
-			@Override
+			
 			public void onProgressUpdate(IKandyTransferProgress progress) {
 				Log.i(TAG, "uploadKandyFile():onProgressUpdate(): " + progress + "%");
 				UIUtils.showProgressInDialogOnUiThread(progress.getProgress());
 			}
 
-			@Override
+			
 			public void onRequestSucceded() {
 				Log.i(TAG, "uploadKandyFile():onRequestSucceded()");
 				UIUtils.handleResultOnUiThread(activity, false, KandyUtils.getString("msg_upload_succeed"));
@@ -737,14 +763,14 @@ public class ChatFragment extends Fragment implements OnItemClickListener, OnAct
 	private void markMsgAsReceived(final IKandyMessage message) {
 
 		message.markAsReceived(new KandyResponseListener() {
-			@Override
+			
 			public void onRequestFailed(int responseCode, String err) {
 				Log.e(TAG, "Kandy.getEventsService().ackEvent:onRequestFailed error: " + err + ".Response code: "
 						+ responseCode);
 				UIUtils.handleResultOnUiThread(activity, true, err);
 			}
 
-			@Override
+			
 			public void onRequestSucceded() {
 				Log.i(TAG, "Kandy.getEventsService().ackEvent:onRequestSucceded");
 				UIUtils.handleResultOnUiThread(activity, false, "Ack has been sent");
@@ -756,7 +782,7 @@ public class ChatFragment extends Fragment implements OnItemClickListener, OnAct
 	private void markAsDeliveredOnUI(final KandyDeliveryAck message) {
 		activity.runOnUiThread(new Runnable() {
 
-			@Override
+			
 			public void run() {
 				mAdapter.markAsDelivered(message);
 			}
@@ -766,7 +792,7 @@ public class ChatFragment extends Fragment implements OnItemClickListener, OnAct
 	private void markAsReceivedOnUI(final IKandyMessage message) {
 		activity.runOnUiThread(new Runnable() {
 
-			@Override
+			
 			public void run() {
 				if (mAdapter.markAsReceived(message)) {
 					mAdapter.notifyDataSetChanged();
@@ -778,14 +804,13 @@ public class ChatFragment extends Fragment implements OnItemClickListener, OnAct
 	private void addUniqueMessageOnUI(final IKandyMessage message) {
 		activity.runOnUiThread(new Runnable() {
 
-			@Override
 			public void run() {
 				mAdapter.addUniqe(new Message(message));
 			}
 		});
 	}
 
-	@Override
+	
 	public void onChatDelivered(KandyDeliveryAck message) {
 		Log.d(TAG, "ChatsActivity:onChatDelivered " + message.getEventType().name() + " uuid: " + message.getUUID());
 		((KandyChatServiceNotificationListener) viewProxy.getProxy()).onChatDelivered(message);
@@ -793,7 +818,7 @@ public class ChatFragment extends Fragment implements OnItemClickListener, OnAct
 		markAsDeliveredOnUI(message);
 	}
 
-	@Override
+	
 	public void onChatMediaAutoDownloadFailed(IKandyMessage message, int errorCode, String err) {
 		Log.d(TAG, "onChatMediaDownloadFailed: messageUUID: " + message.getUUID() + " error: " + err + " error code: "
 				+ errorCode);
@@ -803,14 +828,14 @@ public class ChatFragment extends Fragment implements OnItemClickListener, OnAct
 
 		activity.runOnUiThread(new Runnable() {
 
-			@Override
+			
 			public void run() {
 				activity.setProgressBarIndeterminateVisibility(Boolean.FALSE);
 			}
 		});
 	}
 
-	@Override
+	
 	public void onChatMediaAutoDownloadProgress(IKandyMessage message, IKandyTransferProgress progress) {
 		Log.d(TAG, "onChatMediaDownloadProgress: messageUUID: " + message.getUUID().toString() + " progress: "
 				+ progress);
@@ -820,14 +845,14 @@ public class ChatFragment extends Fragment implements OnItemClickListener, OnAct
 
 		activity.runOnUiThread(new Runnable() {
 
-			@Override
+			
 			public void run() {
 				activity.setProgressBarIndeterminateVisibility(Boolean.TRUE);
 			}
 		});
 	}
 
-	@Override
+	
 	public void onChatMediaAutoDownloadSucceded(IKandyMessage message, Uri path) {
 		Log.d(TAG, "onChatMediaDownloadSucceded: messageUUID: " + message.getUUID() + " uri path: " + path.getPath());
 
@@ -835,14 +860,14 @@ public class ChatFragment extends Fragment implements OnItemClickListener, OnAct
 
 		activity.runOnUiThread(new Runnable() {
 
-			@Override
+			
 			public void run() {
 				activity.setProgressBarIndeterminateVisibility(Boolean.FALSE);
 			}
 		});
 	}
 
-	@Override
+	
 	public void onChatReceived(IKandyMessage message, KandyRecordType type) {
 		Log.d(TAG, "onChatReceived: message: " + message + " type: " + type);
 
@@ -852,7 +877,7 @@ public class ChatFragment extends Fragment implements OnItemClickListener, OnAct
 		mMessagesUUIDQueue.add((KandyChatMessage) message);
 	}
 
-	@Override
+	
 	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
 		mSelectedMessage = mAdapter.getItem(position);
@@ -933,12 +958,12 @@ public class ChatFragment extends Fragment implements OnItemClickListener, OnAct
 		Kandy.getServices().getChatService()
 				.cancelMediaTransfer(mSelectedMessage.kandyMessage, new KandyResponseCancelListener() {
 
-					@Override
+					
 					public void onRequestFailed(int responseCode, String err) {
 						Log.d(TAG, "cancelDownloadProcess(): onRequestFailed: code: " + responseCode + " error: " + err);
 					}
 
-					@Override
+					
 					public void onCancelSucceded() {
 						Log.d(TAG, "cancelDownloadProcess():onCancelSucceded()");
 					}
@@ -990,19 +1015,19 @@ public class ChatFragment extends Fragment implements OnItemClickListener, OnAct
 				// download the media if not exists
 				Kandy.getServices().getChatService().downloadMedia(message, new KandyResponseProgressListener() {
 
-					@Override
+					
 					public void onRequestFailed(int responseCode, String err) {
 						Log.e(TAG, "onRequestFailed: " + err + " response code: " + responseCode);
 					}
 
-					@Override
+					
 					public void onRequestSucceded(Uri fileUri) {
 						Intent intent = new Intent(Intent.ACTION_VIEW);
 						intent.setDataAndType(uri, message.getMediaItem().getMimeType());
 						activity.startActivity(intent);
 					}
 
-					@Override
+					
 					public void onProgressUpdate(IKandyTransferProgress progress) {
 						Log.d(TAG, "onProgressUpdate: " + " progress: " + progress);
 					}
@@ -1021,19 +1046,19 @@ public class ChatFragment extends Fragment implements OnItemClickListener, OnAct
 
 			Kandy.getServices().getChatService().downloadMedia(message, new KandyResponseProgressListener() {
 
-				@Override
+				
 				public void onRequestFailed(int responseCode, String err) {
 					Log.e(TAG, "onRequestFailed: " + err + " response code: " + responseCode);
 				}
 
-				@Override
+				
 				public void onRequestSucceded(Uri fileUri) {
 					Intent intent = new Intent(Intent.ACTION_VIEW);
 					intent.setDataAndType(fileUri, message.getMediaItem().getMimeType());
 					activity.startActivity(intent);
 				}
 
-				@Override
+				
 				public void onProgressUpdate(IKandyTransferProgress progress) {
 					Log.d(TAG, "onProgressUpdate: " + " progress: " + progress);
 				}

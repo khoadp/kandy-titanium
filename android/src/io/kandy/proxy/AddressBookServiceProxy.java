@@ -1,19 +1,29 @@
 package io.kandy.proxy;
 
-import android.util.Log;
-import com.genband.kandy.api.Kandy;
-import com.genband.kandy.api.services.addressbook.*;
-import com.genband.kandy.api.services.common.KandyResponseListener;
 import io.kandy.KandyModule;
 import io.kandy.utils.KandyUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.appcelerator.kroll.KrollDict;
 import org.appcelerator.kroll.KrollFunction;
 import org.appcelerator.kroll.KrollProxy;
 import org.appcelerator.kroll.annotations.Kroll;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.List;
+import android.util.Log;
+
+import com.genband.kandy.api.Kandy;
+import com.genband.kandy.api.services.addressbook.IKandyContact;
+import com.genband.kandy.api.services.addressbook.KandyContactListener;
+import com.genband.kandy.api.services.addressbook.KandyContactParams;
+import com.genband.kandy.api.services.addressbook.KandyContactsListener;
+import com.genband.kandy.api.services.addressbook.KandyDeviceContactsFilter;
+import com.genband.kandy.api.services.addressbook.KandyDomainContactFilter;
+import com.genband.kandy.api.services.addressbook.KandyEmailContactRecord;
+import com.genband.kandy.api.services.addressbook.KandyPhoneContactRecord;
+import com.genband.kandy.api.services.common.KandyResponseListener;
 
 /**
  * Address book service

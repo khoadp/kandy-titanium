@@ -1,5 +1,13 @@
 package io.kandy.proxy.adapters;
 
+import io.kandy.proxy.fragments.ChatFragment.Message;
+import io.kandy.utils.KandyUtils;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -11,16 +19,16 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-import com.genband.kandy.api.Kandy;
-import com.genband.kandy.api.services.chats.*;
-import com.genband.kandy.api.utils.KandyMediaUtils;
-import io.kandy.proxy.fragments.ChatFragment.Message;
-import io.kandy.utils.KandyUtils;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import com.genband.kandy.api.Kandy;
+import com.genband.kandy.api.services.chats.IKandyContactItem;
+import com.genband.kandy.api.services.chats.IKandyImageItem;
+import com.genband.kandy.api.services.chats.IKandyMessage;
+import com.genband.kandy.api.services.chats.IKandyVideoItem;
+import com.genband.kandy.api.services.chats.KandyDeliveryAck;
+import com.genband.kandy.api.services.chats.KandyMessageMediaItemType;
+import com.genband.kandy.api.services.chats.KandyMessageType;
+import com.genband.kandy.api.utils.KandyMediaUtils;
 
 public class MessagesAdapter extends ArrayAdapter<Message> {
 

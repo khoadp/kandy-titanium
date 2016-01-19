@@ -1,19 +1,22 @@
 package io.kandy.proxy;
 
-import android.util.Log;
-import com.genband.kandy.api.Kandy;
-import com.genband.kandy.api.services.calls.KandyRecord;
-import com.genband.kandy.api.services.presence.IKandyPresence;
-import com.genband.kandy.api.services.presence.KandyPresenceResponseListener;
-import com.genband.kandy.api.utils.KandyIllegalArgumentException;
 import io.kandy.KandyModule;
 import io.kandy.utils.KandyUtils;
+
+import java.util.ArrayList;
+
 import org.appcelerator.kroll.KrollDict;
 import org.appcelerator.kroll.KrollFunction;
 import org.appcelerator.kroll.KrollProxy;
 import org.appcelerator.kroll.annotations.Kroll;
 
-import java.util.ArrayList;
+import android.util.Log;
+
+import com.genband.kandy.api.Kandy;
+import com.genband.kandy.api.services.calls.KandyRecord;
+import com.genband.kandy.api.services.presence.IKandyPresence;
+import com.genband.kandy.api.services.presence.KandyPresenceResponseListener;
+import com.genband.kandy.api.utils.KandyIllegalArgumentException;
 
 /**
  * Presence service

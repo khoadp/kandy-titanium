@@ -1,20 +1,12 @@
 package io.kandy.proxy;
 
-import android.app.Activity;
-import android.net.Uri;
-import android.os.Bundle;
-import android.util.Log;
-import com.genband.kandy.api.Kandy;
-import com.genband.kandy.api.services.calls.KandyRecord;
-import com.genband.kandy.api.services.calls.KandyRecordType;
-import com.genband.kandy.api.services.chats.*;
-import com.genband.kandy.api.services.common.KandyResponseListener;
-import com.genband.kandy.api.services.common.KandyResponseProgressListener;
-import com.genband.kandy.api.services.groups.*;
-import com.genband.kandy.api.utils.KandyIllegalArgumentException;
 import io.kandy.KandyModule;
 import io.kandy.proxy.views.GroupViewProxy;
 import io.kandy.utils.KandyUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.appcelerator.kroll.KrollDict;
 import org.appcelerator.kroll.KrollFunction;
 import org.appcelerator.kroll.annotations.Kroll;
@@ -22,8 +14,32 @@ import org.appcelerator.titanium.proxy.TiViewProxy;
 import org.appcelerator.titanium.view.TiUIView;
 import org.json.JSONArray;
 
-import java.util.ArrayList;
-import java.util.List;
+import android.app.Activity;
+import android.net.Uri;
+import android.os.Bundle;
+import android.util.Log;
+
+import com.genband.kandy.api.Kandy;
+import com.genband.kandy.api.services.calls.KandyRecord;
+import com.genband.kandy.api.services.calls.KandyRecordType;
+import com.genband.kandy.api.services.chats.IKandyMessage;
+import com.genband.kandy.api.services.chats.IKandyTransferProgress;
+import com.genband.kandy.api.services.chats.KandyChatServiceNotificationListener;
+import com.genband.kandy.api.services.chats.KandyDeliveryAck;
+import com.genband.kandy.api.services.chats.KandyThumbnailSize;
+import com.genband.kandy.api.services.common.KandyResponseListener;
+import com.genband.kandy.api.services.common.KandyResponseProgressListener;
+import com.genband.kandy.api.services.groups.IKandyGroupDestroyed;
+import com.genband.kandy.api.services.groups.IKandyGroupParticipantJoined;
+import com.genband.kandy.api.services.groups.IKandyGroupParticipantKicked;
+import com.genband.kandy.api.services.groups.IKandyGroupParticipantLeft;
+import com.genband.kandy.api.services.groups.IKandyGroupUpdated;
+import com.genband.kandy.api.services.groups.KandyGroup;
+import com.genband.kandy.api.services.groups.KandyGroupParams;
+import com.genband.kandy.api.services.groups.KandyGroupResponseListener;
+import com.genband.kandy.api.services.groups.KandyGroupServiceNotificationListener;
+import com.genband.kandy.api.services.groups.KandyGroupsResponseListener;
+import com.genband.kandy.api.utils.KandyIllegalArgumentException;
 
 @Kroll.proxy(creatableInModule = KandyModule.class)
 public class GroupServiceProxy extends TiViewProxy implements KandyGroupServiceNotificationListener,
@@ -504,7 +520,6 @@ public class GroupServiceProxy extends TiViewProxy implements KandyGroupServiceN
 
 	}
 
-	@Override
 	public void onGroupDestroyed(IKandyGroupDestroyed group) {
 		if (hasListeners("onGroupDestroyed")) {
 			KrollDict result = new KrollDict();
@@ -519,7 +534,6 @@ public class GroupServiceProxy extends TiViewProxy implements KandyGroupServiceN
 		}
 	}
 
-	@Override
 	public void onGroupUpdated(IKandyGroupUpdated group) {
 		if (hasListeners("onGroupUpdated")) {
 			KrollDict result = new KrollDict();
@@ -534,7 +548,6 @@ public class GroupServiceProxy extends TiViewProxy implements KandyGroupServiceN
 		}
 	}
 
-	@Override
 	public void onParticipantJoined(IKandyGroupParticipantJoined participant) {
 		if (hasListeners("onParticipantJoined")) {
 			KrollDict result = new KrollDict();
@@ -557,7 +570,6 @@ public class GroupServiceProxy extends TiViewProxy implements KandyGroupServiceN
 		}
 	}
 
-	@Override
 	public void onParticipantKicked(IKandyGroupParticipantKicked participant) {
 		if (hasListeners("onParticipantKicked")) {
 			KrollDict result = new KrollDict();
@@ -580,7 +592,6 @@ public class GroupServiceProxy extends TiViewProxy implements KandyGroupServiceN
 		}
 	}
 
-	@Override
 	public void onParticipantLeft(IKandyGroupParticipantLeft participant) {
 		if (hasListeners("onParticipantKicked")) {
 			KrollDict result = new KrollDict();
@@ -603,14 +614,12 @@ public class GroupServiceProxy extends TiViewProxy implements KandyGroupServiceN
 		}
 	}
 
-	@Override
 	public void onChatDelivered(KandyDeliveryAck ack) {
 		Log.d(LCAT, "KandyChatServiceNotificationListener->onChatDelivered() was invoked: " + ack.getUUID());
 		if (hasListeners("onChatDelivered"))
 			fireEvent("onChatDelivered", KandyUtils.getKrollDictFromKandyDeliveryAck(ack));
 	}
 
-	@Override
 	public void onChatMediaAutoDownloadFailed(IKandyMessage message, int code, String error) {
 		Log.d(LCAT, "KandyChatServiceNotificationListener->onChatMediaAutoDownloadFailed() was invoked.");
 
@@ -623,7 +632,6 @@ public class GroupServiceProxy extends TiViewProxy implements KandyGroupServiceN
 		}
 	}
 
-	@Override
 	public void onChatMediaAutoDownloadProgress(IKandyMessage message, IKandyTransferProgress progress) {
 		Log.d(LCAT, "KandyChatServiceNotificationListener->onChatMediaAutoDownloadProgress() was invoked: " + progress);
 
@@ -638,7 +646,6 @@ public class GroupServiceProxy extends TiViewProxy implements KandyGroupServiceN
 		}
 	}
 
-	@Override
 	public void onChatMediaAutoDownloadSucceded(IKandyMessage message, Uri uri) {
 		Log.d(LCAT, "KandyChatServiceNotificationListener->onChatMediaAutoDownloadSucceded() was invoked: " + uri);
 
@@ -650,7 +657,6 @@ public class GroupServiceProxy extends TiViewProxy implements KandyGroupServiceN
 		}
 	}
 
-	@Override
 	public void onChatReceived(IKandyMessage message, KandyRecordType type) {
 		Log.d(LCAT, "KandyChatServiceNotificationListener->onChatReceived() was invoked: " + type.name());
 		if (hasListeners("onChatReceived")) {

@@ -1,17 +1,20 @@
 package io.kandy.proxy;
 
-import android.text.TextUtils;
-import android.util.Log;
-import com.genband.kandy.api.Kandy;
-import com.genband.kandy.api.services.common.KandyResponseListener;
-import com.google.android.gcm.GCMRegistrar;
 import io.kandy.KandyConstant;
 import io.kandy.KandyModule;
 import io.kandy.utils.KandyUtils;
+
 import org.appcelerator.kroll.KrollDict;
 import org.appcelerator.kroll.KrollFunction;
 import org.appcelerator.kroll.KrollProxy;
 import org.appcelerator.kroll.annotations.Kroll;
+
+import android.text.TextUtils;
+import android.util.Log;
+
+import com.genband.kandy.api.Kandy;
+import com.genband.kandy.api.services.common.KandyResponseListener;
+import com.google.android.gcm.GCMRegistrar;
 
 /**
  * Push service

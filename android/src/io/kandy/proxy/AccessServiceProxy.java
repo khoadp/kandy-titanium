@@ -1,7 +1,19 @@
 package io.kandy.proxy;
 
+import io.kandy.KandyModule;
+import io.kandy.proxy.views.AccessViewProxy;
+import io.kandy.utils.KandyUtils;
+
+import org.appcelerator.kroll.KrollDict;
+import org.appcelerator.kroll.KrollFunction;
+import org.appcelerator.kroll.annotations.Kroll;
+import org.appcelerator.titanium.proxy.TiViewProxy;
+import org.appcelerator.titanium.view.TiUIView;
+import org.json.JSONObject;
+
 import android.app.Activity;
 import android.util.Log;
+
 import com.genband.kandy.api.Kandy;
 import com.genband.kandy.api.access.KandyConnectServiceNotificationListener;
 import com.genband.kandy.api.access.KandyConnectionState;
@@ -9,14 +21,6 @@ import com.genband.kandy.api.access.KandyLoginResponseListener;
 import com.genband.kandy.api.access.KandyLogoutResponseListener;
 import com.genband.kandy.api.services.calls.KandyRecord;
 import com.genband.kandy.api.utils.KandyIllegalArgumentException;
-import io.kandy.KandyModule;
-import io.kandy.proxy.views.AccessViewProxy;
-import io.kandy.utils.KandyUtils;
-import org.appcelerator.kroll.KrollDict;
-import org.appcelerator.kroll.KrollFunction;
-import org.appcelerator.kroll.annotations.Kroll;
-import org.appcelerator.titanium.proxy.TiViewProxy;
-import org.appcelerator.titanium.view.TiUIView;
 
 /**
  * Access service proxy.
@@ -174,7 +178,6 @@ public class AccessServiceProxy extends TiViewProxy implements KandyConnectServi
 		return (KandyConnectionState.CONNECTED.equals(Kandy.getAccess().getConnectionState()));
 	}
 
-	@Override
 	public void onConnectionStateChanged(KandyConnectionState state) {
 		Log.d(LCAT, "onConnectionStateChanged() was invoked: " + state.name());
 		if (hasListeners("onConnectionStateChanged")) {
@@ -186,7 +189,6 @@ public class AccessServiceProxy extends TiViewProxy implements KandyConnectServi
 			viewProxy.onConnectionStateChanged(state);
 	}
 
-	@Override
 	public void onInvalidUser(String error) {
 		Log.d(LCAT, "onInvalidUser() was invoked: " + error);
 		if (hasListeners("onInvalidUser")) {
@@ -198,7 +200,6 @@ public class AccessServiceProxy extends TiViewProxy implements KandyConnectServi
 			viewProxy.onInvalidUser(error);
 	}
 
-	@Override
 	public void onSDKNotSupported(String error) {
 		Log.d(LCAT, "onSDKNotSupported() was invoked: " + error);
 		if (hasListeners("onSDKNotSupported")) {
@@ -210,7 +211,6 @@ public class AccessServiceProxy extends TiViewProxy implements KandyConnectServi
 			viewProxy.onSDKNotSupported(error);
 	}
 
-	@Override
 	public void onSessionExpired(String error) {
 		Log.d(LCAT, "onSessionExpired() was invoked: " + error);
 		if (hasListeners("onSessionExpired")) {
@@ -222,7 +222,6 @@ public class AccessServiceProxy extends TiViewProxy implements KandyConnectServi
 			viewProxy.onSessionExpired(error);
 	}
 
-	@Override
 	public void onSocketConnected() {
 		Log.d(LCAT, "onSocketConnected() was invoked.");
 		fireEvent("onSocketConnected", null);
@@ -230,7 +229,6 @@ public class AccessServiceProxy extends TiViewProxy implements KandyConnectServi
 			viewProxy.onSocketConnected();
 	}
 
-	@Override
 	public void onSocketConnecting() {
 		Log.d(LCAT, "onSocketConnecting() was invoked.");
 		fireEvent("onSocketConnecting", null);
@@ -238,7 +236,6 @@ public class AccessServiceProxy extends TiViewProxy implements KandyConnectServi
 			viewProxy.onSocketConnecting();
 	}
 
-	@Override
 	public void onSocketDisconnected() {
 		Log.d(LCAT, "onSocketDisconnected() was invoked.");
 		fireEvent("onSocketDisconnected", null);
@@ -246,7 +243,6 @@ public class AccessServiceProxy extends TiViewProxy implements KandyConnectServi
 			viewProxy.onSocketDisconnected();
 	}
 
-	@Override
 	public void onSocketFailedWithError(String error) {
 		Log.d(LCAT, "onSocketFailedWithError() was invoked: " + error);
 		if (hasListeners("onSocketFailedWithError")) {
@@ -256,5 +252,24 @@ public class AccessServiceProxy extends TiViewProxy implements KandyConnectServi
 		}
 		if (viewProxy != null)
 			viewProxy.onSocketFailedWithError(error);
+	}
+
+	public void onCertificateError(String error) {
+		Log.d(LCAT, "onCertificateError() was invoked: " + error);
+		if (hasListeners("onCertificateError")) {
+			KrollDict props = new KrollDict();
+			props.put("error", error);
+			fireEvent("onCertificateError", props);
+		}
+		if (viewProxy != null)
+			viewProxy.onCertificateError(error);
+	}
+
+	public void onServerConfigurationReceived(JSONObject config) {
+		if (hasListeners("onServerConfigurationReceived")) {
+			fireEvent("onSocketFailedWithError", config);
+		}
+		if (viewProxy != null)
+			viewProxy.onServerConfigurationReceived(config);
 	}
 }

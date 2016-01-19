@@ -1,18 +1,21 @@
 package io.kandy.proxy;
 
+import io.kandy.KandyModule;
+import io.kandy.utils.KandyUtils;
+
+import org.appcelerator.kroll.KrollDict;
+import org.appcelerator.kroll.KrollFunction;
+import org.appcelerator.kroll.KrollProxy;
+import org.appcelerator.kroll.annotations.Kroll;
+
 import android.location.Location;
 import android.util.Log;
+
 import com.genband.kandy.api.Kandy;
 import com.genband.kandy.api.services.location.IKandyAreaCode;
 import com.genband.kandy.api.services.location.KandyCountryInfoResponseListener;
 import com.genband.kandy.api.services.location.KandyCurrentLocationListener;
 import com.genband.kandy.api.utils.KandyIllegalArgumentException;
-import io.kandy.KandyModule;
-import io.kandy.utils.KandyUtils;
-import org.appcelerator.kroll.KrollDict;
-import org.appcelerator.kroll.KrollFunction;
-import org.appcelerator.kroll.KrollProxy;
-import org.appcelerator.kroll.annotations.Kroll;
 
 /**
  * Location service
@@ -64,7 +67,6 @@ public class LocationServiceProxy extends KrollProxy {
 		try {
 			Kandy.getServices().getLocationService().getCurrentLocation(new KandyCurrentLocationListener() {
 
-				@Override
 				public void onCurrentLocationReceived(Location location) {
 					Log.d(LCAT, "KandyCurrentLocationListener->onCurrentLocationReceived() was invoked.");
 
@@ -86,7 +88,6 @@ public class LocationServiceProxy extends KrollProxy {
 					KandyUtils.sendSuccessResult(getKrollObject(), success, result);
 				}
 
-				@Override
 				public void onCurrentLocationFailed(int code, String err) {
 					Log.d(LCAT,
 							"KandyCurrentLocationListener->onCurrentLocationFailed() was invoked: "

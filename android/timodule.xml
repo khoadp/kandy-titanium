@@ -12,7 +12,7 @@
             <uses-feature android:name="android.hardware.camera" />
             <uses-feature android:name="android.hardware.camera.autofocus" />
 
-            <permission android:name="$PACKAGE_NAME.permission.C2D_MESSAGE" android:protectionLevel="signature" />
+            <permission android:name="$PACKAGE_NAME.C2D_MESSAGE" android:protectionLevel="signature"/>
             <uses-permission android:name="$PACKAGE_NAME.permission.C2D_MESSAGE" />
             <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
             <uses-permission android:name="android.permission.WAKE_LOCK" />
@@ -25,6 +25,7 @@
             <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
             <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
             <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+            <uses-permission android:name="android.permission.BLUETOOTH"/>
             <application>
             	<service android:enabled="true" android:name="com.genband.mobile.core.NotificationEngine.NotificationAndroidService" />
             	<service android:enabled="true" android:name="com.genband.mobile.impl.services.registration.GeneralRenewalAndroidService" />

@@ -1,14 +1,16 @@
 package io.kandy.proxy.views;
 
+import io.kandy.proxy.fragments.ChatFragment;
+import io.kandy.utils.KandyUtils;
+
+import org.appcelerator.titanium.proxy.TiViewProxy;
+import org.appcelerator.titanium.view.TiUIView;
+
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
-import io.kandy.proxy.fragments.ChatFragment;
-import io.kandy.utils.KandyUtils;
-import org.appcelerator.titanium.proxy.TiViewProxy;
-import org.appcelerator.titanium.view.TiUIView;
 
 public class ChatViewProxy extends TiUIView {
 
