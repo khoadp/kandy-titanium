@@ -13,189 +13,183 @@ import android.widget.Toast;
  */
 public class UIUtils {
 
-	private static ProgressDialog mProgressDialog;
+    private static ProgressDialog mProgressDialog;
 
-	public static void showProgressDialogOnUiThread(final Activity activity, final String message) {
-		activity.runOnUiThread(new Runnable() {
+    public static void showProgressDialogOnUiThread(final Activity activity, final String message) {
+        activity.runOnUiThread(new Runnable() {
 
-			
-			public void run() {
-				dismissProgressDialog();
-				mProgressDialog = ProgressDialog.show(activity, null, message);
-			}
-		});
-	}
 
-	public static ProgressDialog showProgressDialogOnUiThreadWithProgress(final Activity activity, final String message) {
-		activity.runOnUiThread(new Runnable() {
+            public void run() {
+                dismissProgressDialog();
+                mProgressDialog = ProgressDialog.show(activity, null, message);
+            }
+        });
+    }
 
-			
-			public void run() {
-				dismissProgressDialog();
-				mProgressDialog = new ProgressDialog(activity);
-				mProgressDialog.setMessage(message);
-				mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-				mProgressDialog.setProgressNumberFormat(null);
-				mProgressDialog.show();
-			}
-		});
-		return mProgressDialog;
-	}
+    public static ProgressDialog showProgressDialogOnUiThreadWithProgress(final Activity activity, final String message) {
+        activity.runOnUiThread(new Runnable() {
 
-	public static ProgressDialog showCancelableProgressDialogOnUiThreadWithProgress(final Activity activity,
-			final String message, final OnCancelListener listener) {
-		activity.runOnUiThread(new Runnable() {
 
-			
-			public void run() {
-				dismissProgressDialog();
-				mProgressDialog = new ProgressDialog(activity);
-				mProgressDialog.setCancelable(true);
-				mProgressDialog.setOnCancelListener(listener);
-				mProgressDialog.setMessage(message);
-				mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-				mProgressDialog.setProgressNumberFormat(null);
-				mProgressDialog.show();
-			}
-		});
-		return mProgressDialog;
-	}
+            public void run() {
+                dismissProgressDialog();
+                mProgressDialog = new ProgressDialog(activity);
+                mProgressDialog.setMessage(message);
+                mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                mProgressDialog.setProgressNumberFormat(null);
+                mProgressDialog.show();
+            }
+        });
+        return mProgressDialog;
+    }
 
-	public static ProgressDialog showCancelableProgressDialogOnUiThreadWithProgressAndButton(final Activity activity,
-			final String message, final OnCancelListener listener, final DialogInterface.OnClickListener clickListener) {
-		activity.runOnUiThread(new Runnable() {
+    public static ProgressDialog showCancelableProgressDialogOnUiThreadWithProgress(final Activity activity,
+                                                                                    final String message, final OnCancelListener listener) {
+        activity.runOnUiThread(new Runnable() {
 
-			
-			public void run() {
-				dismissProgressDialog();
-				mProgressDialog = new ProgressDialog(activity);
-				mProgressDialog.setCancelable(true);
-				mProgressDialog.setButton(DialogInterface.BUTTON_NEGATIVE,
-						activity.getString(KandyUtils.getId("ui_dialog_cancel_button_label")), clickListener);
-				mProgressDialog.setOnCancelListener(listener);
-				mProgressDialog.setMessage(message);
-				mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-				mProgressDialog.setProgressNumberFormat(null);
-				mProgressDialog.show();
-			}
-		});
-		return mProgressDialog;
-	}
 
-	public static void showProgressInDialogOnUiThread(final int progress) {
-		if (mProgressDialog != null && mProgressDialog.isShowing()) {
-			mProgressDialog.setProgress(progress);
-		}
-	}
+            public void run() {
+                dismissProgressDialog();
+                mProgressDialog = new ProgressDialog(activity);
+                mProgressDialog.setCancelable(true);
+                mProgressDialog.setOnCancelListener(listener);
+                mProgressDialog.setMessage(message);
+                mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                mProgressDialog.setProgressNumberFormat(null);
+                mProgressDialog.show();
+            }
+        });
+        return mProgressDialog;
+    }
 
-	public static void showProgressDialogWithMessage(Context context, String pMessage) {
-		dismissProgressDialog();
-		mProgressDialog = ProgressDialog.show(context, null, pMessage);
-	}
+    public static ProgressDialog showCancelableProgressDialogOnUiThreadWithProgressAndButton(final Activity activity,
+                                                                                             final String message, final OnCancelListener listener, final DialogInterface.OnClickListener clickListener) {
+        activity.runOnUiThread(new Runnable() {
 
-	public static void dismissProgressDialog() {
-		if (mProgressDialog != null && mProgressDialog.isShowing()) {
-			mProgressDialog.dismiss();
-			mProgressDialog = null;
-		}
-	}
 
-	/**
-	 * Show toast with message. Must be called from UI Thread
-	 * 
-	 * @param context
-	 * @param pMessage
-	 *            message to be shown
-	 */
-	public static void showToastWithMessage(Context context, String pMessage) {
-		dismissProgressDialog();
-		Toast.makeText(context, pMessage, Toast.LENGTH_SHORT).show();
-	}
+            public void run() {
+                dismissProgressDialog();
+                mProgressDialog = new ProgressDialog(activity);
+                mProgressDialog.setCancelable(true);
+                mProgressDialog.setButton(DialogInterface.BUTTON_NEGATIVE,
+                        activity.getString(KandyUtils.getId("ui_dialog_cancel_button_label")), clickListener);
+                mProgressDialog.setOnCancelListener(listener);
+                mProgressDialog.setMessage(message);
+                mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                mProgressDialog.setProgressNumberFormat(null);
+                mProgressDialog.show();
+            }
+        });
+        return mProgressDialog;
+    }
 
-	/**
-	 * Show dialog with message. Must be called from UI Thread
-	 * 
-	 * @param context
-	 * @param pErrorMessage
-	 *            message to be shown
-	 */
-	public static void showDialogWithErrorMessage(Context context, String pErrorMessage) {
-		dismissProgressDialog();
+    public static void showProgressInDialogOnUiThread(final int progress) {
+        if (mProgressDialog != null && mProgressDialog.isShowing()) {
+            mProgressDialog.setProgress(progress);
+        }
+    }
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(context);
-		builder.setTitle("Error");
-		builder.setMessage(pErrorMessage);
-		builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+    public static void showProgressDialogWithMessage(Context context, String pMessage) {
+        dismissProgressDialog();
+        mProgressDialog = ProgressDialog.show(context, null, pMessage);
+    }
 
-			
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.dismiss();
-			}
-		});
+    public static void dismissProgressDialog() {
+        if (mProgressDialog != null && mProgressDialog.isShowing()) {
+            mProgressDialog.dismiss();
+            mProgressDialog = null;
+        }
+    }
 
-		builder.create().show();
-	}
+    /**
+     * Show toast with message. Must be called from UI Thread
+     *
+     * @param context
+     * @param pMessage message to be shown
+     */
+    public static void showToastWithMessage(Context context, String pMessage) {
+        dismissProgressDialog();
+        Toast.makeText(context, pMessage, Toast.LENGTH_SHORT).show();
+    }
 
-	/**
-	 * Show titled dialog with message. Must be called from UI Thread
-	 * 
-	 * @param context
-	 * @param pTitle
-	 *            title of the dialog
-	 * @param pMessage
-	 *            message to be shown
-	 */
-	public static void showDialogWithTitledMessage(Context context, String pTitle, String pMessage) {
-		dismissProgressDialog();
+    /**
+     * Show dialog with message. Must be called from UI Thread
+     *
+     * @param context
+     * @param pErrorMessage message to be shown
+     */
+    public static void showDialogWithErrorMessage(Context context, String pErrorMessage) {
+        dismissProgressDialog();
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(context);
-		builder.setTitle(pTitle);
-		builder.setMessage(pMessage);
-		builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("Error");
+        builder.setMessage(pErrorMessage);
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 
-			
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.dismiss();
-			}
-		});
 
-		builder.create().show();
-	}
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
 
-	/**
-	 * Handles the result of requests on UI thread(Hides the progress dialog,
-	 * shows the toast/dialog)
-	 * 
-	 * @param isFail
-	 *            result of request - succeed<tt>(false)</tt>/failed
-	 *            <tt>(true)</tt>
-	 * @param pMessage
-	 *            response to show
-	 */
-	public static void handleResultOnUiThread(final Activity pActivity, final boolean isFail, final String pMessage) {
-		pActivity.runOnUiThread(new Runnable() {
+        builder.create().show();
+    }
 
-			
-			public void run() {
-				dismissProgressDialog();
+    /**
+     * Show titled dialog with message. Must be called from UI Thread
+     *
+     * @param context
+     * @param pTitle   title of the dialog
+     * @param pMessage message to be shown
+     */
+    public static void showDialogWithTitledMessage(Context context, String pTitle, String pMessage) {
+        dismissProgressDialog();
 
-				if (isFail) {
-					showDialogWithErrorMessage(pActivity, pMessage);
-				} else {
-					showToastWithMessage(pActivity, pMessage);
-				}
-			}
-		});
-	}
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle(pTitle);
+        builder.setMessage(pMessage);
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 
-	public static void showDialogOnUiThread(final Activity pActivity, final String pTitle, final String pMessage) {
-		pActivity.runOnUiThread(new Runnable() {
 
-			
-			public void run() {
-				dismissProgressDialog();
-				showDialogWithTitledMessage(pActivity, pTitle, pMessage);
-			}
-		});
-	}
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        builder.create().show();
+    }
+
+    /**
+     * Handles the result of requests on UI thread(Hides the progress dialog,
+     * shows the toast/dialog)
+     *
+     * @param isFail   result of request - succeed<tt>(false)</tt>/failed
+     *                 <tt>(true)</tt>
+     * @param pMessage response to show
+     */
+    public static void handleResultOnUiThread(final Activity pActivity, final boolean isFail, final String pMessage) {
+        pActivity.runOnUiThread(new Runnable() {
+
+
+            public void run() {
+                dismissProgressDialog();
+
+                if (isFail) {
+                    showDialogWithErrorMessage(pActivity, pMessage);
+                } else {
+                    showToastWithMessage(pActivity, pMessage);
+                }
+            }
+        });
+    }
+
+    public static void showDialogOnUiThread(final Activity pActivity, final String pTitle, final String pMessage) {
+        pActivity.runOnUiThread(new Runnable() {
+
+
+            public void run() {
+                dismissProgressDialog();
+                showDialogWithTitledMessage(pActivity, pTitle, pMessage);
+            }
+        });
+    }
 }

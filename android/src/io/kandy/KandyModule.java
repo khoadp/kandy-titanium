@@ -3,9 +3,13 @@ package io.kandy;
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import com.genband.kandy.api.IKandyGlobalSettings;
 import com.genband.kandy.api.Kandy;
+import com.genband.kandy.api.services.calls.KandyRecord;
+import com.genband.kandy.api.services.chats.IKandyChatDownloadPathBuilder;
+import com.genband.kandy.api.services.chats.IKandyFileItem;
 import com.genband.kandy.api.services.chats.KandyChatSettings;
 import com.genband.kandy.api.services.chats.KandyThumbnailSize;
 import com.genband.kandy.api.services.common.ConnectionType;
@@ -168,6 +172,7 @@ public class KandyModule extends KrollModule {
         FileUtils.copyAssets(getActivity().getApplicationContext(), localStorageDirectory);
     }
 
+    @SuppressWarnings("deprecation")
     public void applyKandyChatSettings() {
 
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
@@ -196,6 +201,30 @@ public class KandyModule extends KrollModule {
             settings.setDownloadMediaPath(downloadPath);
         }
 
+        boolean usePath = sp.getBoolean(KandyConstant.PREF_KEY_CUSTOM_PATH, false);
+        if (usePath) {
+            settings.setDownloadMediaPath(new IKandyChatDownloadPathBuilder() {
+
+                public File uploadAbsolutePath() {
+                    File dir = new File(Environment.getExternalStorageDirectory(), "custom");
+                    dir.mkdirs();
+
+                    return dir;
+                }
+
+                public File downloadAbsolutPath(KandyRecord sender, KandyRecord recipient,
+                                                IKandyFileItem fileItem,
+                                                boolean isThumbnail) {
+                    File dir = new File(Environment.getExternalStorageDirectory(), sender.getUserName());
+                    dir.mkdirs();
+
+                    File file = new File(dir, fileItem.getDisplayName());
+
+                    return file;
+                }
+            });
+        }
+
         value = sp.getString(KandyConstant.PREF_KEY_THUMB_SIZE, null);
         if (value != null) { // otherwise will be used default setting from SDK
             KandyThumbnailSize thumbnailSize = KandyThumbnailSize.valueOf(value);
@@ -212,6 +241,8 @@ public class KandyModule extends KrollModule {
             edit.putString(KandyConstant.PREF_KEY_MAX_SIZE, options.getString(KandyConstant.PREF_KEY_MAX_SIZE)).apply();
         if (options.containsKey(KandyConstant.PREF_KEY_PATH))
             edit.putString(KandyConstant.PREF_KEY_PATH, options.getString(KandyConstant.PREF_KEY_PATH)).apply();
+        if (options.containsKey(KandyConstant.PREF_KEY_CUSTOM_PATH))
+            edit.putString(KandyConstant.PREF_KEY_CUSTOM_PATH, options.getString(KandyConstant.PREF_KEY_CUSTOM_PATH)).apply();
         if (options.containsKey(KandyConstant.PREF_KEY_THUMB_SIZE))
             edit.putString(KandyConstant.PREF_KEY_THUMB_SIZE, options.getString(KandyConstant.PREF_KEY_THUMB_SIZE)).apply();
     }

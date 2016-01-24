@@ -9,7 +9,7 @@
     <string name="kandy_login_empty_username_text">Invalid username (userID@domain.com)</string>
     <string name="kandy_login_empty_password_text">Enter password</string>
 
-	<string name="kandy_signup_phone_edit_hint">Enter your number</string>
+    <string name="kandy_signup_phone_edit_hint">Enter your number</string>
     <string name="kandy_signup_signup_button_label">Request Code</string>
     <string name="kandy_signup_otp_edit_hint">Enter the OTP code</string>
     <string name="kandy_signup_validate_button_label">Validate</string>
@@ -24,7 +24,7 @@
     <string name="registration_validation_msg">Validating \"Validation code\", please wait...</string>
     <string name="registration_signoff_msg">Signing off, please wait...</string>
 
-	<string name="kandy_call_remote_camera_view_lable">Remote</string>
+    <string name="kandy_call_remote_camera_view_lable">Remote</string>
     <string name="kandy_call_local_camera_view_lable">Local</string>
     <string name="kandy_calls_pstn_checkbox_label">Start PSTN call</string>
     <string name="kandy_calls_sip_trunk_checkbox_label">Start call trough SIP Trunk</string>
@@ -61,7 +61,7 @@
 
     <string name="kandy_chat_phone_number_verification_text">Invalid recipient\'s number (recipientID@domain.com)
     </string>
-    
+
     <string name="kandy_chat_pull_label">Pull pending events</string>
     <string name="kandy_chat_back_label">Back group details</string>
     <string name="kandy_chat_pull_desc">Will refresh pending messages from Kandy services</string>
@@ -71,22 +71,27 @@
     <string name="kandy_chat_sms_label">Will send SMS via Kandy services</string>
     <string name="kandy_chat_message_invalid_title">Invalid SMS</string>
     <string name="kandy_chat_message_empty_message">Please enter message text to be sent</string>
-    <string name="kandy_chat_message_invalid_phone">Invalid phone number, The phone number must be an E164 formatted number</string>
+    <string name="kandy_chat_message_invalid_phone">Invalid phone number, The phone number must be an E164 formatted
+        number
+    </string>
     <string name="kandy_chat_message_click_menu_title">Message Action:</string>
     <string name="kandy_chat_message_click_menu_view">View message</string>
     <string name="kandy_chat_message_click_menu_ack">Mark as received</string>
     <string name="kandy_chat_message_click_menu_cancel">Dismiss</string>
     <string name="kandy_chat_message_click_menu_cancel_download">Cancel Download</string>
     <string name="kandy_chat_message_sent_label">Message sent</string>
-    <string name="kandy_chat_phone_number_verification_text">Invalid recipient\'s number (recipientID@domain.com)</string>
-    <string name="kandy_chat_phone_number_domain_verification_text">Invalid recipient, please enter username with domain(userID@domain.com)</string>
+    <string name="kandy_chat_phone_number_verification_text">Invalid recipient\'s number (recipientID@domain.com)
+    </string>
+    <string name="kandy_chat_phone_number_domain_verification_text">Invalid recipient, please enter username with
+        domain(userID@domain.com)
+    </string>
     <string name="kandy_chat_phone_number_hint_text">recipientID@domain.com</string>
     <string name="kandy_chat_message_hint_text">Message</string>
     <string name="kandy_chat_get_incoming_msgs_button_label">Get Pending Messages</string>
     <string name="ui_message_listview_item_sender">Received From:</string>
     <string name="ui_message_listview_item_recipient">Sent To:</string>
     <string name="ui_message_listview_item_message">Message:</string>
-    
+
     <string name="ui_dialog_cancel_button_label">Cancel</string>
     <string name="loading">loading ...</string>
     <string name="msg_uploading_video">Uploading video file</string>
@@ -97,14 +102,14 @@
     <string name="msg_pull_events">Pulling pending events...</string>
     <string name="msg_pull_events_succeed">Pulling pending events succeed</string>
 
-	<!-- Kandy Groups -->
+    <!-- Kandy Groups -->
     <!-- Kandy Groups Activity -->
-	<string name="groups_list_activity_add_new_group">Create</string>
+    <string name="groups_list_activity_add_new_group">Create</string>
     <string name="groups_list_activity_enter_group_name_hint">Enter Group Name</string>
     <string name="groups_list_activity_get_groups_msg">Getting groups, please wait...</string>
     <string name="groups_list_activity_create_group_msg">Creating group, please wait...</string>
     <string name="groups_list_activity_group_created">Group has been created</string>
-    
+
     <!-- Group Settings Activity -->
     <string name="groups_settings_activity_menu_edit_name">Edit Group Name</string>
     <string name="groups_settings_activity_menu_edit_img">Edit Group Image</string>
@@ -126,7 +131,7 @@
     <string name="groups_settings_activity_action_settings_applying_msg">Applying action...</string>
     <string name="groups_settings_activity_action_image_action_msg">Image actions</string>
     <string name="groups_settings_activity_action_participant_action_msg">Participant actions</string>
-    
+
     <!-- Group Chat Activity -->
 
     <string name="title_activity_group_creator">GroupCreatorActivity</string>

@@ -49,7 +49,7 @@
                 android:text="Validate"
                 android:id="@+id/kandy_validate_button"
                 android:layout_gravity="center_horizontal"/>
-    </LinearLayout> 
+    </LinearLayout>
 
     <LinearLayout
             android:id="@+id/kandy_deactivate_view_container"
@@ -58,7 +58,7 @@
             android:layout_height="wrap_content">
 
         <LinearLayout
-        		android:id="@+id/kandy_deactivate_label"
+                android:id="@+id/kandy_deactivate_label"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 

@@ -12,7 +12,7 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_centerVertical="true"
-            android:layout_alignParentLeft="true" />
+            android:layout_alignParentLeft="true"/>
 
     <LinearLayout
             android:layout_width="wrap_content"
@@ -45,7 +45,6 @@
                 android:textSize="@dimen/text_size_small"
                 android:textColor="@color/line_two"/>
     </LinearLayout>
-
 
 
     <TextView

@@ -1,13 +1,5 @@
 package io.kandy.proxy.views;
 
-import io.kandy.proxy.AccessServiceProxy;
-import io.kandy.utils.KandyUtils;
-import io.kandy.utils.UIUtils;
-
-import org.appcelerator.titanium.proxy.TiViewProxy;
-import org.appcelerator.titanium.view.TiUIView;
-import org.json.JSONObject;
-
 import android.app.Activity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -16,7 +8,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-
 import com.genband.kandy.api.Kandy;
 import com.genband.kandy.api.access.KandyConnectServiceNotificationListener;
 import com.genband.kandy.api.access.KandyConnectionState;
@@ -24,279 +15,285 @@ import com.genband.kandy.api.access.KandyLoginResponseListener;
 import com.genband.kandy.api.access.KandyLogoutResponseListener;
 import com.genband.kandy.api.services.calls.KandyRecord;
 import com.genband.kandy.api.utils.KandyIllegalArgumentException;
+import io.kandy.proxy.AccessServiceProxy;
+import io.kandy.utils.KandyUtils;
+import io.kandy.utils.UIUtils;
+import org.appcelerator.titanium.proxy.TiViewProxy;
+import org.appcelerator.titanium.view.TiUIView;
+import org.json.JSONObject;
 
 /**
  * The view for access proxy.
- * 
+ *
  * @author kodeplusdev
  */
 public class AccessViewProxy extends TiUIView implements KandyConnectServiceNotificationListener {
 
-	private static final String LCAT = AccessViewProxy.class.getSimpleName();
+    private static final String LCAT = AccessViewProxy.class.getSimpleName();
 
-	private Activity activity;
+    private Activity activity;
 
-	private View loginView, logoutView;
-	private TextView userInfo;
-	private EditText username, password, accessToken;
-	private Button loginBtn, logoutBtn;
+    private View loginView, logoutView;
+    private TextView userInfo;
+    private EditText username, password, accessToken;
+    private Button loginBtn, logoutBtn;
 
-	public AccessViewProxy(TiViewProxy proxy) {
-		super(proxy);
+    public AccessViewProxy(TiViewProxy proxy) {
+        super(proxy);
 
-		activity = proxy.getActivity();
+        activity = proxy.getActivity();
 
-		View layoutWraper;
+        View layoutWraper;
 
-		LayoutInflater layoutInflater = LayoutInflater.from(proxy.getActivity());
-		layoutWraper = layoutInflater.inflate(KandyUtils.getLayout("kandy_access_widget"), null);
+        LayoutInflater layoutInflater = LayoutInflater.from(proxy.getActivity());
+        layoutWraper = layoutInflater.inflate(KandyUtils.getLayout("kandy_access_widget"), null);
 
-		// Get view containers
-		loginView = layoutWraper.findViewById(KandyUtils.getId("kandy_login_view_container"));
-		logoutView = layoutWraper.findViewById(KandyUtils.getId("kandy_logout_view_container"));
+        // Get view containers
+        loginView = layoutWraper.findViewById(KandyUtils.getId("kandy_login_view_container"));
+        logoutView = layoutWraper.findViewById(KandyUtils.getId("kandy_logout_view_container"));
 
-		// Get widgets
-		username = (EditText) layoutWraper.findViewById(KandyUtils.getId("kandy_username_edit"));
-		password = (EditText) layoutWraper.findViewById(KandyUtils.getId("kandy_password_edit"));
-		accessToken = (EditText) layoutWraper.findViewById(KandyUtils.getId("kandy_access_token_edit"));
-		loginBtn = (Button) layoutWraper.findViewById(KandyUtils.getId("kandy_login_button"));
+        // Get widgets
+        username = (EditText) layoutWraper.findViewById(KandyUtils.getId("kandy_username_edit"));
+        password = (EditText) layoutWraper.findViewById(KandyUtils.getId("kandy_password_edit"));
+        accessToken = (EditText) layoutWraper.findViewById(KandyUtils.getId("kandy_access_token_edit"));
+        loginBtn = (Button) layoutWraper.findViewById(KandyUtils.getId("kandy_login_button"));
 
-		userInfo = (TextView) layoutWraper.findViewById(KandyUtils.getId("kandy_user_info_edit"));
-		logoutBtn = (Button) layoutWraper.findViewById(KandyUtils.getId("kandy_logout_button"));
+        userInfo = (TextView) layoutWraper.findViewById(KandyUtils.getId("kandy_user_info_edit"));
+        logoutBtn = (Button) layoutWraper.findViewById(KandyUtils.getId("kandy_logout_button"));
 
-		String type = (String) proxy.getProperty("type");
+        String type = (String) proxy.getProperty("type");
 
-		if (type != null && type.equals(AccessServiceProxy.ACCESS_TYPE_TOKEN)) {
-			username.setVisibility(View.GONE);
-			password.setVisibility(View.GONE);
-		} else {
-			accessToken.setVisibility(View.GONE);
-		}
+        if (type != null && type.equals(AccessServiceProxy.ACCESS_TYPE_TOKEN)) {
+            username.setVisibility(View.GONE);
+            password.setVisibility(View.GONE);
+        } else {
+            accessToken.setVisibility(View.GONE);
+        }
 
-		// Set click events
-		loginBtn.setOnClickListener(new View.OnClickListener() {
+        // Set click events
+        loginBtn.setOnClickListener(new View.OnClickListener() {
 
-			public void onClick(View v) {
-				startLoginProcess();
-			}
-		});
+            public void onClick(View v) {
+                startLoginProcess();
+            }
+        });
 
-		logoutBtn.setOnClickListener(new View.OnClickListener() {
+        logoutBtn.setOnClickListener(new View.OnClickListener() {
 
-			public void onClick(View v) {
-				startLogoutProcess();
-			}
-		});
+            public void onClick(View v) {
+                startLogoutProcess();
+            }
+        });
 
-		setNativeView(layoutWraper);
-	}
+        setNativeView(layoutWraper);
+    }
 
-	/**
-	 * Display login view
-	 */
-	public void displayLoginView() {
-		activity.runOnUiThread(new Runnable() {
+    /**
+     * Display login view
+     */
+    public void displayLoginView() {
+        activity.runOnUiThread(new Runnable() {
 
-			public void run() {
-				loginView.setVisibility(View.VISIBLE);
-				logoutView.setVisibility(View.GONE);
-			}
-		});
-	}
+            public void run() {
+                loginView.setVisibility(View.VISIBLE);
+                logoutView.setVisibility(View.GONE);
+            }
+        });
+    }
 
-	/**
-	 * Display logout view
-	 */
-	public void displayLogoutView(final String info) {
-		activity.runOnUiThread(new Runnable() {
+    /**
+     * Display logout view
+     */
+    public void displayLogoutView(final String info) {
+        activity.runOnUiThread(new Runnable() {
 
-			public void run() {
-				userInfo.setText(info);
-				loginView.setVisibility(View.GONE);
-				logoutView.setVisibility(View.VISIBLE);
-			}
-		});
-	}
+            public void run() {
+                userInfo.setText(info);
+                loginView.setVisibility(View.GONE);
+                logoutView.setVisibility(View.VISIBLE);
+            }
+        });
+    }
 
-	private void loginEnabled(final boolean enabled) {
-		activity.runOnUiThread(new Runnable() {
+    private void loginEnabled(final boolean enabled) {
+        activity.runOnUiThread(new Runnable() {
 
-			
-			public void run() {
-				username.setEnabled(enabled);
-				password.setEnabled(enabled);
-				accessToken.setEnabled(enabled);
-				loginBtn.setClickable(enabled);
-			}
-		});
-	}
 
-	private void logoutEnabled(final boolean enabled) {
-		activity.runOnUiThread(new Runnable() {
+            public void run() {
+                username.setEnabled(enabled);
+                password.setEnabled(enabled);
+                accessToken.setEnabled(enabled);
+                loginBtn.setClickable(enabled);
+            }
+        });
+    }
 
-			
-			public void run() {
-				logoutBtn.setClickable(enabled);
-			}
-		});
-	}
+    private void logoutEnabled(final boolean enabled) {
+        activity.runOnUiThread(new Runnable() {
 
-	private String getUsername() {
-		return username.getText().toString();
-	}
 
-	private String getPassword() {
-		return password.getText().toString();
-	}
+            public void run() {
+                logoutBtn.setClickable(enabled);
+            }
+        });
+    }
 
-	private void startLoginProcess() {
-		UIUtils.showProgressDialogWithMessage(activity, KandyUtils.getString("kandy_login_login_process"));
-		loginEnabled(false);
-		// if user access token is define we login without user and password
-		String token = accessToken.getText().toString();
-		if (!TextUtils.isEmpty(token)) {
-			login(token);
-		} else {
-			login(getUsername(), getPassword());
-		}
-	}
+    private String getUsername() {
+        return username.getText().toString();
+    }
 
-	private void login(final String username, String password) {
-		KandyRecord kandyUser;
+    private String getPassword() {
+        return password.getText().toString();
+    }
 
-		try {
-			kandyUser = new KandyRecord(username);
+    private void startLoginProcess() {
+        UIUtils.showProgressDialogWithMessage(activity, KandyUtils.getString("kandy_login_login_process"));
+        loginEnabled(false);
+        // if user access token is define we login without user and password
+        String token = accessToken.getText().toString();
+        if (!TextUtils.isEmpty(token)) {
+            login(token);
+        } else {
+            login(getUsername(), getPassword());
+        }
+    }
 
-		} catch (KandyIllegalArgumentException ex) {
-			UIUtils.showDialogWithErrorMessage(activity, KandyUtils.getString("kandy_login_empty_username_text"));
-			loginEnabled(true);
-			return;
-		}
+    private void login(final String username, String password) {
+        KandyRecord kandyUser;
 
-		if (password == null || password.isEmpty()) {
-			UIUtils.showDialogWithErrorMessage(activity, KandyUtils.getString("kandy_login_empty_password_text"));
-			loginEnabled(true);
-			return;
-		}
+        try {
+            kandyUser = new KandyRecord(username);
 
-		Kandy.getAccess().login(kandyUser, password, new KandyLoginResponseListener() {
+        } catch (KandyIllegalArgumentException ex) {
+            UIUtils.showDialogWithErrorMessage(activity, KandyUtils.getString("kandy_login_empty_username_text"));
+            loginEnabled(true);
+            return;
+        }
 
-			
-			public void onRequestFailed(int responseCode, String err) {
-				Log.i(LCAT, "Kandy.getAccess().login:onRequestFailed error: " + err + ". Response code: "
-						+ responseCode);
-				UIUtils.handleResultOnUiThread(activity, true, err);
-				loginEnabled(true);
-			}
+        if (password == null || password.isEmpty()) {
+            UIUtils.showDialogWithErrorMessage(activity, KandyUtils.getString("kandy_login_empty_password_text"));
+            loginEnabled(true);
+            return;
+        }
 
-			
-			public void onLoginSucceeded() {
-				Log.i(LCAT, "Kandy.getAccess().login:onLoginSucceeded");
-				UIUtils.handleResultOnUiThread(activity, false, KandyUtils.getString("kandy_login_login_success"));
-				logoutEnabled(true);
-				displayLogoutView(username);
-			}
-		});
-	}
+        Kandy.getAccess().login(kandyUser, password, new KandyLoginResponseListener() {
 
-	private void login(String userAccessToken) {
-		Kandy.getAccess().login(userAccessToken, new KandyLoginResponseListener() {
 
-			
-			public void onRequestFailed(int responseCode, String err) {
-				Log.i(LCAT, "Kandy.getAccess().login:onRequestFailed error: " + err + ". Response code: "
-						+ responseCode);
-				UIUtils.handleResultOnUiThread(activity, true, err);
-				loginEnabled(true);
-			}
+            public void onRequestFailed(int responseCode, String err) {
+                Log.i(LCAT, "Kandy.getAccess().login:onRequestFailed error: " + err + ". Response code: "
+                        + responseCode);
+                UIUtils.handleResultOnUiThread(activity, true, err);
+                loginEnabled(true);
+            }
 
-			
-			public void onLoginSucceeded() {
-				Log.i(LCAT, "Kandy.getAccess().login:onLoginSucceeded");
-				UIUtils.handleResultOnUiThread(activity, false, KandyUtils.getString("kandy_login_login_success"));
-				logoutEnabled(true);
-				displayLogoutView(Kandy.getSession().getKandyUser().getUser());
-			}
-		});
-	}
 
-	private void startLogoutProcess() {
-		UIUtils.showProgressDialogWithMessage(getProxy().getActivity(),
-				KandyUtils.getString("kandy_login_logout_process"));
-		logoutEnabled(false);
-		logout();
-	}
+            public void onLoginSucceeded() {
+                Log.i(LCAT, "Kandy.getAccess().login:onLoginSucceeded");
+                UIUtils.handleResultOnUiThread(activity, false, KandyUtils.getString("kandy_login_login_success"));
+                logoutEnabled(true);
+                displayLogoutView(username);
+            }
+        });
+    }
 
-	private void logout() {
-		Kandy.getAccess().logout(new KandyLogoutResponseListener() {
+    private void login(String userAccessToken) {
+        Kandy.getAccess().login(userAccessToken, new KandyLoginResponseListener() {
 
-			
-			public void onRequestFailed(int responseCode, String err) {
-				Log.i(LCAT, "Kandy.getAccess().logout:onRequestFailed error: " + err + ". Response code: "
-						+ responseCode);
-				UIUtils.handleResultOnUiThread(getProxy().getActivity(), true, err);
-				logoutEnabled(true);
-			}
 
-			
-			public void onLogoutSucceeded() {
-				UIUtils.handleResultOnUiThread(getProxy().getActivity(), false,
-						KandyUtils.getString("kandy_login_logout_success"));
-				loginEnabled(true);
-				displayLoginView();
-			}
-		});
-	}
+            public void onRequestFailed(int responseCode, String err) {
+                Log.i(LCAT, "Kandy.getAccess().login:onRequestFailed error: " + err + ". Response code: "
+                        + responseCode);
+                UIUtils.handleResultOnUiThread(activity, true, err);
+                loginEnabled(true);
+            }
 
-	public void registerNotificationListener() {
-		Log.d(LCAT, "viewProxy->registerNotificationListener() was invoked.");
-		Kandy.getAccess().registerNotificationListener(this);
-	}
 
-	public void unregisterNotificationListener() {
-		Log.d(LCAT, "viewProxy->unregisterNotificationListener() was invoked.");
-		Kandy.getAccess().unregisterNotificationListener(this);
-	}
+            public void onLoginSucceeded() {
+                Log.i(LCAT, "Kandy.getAccess().login:onLoginSucceeded");
+                UIUtils.handleResultOnUiThread(activity, false, KandyUtils.getString("kandy_login_login_success"));
+                logoutEnabled(true);
+                displayLogoutView(Kandy.getSession().getKandyUser().getUser());
+            }
+        });
+    }
 
-	
-	public void onSocketFailedWithError(String error) {
-	}
+    private void startLogoutProcess() {
+        UIUtils.showProgressDialogWithMessage(getProxy().getActivity(),
+                KandyUtils.getString("kandy_login_logout_process"));
+        logoutEnabled(false);
+        logout();
+    }
 
-	
-	public void onSocketDisconnected() {
-	}
+    private void logout() {
+        Kandy.getAccess().logout(new KandyLogoutResponseListener() {
 
-	
-	public void onSocketConnecting() {
-	}
 
-	
-	public void onSocketConnected() {
-	}
+            public void onRequestFailed(int responseCode, String err) {
+                Log.i(LCAT, "Kandy.getAccess().logout:onRequestFailed error: " + err + ". Response code: "
+                        + responseCode);
+                UIUtils.handleResultOnUiThread(getProxy().getActivity(), true, err);
+                logoutEnabled(true);
+            }
 
-	
-	public void onConnectionStateChanged(KandyConnectionState state) {
-	}
 
-	
-	public void onInvalidUser(String error) {
-	}
+            public void onLogoutSucceeded() {
+                UIUtils.handleResultOnUiThread(getProxy().getActivity(), false,
+                        KandyUtils.getString("kandy_login_logout_success"));
+                loginEnabled(true);
+                displayLoginView();
+            }
+        });
+    }
 
-	
-	public void onSessionExpired(String error) {
-	}
+    public void registerNotificationListener() {
+        Log.d(LCAT, "viewProxy->registerNotificationListener() was invoked.");
+        Kandy.getAccess().registerNotificationListener(this);
+    }
 
-	
-	public void onSDKNotSupported(String error) {
-	}
+    public void unregisterNotificationListener() {
+        Log.d(LCAT, "viewProxy->unregisterNotificationListener() was invoked.");
+        Kandy.getAccess().unregisterNotificationListener(this);
+    }
 
-	public void onCertificateError(String arg0) {
-		// TODO Auto-generated method stub
-		
-	}
 
-	public void onServerConfigurationReceived(JSONObject arg0) {
-		// TODO Auto-generated method stub
-		
-	}
+    public void onSocketFailedWithError(String error) {
+    }
+
+
+    public void onSocketDisconnected() {
+    }
+
+
+    public void onSocketConnecting() {
+    }
+
+
+    public void onSocketConnected() {
+    }
+
+
+    public void onConnectionStateChanged(KandyConnectionState state) {
+    }
+
+
+    public void onInvalidUser(String error) {
+    }
+
+
+    public void onSessionExpired(String error) {
+    }
+
+
+    public void onSDKNotSupported(String error) {
+    }
+
+    public void onCertificateError(String arg0) {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void onServerConfigurationReceived(JSONObject arg0) {
+        // TODO Auto-generated method stub
+
+    }
 }

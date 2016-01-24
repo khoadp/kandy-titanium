@@ -2,7 +2,7 @@
 <resources>
     <dimen name="kandy_horizontal_margin">16dp</dimen>
     <dimen name="kandy_vertical_margin">16dp</dimen>
-    
+
     <dimen name="list_preferred_item_padding">10.0dip</dimen>
     <dimen name="item_normal_height">64.0dip</dimen>
     <dimen name="text_size_medium">16.0sp</dimen>
